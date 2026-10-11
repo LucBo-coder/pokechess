@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Anti-cache meta headers for web hosting / public_html -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="screen-orientation" content="landscape" />
+  <meta name="x5-orientation" content="landscape" />
+  <script>
+    if (window.location.protocol.startsWith('http')) {
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = 'manifest.json';
+      document.head.appendChild(link);
+    }
+  </script>
+  <title>PokéChess+ Roguelike</title>
+  <meta name="description"
+    content="PokéChess+: A Roguelike Pokémon tactical auto-battler with 1,036 Pokémon, dual elemental mechanics, evolution stones, and talismans." />
+
+  <!-- Open Graph / Facebook / Messenger / Zalo -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://pokechess.fun/" />
+  <meta property="og:title" content="PokéChess+ Roguelike" />
+  <meta property="og:description"
+    content="PokéChess+: A Roguelike Pokémon tactical auto-battler with 1,036 Pokémon, dual elemental mechanics, evolution stones, and talismans." />
+  <meta property="og:image" content="https://pokechess.fun/assets/pokechess_thumbnail.png" />
+  <meta property="og:image:secure_url" content="https://pokechess.fun/assets/pokechess_thumbnail.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:alt" content="PokéChess+ Roguelike Game Thumbnail" />
+
+  <!-- Twitter / Discord Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://pokechess.fun/" />
+  <meta name="twitter:title" content="PokéChess+ Roguelike" />
+  <meta name="twitter:description"
+    content="PokéChess+: A Roguelike Pokémon tactical auto-battler with 1,036 Pokémon, dual elemental mechanics, evolution stones, and talismans." />
+  <meta name="twitter:image" content="https://pokechess.fun/assets/pokechess_thumbnail.png" />
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="js/lib/tom-select.default.min.css" />
+  <link rel="stylesheet" href="style.css?v=3.3.1791699025" />
+  <link rel="stylesheet" href="css/hex_board.css?v=2">
+  <link rel="stylesheet" href="css/hex_combat.css?v=2">
+</head>
+
+<body>
+  <!-- Balatro Hypnotic Swirling Vortex Canvas -->
+  <canvas id="balatroCanvas" class="balatro-canvas"></canvas>
+
+  <div id="gameViewport">
+    <div id="app">
+      <!-- Header with Roguelike stats -->
+      <header class="game-header">
+        <div class="logo">
+          <span class="logo-poke-ball"></span>
+          <span class="logo-poke-badge">POKÉ</span><span class="logo-text">CHESS<span class="logo-plus">+</span></span>
+        </div>
+
+        <div class="rogue-stats">
+          <div class="stat-pill stage-pill">
+            <span class="stat-label">STAGE:</span>
+            <span class="stat-val" id="statStage">1</span>
+          </div>
+          <div class="stat-pill gold-pill">
+            <img src="assets/ui/coin.png" class="stat-icon" alt="Gold" />
+            <span class="stat-label">GOLD:</span>
+            <span class="stat-val" id="statGold">0</span>
+          </div>
+          <div class="stat-pill slot-pill">
+            <img src="assets/ui/slot.png" class="stat-icon" alt="Slot" />
+            <span class="stat-label">SLOT:</span>
+            <span class="stat-val"><span id="statDeployed">0</span>/<span id="statMaxSlots">3</span></span>
+          </div>
+        </div>
+
+        <div class="header-controls">
+          <div class="music-widget" id="musicWidget" title="Background Music">
+            <button id="btnMusicToggle" class="btn btn-music" type="button" title="Toggle Music (Press M)">
+              <span id="musicIcon">🔊</span>
+              <span class="music-text">BGM</span>
+            </button>
+            <div class="music-slider-wrap">
+              <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" class="music-slider"
+                title="Music Volume" />
+            </div>
+          </div>
+          <button id="btnUpgradeSlot" class="btn btn-gold" title="Upgrade squad deployment capacity">
+            <img src="assets/ui/slot.png" class="btn-ui-icon" alt="Slot" /> +Slot 4 (10 <img src="assets/ui/coin.png"
+              class="btn-ui-icon" alt="G" />)
+          </button>
+          <button id="btnNewRun" class="btn btn-secondary">NEW RUN</button>
+          <button id="btnOpenMenu" class="btn btn-secondary" title="Open Game Menu / Save Vault (ESC)">MENU</button>
+        </div>
+      </header>
+
+      <!-- Retro Pixel Toast Notification Banner -->
+      <div id="gameToast" class="retro-toast hidden" title="Click to dismiss">
+        <span class="toast-icon" id="toastIcon">!</span>
+        <span class="toast-message" id="toastMessage">Notification</span>
+      </div>
+
+      <main class="game-layout">
+        <!-- Left Panel: Talisman System (Bag & Shop) -->
+        <aside class="side-panel left-panel">
+          <div class="card-box talisman-panel" id="talismanView">
+            <div class="panel-title talisman-panel-title">TALISMAN & SYN</div>
+            <div class="talisman-tabs">
+              <button class="talisman-tab active" id="tabTalismanBag" data-tab="bag" type="button">
+                BAG (<span id="talismanCountBadge">0</span>)
+              </button>
+              <button class="talisman-tab" id="tabTalismanType" data-tab="type" type="button">
+                SYN (<span id="talismanTypeBadge">0</span>)
+              </button>
+              <button class="talisman-tab" id="tabTalismanShop" data-tab="shop" type="button">
+                SHOP
+              </button>
+            </div>
+
+            <!-- Active Talisman Applying Banner (hidden by default) -->
+            <div class="talisman-apply-banner hidden" id="talismanApplyBanner">
+              <div class="talisman-apply-msg">Select a Pokémon to equip talisman!</div>
+              <button class="btn btn-cancel-apply" id="btnCancelApplyTalisman">CANCEL</button>
+            </div>
+
+            <!-- Container for Bag or Shop views -->
+            <div class="talisman-content" id="talismanContent">
+              <!-- Dynamically rendered -->
+            </div>
+
+            <!-- Footer for Reroll in Shop mode / Sell in Bag mode -->
+            <div class="talisman-footer" id="talismanFooter">
+              <button id="btnSellTalisman" class="btn btn-sell-talisman" disabled
+                title="Select a talisman in bag to sell">
+                SELL
+              </button>
+              <button id="btnRerollTalisman" class="btn btn-reroll-talisman" title="Reroll 3 new talismans for 3 Gold">
+                REROLL (3 <img src="assets/ui/coin.png" class="btn-ui-icon" alt="G" />)
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Center Arena: Pure Unobstructed Chessboard with Battle Controls -->
+        <section class="arena-center">
+          <div class="board-view" id="boardView">
+            <!-- Battlefield top controls bar -->
+            <div class="board-top-controls" id="boardTopControls">
+              <div class="enemy-status-badge">
+                <span class="enemy-text" id="enemyName">STAGE 1</span>
+              </div>
+
+              <div class="phase-buttons" id="phaseButtons">
+                <button id="btnRecallAll" class="btn btn-secondary"
+                  title="Recall all deployed Pokémon back to bench">RECALL</button>
+                <button id="btnStartAutoBattle" class="btn btn-auto-battler" style="display: none !important;"
+                  title="Auto Battle">
+                  AUTO
+                </button>
+                <button id="btnSkipTurn" class="btn btn-skip-turn hidden"
+                  title="Skip this unit's turn / Skip attack after moving">
+                  ⏭ SKIP
+                </button>
+                <button id="btnStartBattle" class="btn btn-cta-battle"
+                  title="Commence battle for this round">
+                  BATTLE
+                </button>
+              </div>
+            </div>
+
+            <!-- Pixel Chessboard with 9-slice frame -->
+            <div class="board-wrapper">
+              <div class="board-frame">
+                <div class="board-labels-top">
+                  <span></span>
+                  <span>a</span><span>b</span><span>c</span><span>d</span>
+                  <span>e</span><span>f</span><span>g</span><span>h</span>
+                  <span></span>
+                </div>
+                <div class="board-with-ranks">
+                  <div class="board-ranks" id="ranksLeft">
+                    <span>8</span><span>7</span><span>6</span><span>5</span>
+                    <span>4</span><span>3</span><span>2</span><span>1</span>
+                  </div>
+                  <div class="board-container">
+                    <div class="board" id="chessBoard"></div>
+                  </div>
+                  <div class="board-ranks" id="ranksRight">
+                    <span>8</span><span>7</span><span>6</span><span>5</span>
+                    <span>4</span><span>3</span><span>2</span><span>1</span>
+                  </div>
+                </div>
+                <div class="board-labels-bottom">
+                  <span></span>
+                  <span>a</span><span>b</span><span>c</span><span>d</span>
+                  <span>e</span><span>f</span><span>g</span><span>h</span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Turn Order Queue Strip (Under Chessboard) -->
+            <div class="turn-order-container" id="turnOrderContainer">
+              <div class="turn-order-label">
+                <span class="turn-queue-title">ACTION QUEUE</span>
+                <span class="turn-queue-round" id="turnQueueRoundBadge">ROUND 1</span>
+              </div>
+              <div class="turn-order-strip" id="turnOrderStrip">
+                <!-- Dynamically populated: [Jolteon] [Charizard] [Venusaur] [Steelix] [End] -->
+              </div>
+            </div>
+
+            <!-- Board bottom controls placeholder (hidden) -->
+            <div class="board-bottom-controls hidden" id="boardBottomControls"></div>
+          </div>
+        </section>
+
+        <!-- Right Panel: Pokemon Squad (Bench & Recruit Tabs) -->
+        <aside class="side-panel right-panel" id="pokemonPanel">
+          <div class="card-box pokemon-panel" id="marketView">
+            <div class="panel-title pokemon-panel-title">POKÉMON</div>
+            <div class="pokemon-tabs">
+              <button class="pokemon-tab active" id="tabPokemonBench" data-tab="bench" type="button">
+                BENCH (<span id="invTotalCount">3</span>)
+              </button>
+              <button class="pokemon-tab" id="tabPokemonRecruit" data-tab="recruit" type="button">
+                RECRUIT
+              </button>
+            </div>
+
+            <div class="pokemon-subtitle" id="marketSubtitle">Squad & Bench</div>
+
+            <!-- Content Area: Switchable between Bench Cards and Recruit Cards -->
+            <div class="pokemon-content" id="pokemonContent">
+              <div class="pokemon-cards-list" id="inventorySlots">
+                <!-- Rendered dynamically as 96x48 cards -->
+              </div>
+              <div class="pokemon-cards-list hidden" id="rewardCardsGrid">
+                <!-- Rendered dynamically as 96x48 cards -->
+              </div>
+            </div>
+
+            <!-- Footer: SELL in Bench tab / ROLL in Recruit tab -->
+            <div class="pokemon-footer" id="pokemonFooter">
+              <button id="btnSell" class="btn btn-sell" title="Select a Pokémon to sell" disabled>
+                SELL
+              </button>
+              <button id="btnReroll" class="btn btn-reroll hidden" title="Reroll 3 new Pokémon for 5 Gold">
+                REROLL (5 <img src="assets/ui/coin.png" class="btn-ui-icon" alt="G" />)
+              </button>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <!-- Modals -->
+      <div class="modal-overlay hidden" id="victoryModal">
+        <div class="modal-box game-over-box">
+          <div class="modal-title">VICTORY!</div>
+          <div class="modal-subtitle" id="victorySubtitle">You defeated the enemy army!</div>
+          <div class="reward-pill" id="victoryRewardText">+12 Gold Reward</div>
+          <button class="btn btn-primary btn-large" id="btnGoToShopReward">Recruit New Pokémon</button>
+        </div>
+      </div>
+
+      <div class="modal-overlay hidden" id="defeatModal">
+        <div class="modal-box game-over-box">
+          <div class="modal-title">DEFEAT!</div>
+          <div class="modal-subtitle" id="defeatSubtitle">All your Pokémon fell in battle.</div>
+          <div class="defeat-stats" id="defeatStats">Highest Stage: 1 | Gold: 0</div>
+          <button class="btn btn-primary btn-large" id="btnRestartRun">Start New Journey</button>
+        </div>
+      </div>
+
+      <div class="modal-overlay hidden" id="drawModal">
+        <div class="modal-box game-over-box">
+          <div class="modal-title" style="color: #64b5f6;">STALEMATE DRAW!</div>
+          <div class="modal-subtitle" id="drawSubtitle">All remaining pieces fell into the abyss!</div>
+          <div class="defeat-stats" id="drawStats">Your squad was retained. Rearrange and try again!</div>
+          <button class="btn btn-primary btn-large" id="btnRetryStage">RETRY STAGE</button>
+        </div>
+      </div>
+
+      <div class="modal-overlay hidden" id="confirmModal">
+        <div class="modal-box confirm-box">
+          <div class="modal-title" id="confirmTitle" style="color: var(--gold);">CONFIRM</div>
+          <div class="modal-subtitle" id="confirmSubtitle">Are you sure you want to proceed?</div>
+          <div class="confirm-buttons">
+            <button class="btn btn-secondary btn-large" id="btnCancelConfirm">CANCEL</button>
+            <button class="btn btn-primary btn-large" id="btnAcceptConfirm">CONFIRM</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay hidden" id="promotionModal">
+        <div class="modal-box">
+          <div class="modal-title">PROMOTION EVOLUTION</div>
+          <div class="promotion-choices" id="promotionChoices"></div>
+        </div>
+      </div>
+
+      <!-- In-Game Menu / Pause Modal -->
+      <div class="modal-overlay hidden" id="inGameMenuModal">
+        <div class="modal-box in-game-menu-box">
+          <div class="modal-title">CONTROL PANEL</div>
+          <div class="modal-subtitle">Trainer Management System</div>
+          <div class="in-game-menu-buttons">
+            <button class="btn btn-primary btn-large" id="btnResumeGame">RESUME BATTLE</button>
+            <button class="btn btn-gold btn-large" id="btnOpenSaveSlots">SAVE VAULT (3 SLOTS)</button>
+            <button class="btn btn-secondary btn-large" id="btnInGameHowToPlay">HOW TO PLAY / GUIDE</button>
+            <button class="btn btn-secondary btn-large" id="btnInGameRestart">RESTART RUN</button>
+            <button class="btn btn-secondary btn-large" id="btnReturnToMainMenu">MAIN MENU</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Slot Save / Load Vault Modal -->
+      <div class="modal-overlay hidden" id="saveSlotsModal">
+        <div class="modal-box save-slots-box">
+          <div class="modal-title save-vault-title">PROGRESS VAULT (3 SLOTS)</div>
+          <div class="modal-subtitle save-vault-subtitle">Save, load, or backup your adventure journey</div>
+
+          <div class="save-slots-list" id="saveSlotsList">
+            <!-- Dynamically populated 3 slots -->
+          </div>
+
+          <div class="save-vault-actions">
+            <input type="file" id="importSaveFileInput" accept=".json" style="display:none" />
+            <button class="btn btn-secondary" id="btnExportSaves" title="Export save data to .json file">
+              EXPORT FILE
+            </button>
+            <button class="btn btn-secondary" id="btnImportSaves" title="Import save data from .json file">
+              IMPORT FILE
+            </button>
+            <button class="btn btn-primary" id="btnCloseSaveSlots">
+              CLOSE
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to Play Modal -->
+      <div class="modal-overlay hidden" id="howToPlayModal">
+        <div class="modal-box how-to-play-box">
+          <div class="modal-title">TACTICAL GUIDE</div>
+          <div class="how-to-play-content">
+            <div class="intel-item">
+              <span class="intel-num">1</span>
+              <span><strong>DEPLOYMENT:</strong> Select a Pokémon from your Bench and place it onto home ranks (Ranks 1 & 2). Spend Gold to expand your active squad up to 12 slots!</span>
+            </div>
+            <div class="intel-item">
+              <span class="intel-num">2</span>
+              <span><strong>ELEMENT TYPES:</strong> Attacking from a <strong>White Tile</strong> strikes with <strong>Type 1</strong>. Attacking from a <strong>Black Tile</strong> strikes with <strong>Type 2</strong>. Defending takes damage based on both types (Super Effective x2, Resist 0.5x, or Immune 0x)!</span>
+            </div>
+            <div class="intel-item">
+              <span class="intel-num">3</span>
+              <span><strong>EVOLUTION & STONES:</strong> Pokémon evolve after winning battles or using Evolution Stones (Fire, Water, Thunder, Moon...) from your Bag to unlock powerful forms!</span>
+            </div>
+            <div class="intel-item">
+              <span class="intel-num">4</span>
+              <span><strong>TALISMANS & SYNERGIES:</strong> Deploy matching elements to activate TFT-style <strong>Synergy Tiers</strong> (3/6/9/12, 4/8/12, 2/3/4/5/6, etc.), and equip up to 3 talismans per Pokémon from the Shop!</span>
+            </div>
+            <div class="intel-item">
+              <span class="intel-num">5</span>
+              <span><strong>SUDDEN DEATH:</strong> Click <strong>BATTLE</strong> to begin combat. After Turn 15, the outermost tiles will tremble and collapse into the abyss!</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-large" id="btnCloseHowToPlay">UNDERSTOOD</button>
+        </div>
+      </div>
+
+      <!-- Starter Selection Modal -->
+      <div class="modal-overlay hidden" id="starterSelectModal">
+        <div class="modal-box starter-select-box">
+          <div class="starter-modal-header">
+            <div class="modal-title">STARTER SELECTION</div>
+            <div class="modal-subtitle">Unlock new starters by recruiting them in runs (Common: 3x | Rare: 5x | Epic: 8x)</div>
+          </div>
+
+          <div class="starter-active-banner" id="starterActiveBanner">
+            <!-- Render active starter info -->
+          </div>
+
+          <div class="starter-filter-bar">
+            <input type="text" id="starterSearchInput" class="starter-search-input" placeholder="Search Pokémon by name or number..." />
+            <div class="starter-filter-tabs">
+              <button class="starter-filter-tab active" data-filter="all">ALL</button>
+              <button class="starter-filter-tab" data-filter="unlocked">UNLOCKED</button>
+              <button class="starter-filter-tab" data-filter="locked">LOCKED</button>
+            </div>
+          </div>
+
+          <div class="starter-grid" id="starterGrid">
+            <!-- Dynamic starter cards -->
+          </div>
+
+          <div class="starter-modal-footer">
+            <button class="btn btn-primary" id="btnCloseStarterModal">CLOSE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Massive Path of Exile Astral Skill Tree Modal -->
+      <div class="modal-overlay hidden" id="skillTreeModal">
+        <div class="skill-tree-fullscreen">
+          <div class="skill-tree-hud-top">
+            <div class="skill-tree-title-block">
+              <span class="skill-tree-main-title">ASTRAL PASSIVE TREE</span>
+              <span class="skill-tree-subtitle">Meta-progression: Clear battle stages to earn Skill Points and unlock permanent passive stars</span>
+            </div>
+            <div class="skill-tree-stats-bar">
+              <div class="hud-pill hud-pill-points">
+                <span class="pill-label">POINTS:</span>
+                <span class="pill-value" id="skillTreePointsCount">0</span>
+              </div>
+              <div class="hud-pill hud-pill-alloc">
+                <span class="pill-label">ALLOCATED:</span>
+                <span class="pill-value" id="skillTreeAllocatedCount">1/110</span>
+              </div>
+              <button class="btn btn-secondary btn-tree-action" id="btnResetSkillTree" title="Refund 100% of skill points">
+                RESET TREE
+              </button>
+              <button class="btn btn-secondary btn-tree-action" id="btnCenterSkillTree" title="Center camera on Origin Star">
+                CENTER
+              </button>
+              <button class="btn btn-primary btn-tree-close" id="btnCloseSkillTree">CLOSE</button>
+            </div>
+          </div>
+
+          <!-- Matrix / Constellation Selector Tabs (Core + 18 Elements) -->
+          <div class="skill-tree-matrix-tabs" id="skillTreeMatrixTabs">
+            <button class="matrix-tab active" data-tree="core">CORE</button>
+            <button class="matrix-tab" data-tree="normal">NORMAL</button>
+            <button class="matrix-tab" data-tree="fire">FIRE</button>
+            <button class="matrix-tab" data-tree="water">WATER</button>
+            <button class="matrix-tab" data-tree="grass">GRASS</button>
+            <button class="matrix-tab" data-tree="electric">ELECTRIC</button>
+            <button class="matrix-tab" data-tree="ice">ICE</button>
+            <button class="matrix-tab" data-tree="fighting">FIGHTING</button>
+            <button class="matrix-tab" data-tree="poison">POISON</button>
+            <button class="matrix-tab" data-tree="ground">GROUND</button>
+            <button class="matrix-tab" data-tree="flying">FLYING</button>
+            <button class="matrix-tab" data-tree="psychic">PSYCHIC</button>
+            <button class="matrix-tab" data-tree="bug">BUG</button>
+            <button class="matrix-tab" data-tree="rock">ROCK</button>
+            <button class="matrix-tab" data-tree="ghost">GHOST</button>
+            <button class="matrix-tab" data-tree="dragon">DRAGON</button>
+            <button class="matrix-tab" data-tree="steel">STEEL</button>
+            <button class="matrix-tab" data-tree="dark">DARK</button>
+            <button class="matrix-tab" data-tree="fairy">FAIRY</button>
+          </div>
+
+          <!-- Interactive Fullscreen PoE Canvas -->
+          <div class="skill-tree-canvas-container" id="skillTreeCanvasContainer">
+            <canvas id="skillTreeCanvas" width="750" height="380"></canvas>
+            <!-- PoE Floating Node Tooltip Card -->
+            <div class="skill-tree-tooltip" id="skillTreeTooltip" style="display: none;"></div>
+            <!-- Canvas Controls Hint -->
+            <div class="skill-tree-hint">
+              <span>Drag to Pan</span>
+              <span>•</span>
+              <span>Scroll to Zoom</span>
+              <span>•</span>
+              <span>Click connected node to Allocate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Step-by-Step Guided Tutorial Overlay -->
+      <div class="tutorial-overlay hidden" id="tutorialOverlay">
+        <div class="tutorial-spotlight" id="tutorialSpotlight"></div>
+        <div class="tutorial-pointer" id="tutorialPointer">
+          <div class="tutorial-hand" id="tutorialHand">▼</div>
+        </div>
+        <div class="tutorial-card" id="tutorialCard">
+          <div class="tutorial-card-header">
+            <span class="tutorial-step-badge" id="tutorialStepBadge">STEP 1/7</span>
+            <span class="tutorial-card-title" id="tutorialTitle">DEPLOY POKÉMON</span>
+            <button class="tutorial-btn-skip" id="btnTutorialSkip" title="Skip tutorial">SKIP ✕</button>
+          </div>
+          <div class="tutorial-card-body" id="tutorialBody">
+            Loading tutorial...
+          </div>
+          <div class="tutorial-card-footer">
+            <button class="btn btn-secondary tutorial-btn-prev" id="btnTutorialPrev">BACK</button>
+            <button class="btn btn-primary tutorial-btn-next" id="btnTutorialNext">NEXT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coffee Donate Modal (VietQR) -->
+      <div class="modal-overlay hidden donate-modal-overlay" id="coffeeDonateModal">
+        <div class="modal-box donate-modal-box">
+          <div class="donate-modal-header">
+            <span class="donate-modal-title">BUY ME A COFFEE</span>
+            <button class="donate-close-x" id="btnCloseCoffeeModal" type="button" title="Close">✕</button>
+          </div>
+          <div class="donate-subtitle">PokéChess+ is 100% free with zero paywalls. Any tip is purely voluntary to support server hosting and buy the developer a coffee!</div>
+
+          <div class="donate-qr-wrapper">
+            <img 
+              src="https://vietqr.app/img?bank=VietinBank&acc=100873549564&template=compact&des=SEVQR+UNG+HO+TOI&showinfo=true&holder=NGUYEN%20VAN%20ANH" 
+              alt="VietQR Donate" 
+              class="donate-qr-img" 
+              id="donateQrImg"
+            />
+          </div>
+
+          <div class="donate-info-card">
+            <div class="donate-info-row">
+              <span class="donate-label">Bank:</span>
+              <span class="donate-value">VietinBank</span>
+            </div>
+            <div class="donate-info-row">
+              <span class="donate-label">Account No:</span>
+              <span class="donate-value donate-acc" id="donateAccNum" title="Click to copy account number">100873549564 📋</span>
+            </div>
+            <div class="donate-info-row">
+              <span class="donate-label">Account Name:</span>
+              <span class="donate-value">NGUYEN VAN ANH</span>
+            </div>
+            <div class="donate-info-row">
+              <span class="donate-label">Description:</span>
+              <span class="donate-value donate-content">SEVQR UNG HO TOI</span>
+            </div>
+          </div>
+
+          <div class="donate-disclaimer-box">
+            <div class="disclaimer-title">NON-PROFIT FAN TRIBUTE DISCLAIMER</div>
+            <div class="disclaimer-text">
+              PokéChess+ is an independent, non-commercial fan-made tribute and is NOT affiliated with or endorsed by Nintendo, Game Freak, or The Pokémon Company. All Pokémon trademarks and assets belong to their respective copyright owners. No commercial sales or paid features exist.
+            </div>
+          </div>
+
+          <div class="donate-thanks">Thank you so much for playing and supporting the game!</div>
+          <button class="btn-close-coffee" id="btnDismissCoffeeModal" type="button">CLOSE</button>
+        </div>
+      </div>
+
+      <!-- Full-Screen Retro Pixel Main Menu Screen -->
+      <div class="main-menu-overlay" id="mainMenuOverlay">
+        <!-- Top-Right Coffee Donate Button -->
+        <button id="btnMenuCoffee" class="btn-menu-coffee" type="button" title="Buy me a coffee (Voluntary tip)">
+          <span class="coffee-text">BUY ME A COFFEE</span>
+        </button>
+
+        <div class="main-menu-box">
+          <div class="main-menu-header">
+            <div class="main-menu-tag">TACTICAL POKÉMON BATTLE CHESS</div>
+            <h1 class="main-menu-title"><span class="title-poke-ball"></span><span class="title-poke">POKÉ</span>CHESS<span class="logo-plus">+</span></h1>
+            <div class="main-menu-subtitle">OVER 1,000 UNIQUE POKÉMON SPECIES</div>
+          </div>
+
+          <div class="main-menu-buttons">
+            <button id="btnMenuContinue" class="btn btn-menu-action" disabled>
+              CONTINUE JOURNEY
+            </button>
+            <button id="btnMenuNewRun" class="btn btn-menu-action btn-menu-primary">
+              NEW JOURNEY
+            </button>
+            <button id="btnMenuStarters" class="btn btn-menu-action btn-menu-cyan">
+              STARTER SELECTION
+            </button>
+            <button id="btnMenuSkillTree" class="btn btn-menu-action btn-menu-purple">
+              ASTRAL PASSIVE TREE
+            </button>
+            <button id="btnMenuSaves" class="btn btn-menu-action btn-menu-gold">
+              SAVE PROFILES (3 SLOTS)
+            </button>
+            <button id="btnMenuHowToPlay" class="btn btn-menu-action">
+              TACTICAL GUIDE
+            </button>
+          </div>
+
+          <div class="main-menu-footer">
+            <span class="main-menu-version">POKÉCHESS+ v3.0.0</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /#app -->
+  </div><!-- /#gameViewport -->
+
+  <!-- Mobile Portrait Orientation Prompt Overlay -->
+  <div id="rotateOverlay" class="rotate-overlay">
+    <div class="rotate-content">
+      <div class="rotate-icon-wrap">
+        <div class="rotate-phone-icon"></div>
+      </div>
+      <div class="rotate-title">ROTATE TO LANDSCAPE</div>
+      <div class="rotate-subtitle">This game is designed to be played in landscape mode</div>
+      <button id="btnEnterLandscape" class="btn btn-primary btn-large rotate-btn">▶ ENTER FULLSCREEN & PLAY</button>
+    </div>
+  </div>
+
+  <!-- Core Config -->
+  <script src="js/config.js?v=3.3.1791699025"></script>
+  <!-- All 732 Pokemon Pieces Bundle (Gen 1 - Gen 6) -->
+  <script src="js/pieces_all.js?v=3.3.1791699025"></script>
+  <!-- Individual Pokemon Pieces (js/pieces/*.js) for dev override -->
+  <script src="js/pieces/bulbasaur.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/ivysaur.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/venusaur.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/charmander.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/charmeleon.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/charizard.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/squirtle.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/wartortle.js?v=3.3.1791699025"></script>
+  <script src="js/pieces/blastoise.js?v=3.3.1791699025"></script>
+  <!-- Talisman System Core -->
+  <script src="js/talisman_core.js?v=3.3.1791699025"></script>
+  <!-- Individual Talismans (js/talismans/*.js) -->
+  <script src="js/talismans/fire_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/water_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/thunder_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/leaf_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/moon_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/sun_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/dusk_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/dawn_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/shiny_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/ice_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/metal_coat.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/kings_rock.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/dragon_scale.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/up_grade.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/mega_bracelet.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/mega_ring.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/charizardite_x.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/charizardite_y.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/blastoisinite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/venusaurite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/gengarite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/mewtwonite_x.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/mewtwonite_y.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/salamencite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/metagrossite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/aggronite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/scizorite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/leftovers.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/choice_band.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/choice_specs.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/choice_scarf.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/focus_sash.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/focus_band.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/rocky_helmet.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/life_orb.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/expert_belt.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/quick_claw.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/assault_vest.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/shell_bell.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/scope_lens.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/dragon_fang.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/iron_plate.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/razor_claw.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/rainbow_wing.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/roller_skates.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/black_belt.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/exp_share.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/amulet_coin.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/muscle_band.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/wise_glasses.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/eviolite.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/sitrus_berry.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/lum_berry.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/bright_powder.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/metronome.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/big_root.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/air_balloon.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/red_card.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/protective_pads.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/weakness_policy.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/safety_goggles.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/shed_shell.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/charcoal.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/mystic_water.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/eject_button.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/destiny_knot.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/toxic_orb.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/flame_orb.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/sticky_barb.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/float_stone.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/starf_berry.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/custap_berry.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/smoke_ball.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/iron_ball.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/ring_target.js?v=3.3.1791699025"></script>
+  <!-- 18 Elemental Type Gems (Overrides 2nd Type) -->
+  <script src="js/talismans/normal_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/fire_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/water_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/grass_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/electric_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/ice_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/fighting_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/poison_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/ground_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/flying_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/psychic_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/bug_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/rock_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/ghost_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/dragon_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/steel_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/dark_gem.js?v=3.3.1791699025"></script>
+  <script src="js/talismans/fairy_gem.js?v=3.3.1791699025"></script>
+  <!-- Tom Select Searchable Dropdown Library -->
+  <script src="js/lib/tom-select.complete.min.js?v=3.3.1791699025"></script>
+  <!-- Pokemon Move Editor & Custom Moves Engine -->
+  <script src="js/custom_moves.js?v=3.3.1791699025"></script>
+  <script src="js/audio.js?v=3.3.1791699025"></script>
+  <script src="js/type_system.js?v=3.3.1791699025"></script>
+  <script src="js/synergy_system.js?v=3.3.1791699025"></script>
+  <script src="js/engine.js?v=3.3.1791699025"></script>
+  <script src="js/combat.js?v=3.3.1791699025"></script>
+  <script src="js/animations.js?v=3.3.1791699025"></script>
+  <script src="js/save_system.js?v=3.3.1791699025"></script>
+  <!-- Passive Tree Matrices: Registry, Core & 18 Element Trees -->
+  <script src="js/trees/tree_registry.js?v=3.3.1791699025"></script>
+  <script src="js/trees/core_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/normal_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/fire_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/water_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/grass_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/electric_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/ice_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/fighting_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/poison_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/ground_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/flying_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/psychic_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/bug_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/rock_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/ghost_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/dragon_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/steel_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/dark_tree.js?v=3.3.1791699025"></script>
+  <script src="js/trees/fairy_tree.js?v=3.3.1791699025"></script>
+  <!-- Meta Progression & Astral Skill Tree -->
+  <script src="js/meta_progression.js?v=3.3.1791699025"></script>
+  <!-- Balatro Hypnotic Background Shader -->
+  <script src="js/balatro_bg.js?v=3.3.1791699025"></script>
+  <script src="js/app.js?v=3.3.1791699025"></script>
+  <script src="js/ui_board.js?v=3.3.1791699025"></script>
+  <script src="js/ui_shop.js?v=3.3.1791699025"></script>
+  <script src="js/battle_combat.js?v=3.3.1791699025"></script>
+  <script src="js/battle_ai.js?v=3.3.1791699025"></script>
+  <script src="js/ui_talisman.js?v=3.3.1791699025"></script>
+  <script src="js/ui_menu.js?v=3.3.1791699025"></script>
+  <script src="js/ui_tutorial.js?v=3.3.1791699025"></script>
+  <!-- new -->
+  <script src="js/autochess/auto_combat.js"></script>
+  <script src="js/autochess/hex_board.js"></script>
+  <script src="js/autochess/hex_view.js"></script>
+  <script src="js/autochess/hex_pathfinding.js"></script>
+  <script src="js/autochess/hex_ai.js"></script>
+  <script src="js/autochess/hex_simulation.js"></script>
+  <script src="js/autochess/hex_combat.js"></script>
+  <script src="js/autochess/hex_renderer.js"></script>
+  <script src="js/autochess/hex_unit_config.js"></script>
+  <script src="js/autochess/hex_bridge.js"></script>
+  <script src="js/autochess/hex_balance.js"></script>
+  <script src="js/autochess/hex_skill_info.js"></script>
+  <script src="js/autochess/hex_pokemon_info.js"></script>
+  <script src="js/autochess/hex_preparation_info.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Chess+ Roguelike",
+  "short_name": "Chess+",
+  "description": "Tactical Roguelike Chess Battler",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#07090f",
+  "theme_color": "#07090f",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

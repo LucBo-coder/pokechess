@@ -1,0 +1,340 @@
+/* =========================================
+   POKE AUTO CHESS - HEX BOARD 8x7
+   Visual layer v0.1
+   ========================================= */
+
+:root {
+    --hex-width: 36px;
+    --hex-height: 42px;
+    --hex-step-y: 31.5px;
+    --hex-offset-x: 18px;
+    --hex-board-width: 270px;
+    --hex-board-height: 263px;
+}
+
+/* Only active when Hex mode is enabled */
+body.hex-mode .board-container {
+    width: var(--hex-board-width);
+    height: var(--hex-board-height);
+    background: #080d17;
+    overflow: visible;
+}
+
+body.hex-mode .board {
+    display: block;
+    position: relative;
+    width: var(--hex-board-width);
+    height: var(--hex-board-height);
+    background: transparent;
+}
+
+/* Individual hex cells */
+body.hex-mode .board .square {
+    position: absolute;
+    width: var(--hex-width);
+    height: var(--hex-height);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    isolation: auto;
+}
+
+/* Hex floor */
+body.hex-mode .board .square::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(50% 0%,
+            100% 25%,
+            100% 75%,
+            50% 100%,
+            0% 75%,
+            0% 25%);
+    background: #30475c;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Enemy territory */
+body.hex-mode .board .square.hex-enemy::before {
+    background: #643c47;
+}
+
+/* Player territory */
+body.hex-mode .board .square.hex-player::before {
+    background: #2c5264;
+}
+
+/* Inner hex for visible border */
+body.hex-mode .board .square::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    clip-path: polygon(50% 0%,
+            100% 25%,
+            100% 75%,
+            50% 100%,
+            0% 75%,
+            0% 25%);
+    background: rgba(13, 22, 35, 0.24);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Selected cell */
+body.hex-mode .board .square.selected::before {
+    background: #d3a94c;
+}
+
+/* Disable old rectangular floor images */
+body.hex-mode .board .square .tile-bg {
+    display: none !important;
+}
+
+/* Hide chess coordinate labels */
+body.hex-mode .board-labels-top,
+body.hex-mode .board-labels-bottom,
+body.hex-mode .board-ranks {
+    display: none !important;
+}
+
+/* Hide the old turn-based queue */
+body.hex-mode .turn-order-container {
+    display: none !important;
+}
+
+/* Hide old rectangular deployment outline */
+body.hex-mode .board .square.deploy-zone::before {
+    border: none;
+}
+
+/* Prevent old row-based piece positioning rules
+   from being used as the final hex depth system.
+   A dedicated sprite depth layer comes later. */
+   
+/* TFT POKEMON INFORMATION PANEL */
+
+.hex-unit-tooltip {
+    width: 260px;
+    max-width: calc(100vw - 24px);
+    min-width: 0;
+    padding: 12px;
+
+    background: #111827;
+    border: 2px solid #d6ac50;
+    color: #f4e8c8;
+
+    border-radius: 5px;
+    box-shadow: 0 8px 24px #000b;
+
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: normal;
+    pointer-events: none;
+    z-index: 99999;
+}
+
+.hex-unit-tooltip[hidden] {
+    display: none !important;
+}
+
+.hex-info-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #ffe087;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.hex-info-class {
+    color: #a8caff;
+    font-size: 10px;
+    margin-bottom: 10px;
+}
+
+.hex-info-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0;
+    border-top: 1px solid #38425a;
+    border-bottom: 1px solid #38425a;
+}
+
+.hex-info-stat-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hex-info-stat-row span {
+    color: #aeb8ce;
+}
+
+.hex-info-stat-row strong {
+    color: #ffffff;
+    text-align: right;
+}
+
+.hex-info-section {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #ffd36c;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.hex-info-description {
+    color: #d2d8e5;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.hex-info-hint {
+    margin-top: 10px;
+    padding-top: 7px;
+    border-top: 1px dashed #48526b;
+    color: #8eb8d8;
+    font-size: 9px;
+}
+
+/* Boss preview in setup */
+
+.board .square.setup-boss,
+.board .square.setup-miniboss {
+    isolation: isolate;
+}
+
+.board .square.setup-boss .piece {
+    filter:
+        drop-shadow(0 0 5px #ff5b31) drop-shadow(0 0 12px #ffad32);
+    animation: setupBossPulse 1.8s ease-in-out infinite;
+}
+
+.board .square.setup-miniboss .piece {
+    filter:
+        drop-shadow(0 0 5px #a855f7) drop-shadow(0 0 10px #7c3aed);
+    animation: setupBossPulse 2.2s ease-in-out infinite;
+}
+
+.board .square .setup-boss-crown {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 12;
+    color: #ffd36b;
+    font-size: 16px;
+    line-height: 1;
+    text-shadow: 0 0 6px #ff8a00;
+    pointer-events: none;
+}
+
+.board .square.setup-miniboss .setup-boss-crown {
+    color: #d8b4fe;
+    text-shadow: 0 0 6px #9333ea;
+}
+
+@keyframes setupBossPulse {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px #ff7b31);
+    }
+
+    50% {
+        filter:
+            drop-shadow(0 0 9px #ff7b31) drop-shadow(0 0 15px #ffcc45);
+    }
+}
+
+/* ==========================================
+   POKECHESS+ - RETRO PIXEL BATTLEFIELD V1
+   ========================================== */
+
+   /* ==========================================
+   POKECHESS+ - PIXEL BATTLEFIELD V2
+   ========================================== */
+
+   /* Nền chiến trường */
+   body.hex-mode .board-container {
+       background: #304f36;
+       border: 4px solid #243d2b;
+       border-radius: 0;
+       box-shadow:
+           inset 0 0 0 2px #789b60,
+           0 6px 0 #17271d;
+       width: calc(var(--hex-board-width) + 8px);
+       height: calc(var(--hex-board-height) + 8px);
+   }
+
+   /* Nền cỏ tự nhiên hơn */
+   body.hex-mode .board {
+       background-color: #638d4e;
+
+       background-image:
+           linear-gradient(90deg,
+               transparent 0 92%,
+               #557b45 92% 100%),
+           linear-gradient(transparent 0 92%,
+               #769e5a 92% 100%);
+
+       background-size: 24px 24px;
+       image-rendering: pixelated;
+   }
+
+   /* Xóa nền nâu/xanh cũ của các ô */
+   body.hex-mode .board .square.hex-enemy::before,
+   body.hex-mode .board .square.hex-player::before {
+       background-image:
+           linear-gradient(#93b76c, #93b76c),
+           linear-gradient(#456d3d, #456d3d),
+           linear-gradient(#456d3d, #456d3d);
+       background-size: 3px 2px, 2px 4px, 2px 2px;
+       background-position: 8px 14px, 25px 26px, 23px 28px;
+       background-repeat: no-repeat;
+       box-shadow: none;
+   }
+
+   /* Cả hai bên đều là nền cỏ */
+   body.hex-mode .board .square.hex-enemy::before {
+       background-color: #759a58;
+   }
+
+   body.hex-mode .board .square.hex-player::before {
+       background-color: #628e50;
+   }
+
+   /* Viền Hex nhẹ, không chia cắt chiến trường */
+   body.hex-mode .board .square::after {
+       background: transparent;
+       border: none;
+       opacity: 0;
+   }
+
+   /* Trong SETUP vẫn thấy ranh giới ô để xếp quân */
+   body.hex-mode:not(.hex-combat-active) .board .square::after {
+       opacity: 1;
+       background: rgba(25, 49, 29, 0.08);
+   }
+
+   /* Trong BATTLE giảm cảm giác lưới */
+   body.hex-mode.hex-combat-active .board .square::before {
+       filter: saturate(0.85);
+   }
+
+   /* Ô được chọn */
+   body.hex-mode .board .square.selected::before {
+       background-color: #c7bc69;
+   }
+
+   body.hex-mode .board .square:nth-child(3n)::before {
+       background-position: 21px 13px, 10px 27px, 8px 29px;
+   }
+
+   /* Không vẽ đường chia đôi bằng nét đứt */
+   body.hex-mode .board::after {
+       display: none;
+   }

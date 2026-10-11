@@ -1,0 +1,1550 @@
+.board {
+    position: relative;
+}
+
+/* =====================================
+   POKEMON SPRITE
+   ===================================== */
+
+.hex-combat-unit {
+    position: absolute;
+    width: 36px;
+    height: 42px;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 100;
+
+    transition:
+        left 0.35s steps(7, end),
+        top 0.35s steps(7, end);
+}
+
+.hex-combat-sprite {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: 3px;
+    top: 2px;
+
+    object-fit: contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+/* =====================================
+   CLASS BADGE
+   ===================================== */
+
+.hex-combat-role {
+    position: absolute;
+    right: -3px;
+    top: -3px;
+
+    min-width: 10px;
+    height: 10px;
+    line-height: 10px;
+
+    font-size: 7px;
+    font-weight: bold;
+    text-align: center;
+
+    background: #29283c;
+    color: white;
+    border: 1px solid #111;
+    border-radius: 2px;
+
+    z-index: 5;
+    pointer-events: none;
+}
+
+.hex-combat-unit[data-role="tank"] .hex-combat-role {
+    background: #597a9c;
+}
+
+.hex-combat-unit[data-role="fighter"] .hex-combat-role {
+    background: #b04d40;
+}
+
+.hex-combat-unit[data-role="assassin"] .hex-combat-role {
+    background: #8545aa;
+}
+
+.hex-combat-unit[data-role="mage"] .hex-combat-role {
+    background: #455ed0;
+}
+
+.hex-combat-unit[data-role="marksman"] .hex-combat-role {
+    background: #b48929;
+}
+
+/* =====================================
+   HEALTH BAR
+   ===================================== */
+
+.hex-combat-hp {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    bottom: 7px;
+
+    height: 5px;
+    background: #301d25;
+    border: 1px solid #111;
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+.hex-combat-hp-fill {
+    height: 100%;
+    width: 100%;
+    background: #4de57b;
+
+    transition: width 0.15s linear;
+}
+
+/* =====================================
+   MANA BAR
+   ===================================== */
+
+.hex-combat-mana {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    bottom: 1px;
+
+    height: 4px;
+    background: #152139;
+    border: 1px solid #111;
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+.hex-combat-mana-fill {
+    height: 100%;
+    width: 0%;
+    background: #388dff;
+
+    transition: width 0.15s linear;
+}
+
+.hex-mana-ready .hex-combat-mana-fill {
+    background: #70caff;
+    box-shadow: 0 0 5px #4abaff;
+    animation: hex-mana-pulse 0.5s infinite alternate;
+}
+
+@keyframes hex-mana-pulse {
+    from {
+        filter: brightness(1);
+    }
+
+    to {
+        filter: brightness(1.7);
+    }
+}
+
+/* =====================================
+   SHIELD BAR
+   ===================================== */
+
+.hex-combat-shield {
+    display: none;
+
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    bottom: 13px;
+
+    height: 3px;
+    background: #192c36;
+
+    border: 1px solid #111;
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+.hex-combat-shield-fill {
+    height: 100%;
+    width: 0%;
+    background: #80e9ff;
+}
+
+/* =====================================
+   BASIC ATTACK / HIT
+   ===================================== */
+
+.hex-attacking .hex-combat-sprite {
+    animation: hex-attack 0.22s ease;
+}
+
+.hex-hit .hex-combat-sprite {
+    animation: hex-hit 0.25s ease;
+}
+
+.hex-casting .hex-combat-sprite {
+    animation: hex-cast 0.4s ease;
+}
+
+.hex-dead {
+    pointer-events: none;
+    animation: hex-death 0.35s forwards;
+}
+
+@keyframes hex-attack {
+    50% {
+        transform: scale(1.25);
+    }
+}
+
+@keyframes hex-hit {
+    50% {
+        filter: brightness(2) sepia(1) saturate(5);
+    }
+}
+
+@keyframes hex-cast {
+    0% {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+
+    40% {
+        filter: brightness(2.5);
+        transform: scale(1.35);
+    }
+
+    100% {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+}
+
+@keyframes hex-death {
+    to {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%) scale(0.4);
+    }
+}
+
+/* =====================================
+   SKILL BURST
+   ===================================== */
+
+.hex-skill-burst {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+
+    width: 34px;
+    height: 34px;
+
+    border: 3px solid white;
+    border-radius: 50%;
+
+    transform: translate(-50%, -50%) scale(0.2);
+
+    pointer-events: none;
+    z-index: 110;
+
+    animation: hex-burst 0.45s ease-out forwards;
+}
+
+.hex-burst-tank {
+    border-color: #77e6ff;
+    box-shadow:
+        0 0 10px #46caff,
+        inset 0 0 8px #46caff;
+}
+
+.hex-burst-fighter {
+    border-color: #ff8645;
+    box-shadow: 0 0 12px #ff5d22;
+}
+
+.hex-burst-assassin {
+    border-color: #c46bff;
+    box-shadow: 0 0 12px #8c32ff;
+}
+
+.hex-burst-mage {
+    border-color: #62baff;
+    box-shadow: 0 0 14px #386dff;
+}
+
+.hex-burst-marksman {
+    border-color: #ffe478;
+    box-shadow: 0 0 12px #ffbd28;
+}
+
+@keyframes hex-burst {
+    0% {
+        opacity: 1;
+        transform:
+            translate(-50%, -50%) scale(0.2);
+    }
+
+    65% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(-50%, -50%) scale(1.7);
+    }
+}
+
+/* =====================================
+   TANK SHIELD EFFECT
+   ===================================== */
+
+.hex-shield-active::after {
+    content: '';
+
+    position: absolute;
+    left: 0;
+    top: -2px;
+
+    width: 34px;
+    height: 34px;
+
+    border: 2px solid #73e8ff;
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 8px #44caff,
+        inset 0 0 8px #44caff;
+
+    pointer-events: none;
+
+    animation: hex-shield-flash 0.65s ease forwards;
+}
+
+@keyframes hex-shield-flash {
+    0% {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+
+    40% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+/* =====================================
+   PROJECTILE
+   ===================================== */
+
+.hex-projectile {
+    position: absolute;
+    height: 3px;
+
+    transform-origin: left center;
+
+    background: #ffe68b;
+    box-shadow: 0 0 7px #ffc944;
+
+    pointer-events: none;
+    z-index: 120;
+
+    animation:
+        hex-projectile-flash 0.22s ease-out forwards;
+}
+
+.hex-projectile-mage {
+    height: 5px;
+    background: #73bdff;
+    box-shadow: 0 0 12px #408cff;
+}
+
+.hex-projectile-marksman {
+    background: #ffdf73;
+    box-shadow: 0 0 9px #ffb733;
+}
+
+@keyframes hex-projectile-flash {
+    0% {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+    }
+
+    35% {
+        opacity: 1;
+    }
+
+    75% {
+        clip-path: inset(0 0 0 0);
+    }
+
+    100% {
+        opacity: 0;
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* =====================================
+   FLOATING DAMAGE / SKILL NAME
+   ===================================== */
+
+.hex-floating-text {
+    position: absolute;
+    left: 50%;
+    top: -8px;
+
+    white-space: nowrap;
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 900;
+
+    color: white;
+    text-shadow:
+        1px 1px #000,
+        -1px -1px #000,
+        0 0 4px #000;
+
+    pointer-events: none;
+    z-index: 150;
+
+    animation:
+        hex-floating-up 0.75s ease-out forwards;
+}
+
+.hex-float-damage {
+    color: #ff7777;
+}
+
+.hex-float-skill {
+    color: #ffd24d;
+    font-size: 13px;
+}
+
+.hex-float-shield {
+    color: #7cecff;
+}
+
+.hex-float-skill-name {
+    top: -18px;
+    color: #ffe785;
+    font-size: 8px;
+    letter-spacing: 0.2px;
+}
+
+@keyframes hex-floating-up {
+    0% {
+        opacity: 0;
+        transform:
+            translate(-50%, 6px) scale(0.7);
+    }
+
+    20% {
+        opacity: 1;
+        transform:
+            translate(-50%, 0) scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate(-50%, -26px) scale(1);
+    }
+}
+
+/* =====================================
+   UNIT TOOLTIP
+   ===================================== */
+
+.hex-unit-tooltip {
+    position: fixed;
+    z-index: 99999;
+
+    min-width: 185px;
+    max-width: 230px;
+
+    padding: 9px 11px;
+
+    background: #121728;
+    color: #f1e8c7;
+
+    border: 2px solid #b99540;
+    border-radius: 3px;
+
+    box-shadow: 0 4px 15px #0009;
+
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.55;
+    white-space: pre-line;
+
+    pointer-events: none;
+}
+
+.hex-unit-tooltip[hidden] {
+    display: none !important;
+}
+
+/* =====================================
+   ATTACK RANGE HIGHLIGHT
+   ===================================== */
+
+.board .square.hex-range-cell {
+    filter: brightness(1.35);
+    box-shadow:
+        inset 0 0 0 2px #ffd75b,
+        0 0 7px #e6b42b;
+
+    z-index: 2;
+}
+
+.board .square.hex-range-origin {
+    filter: brightness(1.5);
+    box-shadow:
+        inset 0 0 0 2px #72f5b3,
+        0 0 10px #45db96;
+
+    z-index: 3;
+}
+
+.hex-unit-selected .hex-combat-sprite {
+    filter:
+        drop-shadow(0 0 5px #ffe475);
+}
+
+/* =====================================
+   HIDE LEGACY PIECES
+   ===================================== */
+
+body.hex-combat-active .board .square .piece,
+
+body.hex-combat-active .board .square .piece-shadow,
+
+body.hex-combat-active .board .square .piece-hud,
+
+body.hex-combat-active .board .square .piece-hp,
+
+body.hex-combat-active .board .square .piece-hp-bar,
+
+body.hex-combat-active .board .square .hp-bar,
+
+body.hex-combat-active .board .square .hud-type-badge {
+    display: none !important;
+}
+
+body.hex-combat-active .board .hex-combat-unit {
+    display: block !important;
+}
+/* POKEMON INFO OUTSIDE COMBAT */
+
+.hex-preparation-tooltip {
+    position: fixed !important;
+    z-index: 2147483647 !important;
+
+    width: 260px;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+
+    padding: 12px;
+
+    background: #121827 !important;
+    border: 2px solid #d5ad50;
+    border-radius: 4px;
+
+    color: #e9e9ef !important;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.6;
+
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+
+    box-shadow: 0 8px 25px #000b;
+
+    pointer-events: none !important;
+}
+
+.hex-preparation-tooltip[hidden] {
+    display: none !important;
+}
+
+/* =====================================
+   POKEMON INSPECTOR - TFT STYLE
+   ===================================== */
+
+   /* ========================================
+      POKEMON INSPECTOR - COMPACT GAME UI
+      ======================================== */
+
+   .hex-pokemon-inspector {
+       position: fixed;
+       top: 50%;
+       right: 12px;
+       transform: translateY(-50%);
+
+       width: 240px;
+       max-width: calc(100vw - 24px);
+       max-height: 70vh;
+       overflow-y: auto;
+
+       z-index: 100000;
+       display: none;
+
+       background: #111827;
+       color: #e9edf6;
+       border: 2px solid #d4a83e;
+       box-shadow: 0 8px 25px #000a;
+
+       font-family: monospace;
+       font-size: 10px;
+       line-height: 1.45;
+   }
+
+   .hex-pokemon-inspector.visible {
+       display: block;
+   }
+
+   .hex-inspector-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+
+       padding: 8px 10px;
+       background: #202a40;
+       color: #f2c75a;
+
+       font-size: 10px;
+       font-weight: bold;
+       letter-spacing: 0.5px;
+   }
+
+   .hex-inspector-close {
+       border: 0;
+       background: transparent;
+       color: white;
+       font-size: 17px;
+       cursor: pointer;
+   }
+
+   .hex-inspector-body {
+       padding: 10px;
+   }
+
+   .hex-inspector-name {
+       color: #ffd36b;
+       font-size: 13px;
+       font-weight: bold;
+       text-transform: uppercase;
+   }
+
+   .hex-inspector-subtitle {
+       margin-top: 4px;
+       color: #aeb9d0;
+       font-size: 9px;
+   }
+
+   .hex-inspector-class {
+       display: flex;
+       justify-content: space-between;
+       gap: 6px;
+
+       margin: 10px 0;
+       padding: 7px;
+
+       background: #26334c;
+       color: #8bd4ff;
+
+       font-size: 10px;
+       font-weight: bold;
+   }
+
+   .hex-inspector-stats {
+       display: grid;
+       grid-template-columns: repeat(3, minmax(0, 1fr));
+       gap: 5px;
+   }
+
+   .hex-inspector-stat {
+       padding: 6px 3px;
+       text-align: center;
+       background: #1c263a;
+   }
+
+   .hex-inspector-stat small {
+       display: block;
+       margin-bottom: 3px;
+       color: #94a3b8;
+       font-size: 8px;
+   }
+
+   .hex-inspector-stat strong {
+       color: #fff;
+       font-size: 10px;
+   }
+
+   .hex-inspector-section {
+       margin-top: 10px;
+       padding-top: 9px;
+       border-top: 1px solid #39465f;
+   }
+
+   .hex-inspector-title {
+       margin-bottom: 5px;
+       color: #f2c75a;
+       font-size: 10px;
+       font-weight: bold;
+   }
+
+   .hex-inspector-section p {
+       margin: 5px 0 0;
+       color: #cbd5e1;
+       font-size: 9px;
+       line-height: 1.5;
+   }
+
+   @media (max-width: 700px) {
+       .hex-pokemon-inspector {
+           width: 210px;
+           right: 6px;
+           max-height: 65vh;
+       }
+   }
+   /* ===============================
+   BOSS VISUAL SYSTEM
+================================ */
+
+   .hex-boss-unit {
+       z-index: 20;
+       isolation: isolate;
+   }
+
+   .hex-boss-unit .hex-combat-sprite {
+       position: relative;
+       z-index: 3;
+       filter: drop-shadow(0 0 5px var(--boss-glow));
+   }
+
+   .hex-mini-boss {
+       --boss-glow: #b35cff;
+       --boss-light: #e5b8ff;
+   }
+
+   .hex-main-boss {
+       --boss-glow: #ff5135;
+       --boss-light: #ffd36a;
+   }
+
+   .hex-boss-aura {
+       position: absolute;
+       inset: -12px;
+       border-radius: 50%;
+       pointer-events: none;
+       z-index: 0;
+
+       background: radial-gradient(circle,
+               var(--boss-glow) 0%,
+               transparent 70%);
+
+       opacity: 0.65;
+       animation: hexBossAura 1.6s ease-in-out infinite;
+   }
+
+   .hex-boss-ring {
+       position: absolute;
+       width: 48px;
+       height: 18px;
+       left: 50%;
+       top: 65%;
+       transform: translate(-50%, -50%);
+       border: 2px solid var(--boss-glow);
+       border-radius: 50%;
+       box-shadow:
+           0 0 8px var(--boss-glow),
+           inset 0 0 8px var(--boss-glow);
+       pointer-events: none;
+       z-index: 1;
+       animation: hexBossRing 2s linear infinite;
+   }
+
+   .hex-boss-crown {
+       position: absolute;
+       left: 50%;
+       top: -19px;
+       transform: translateX(-50%);
+       font-size: 16px;
+       color: var(--boss-light);
+       text-shadow: 0 0 8px var(--boss-glow);
+       pointer-events: none;
+       z-index: 5;
+   }
+
+   .hex-boss-unit .hex-combat-hp-fill {
+       background: linear-gradient(90deg,
+               var(--boss-glow),
+               var(--boss-light));
+   }
+
+   .hex-boss-spawning {
+       animation: hexBossSpawn 1.2s ease-out both;
+   }
+
+   .hex-boss-intro-label {
+       position: absolute;
+       bottom: 100%;
+       left: 50%;
+       transform: translateX(-50%);
+       white-space: nowrap;
+       font-size: 10px;
+       font-weight: bold;
+       color: var(--boss-light);
+       text-shadow: 0 0 8px var(--boss-glow);
+       pointer-events: none;
+       z-index: 10;
+       animation: hexBossIntro 2s ease-out forwards;
+   }
+
+   @keyframes hexBossAura {
+
+       0%,
+       100% {
+           opacity: 0.35;
+           transform: scale(0.9);
+       }
+
+       50% {
+           opacity: 0.85;
+           transform: scale(1.2);
+       }
+   }
+
+   @keyframes hexBossRing {
+       0% {
+           opacity: 0.5;
+           filter: brightness(1);
+       }
+
+       50% {
+           opacity: 1;
+           filter: brightness(1.7);
+       }
+
+       100% {
+           opacity: 0.5;
+           filter: brightness(1);
+       }
+   }
+
+   @keyframes hexBossSpawn {
+       0% {
+           opacity: 0;
+           filter: brightness(4);
+       }
+
+       40% {
+           opacity: 1;
+           filter: brightness(2);
+       }
+
+       100% {
+           opacity: 1;
+           filter: brightness(1);
+       }
+   }
+
+   @keyframes hexBossIntro {
+       0% {
+           opacity: 0;
+           transform: translate(-50%, 12px);
+       }
+
+       25% {
+           opacity: 1;
+       }
+
+       75% {
+           opacity: 1;
+       }
+
+       100% {
+           opacity: 0;
+           transform: translate(-50%, -22px);
+       }
+   }
+
+   /* ==========================================
+   RETRO PIXEL COMBAT V1
+   ========================================== */
+
+   /* Sprite giữ nét pixel */
+   .hex-combat-sprite {
+       image-rendering: pixelated;
+       image-rendering: crisp-edges;
+   }
+
+   /* Bóng dưới chân Pokémon */
+   .hex-combat-unit::before {
+       content: '';
+       position: absolute;
+
+       width: 27px;
+       height: 7px;
+
+       left: 50%;
+       top: 30px;
+
+       transform: translateX(-50%);
+
+       background: #182d2088;
+       border-radius: 50%;
+
+       z-index: -1;
+       pointer-events: none;
+   }
+
+   /* Đánh thường: chuyển động giật kiểu pixel */
+   .hex-attacking .hex-combat-sprite {
+       animation: pixelAttack 0.24s steps(3, end);
+   }
+
+   /* Nhận sát thương */
+   .hex-hit .hex-combat-sprite {
+       animation: pixelHit 0.25s steps(4, end);
+   }
+
+   /* Tung kỹ năng */
+   .hex-casting .hex-combat-sprite {
+       animation: pixelCast 0.4s steps(5, end);
+   }
+
+   /* Đạn pixel */
+   .hex-projectile {
+       height: 5px;
+
+       background: repeating-linear-gradient(90deg,
+               #fff2a0 0 5px,
+               #f9a838 5px 9px,
+               transparent 9px 12px);
+
+       box-shadow: none;
+
+       image-rendering: pixelated;
+       animation: pixelProjectile 0.22s steps(6, end) forwards;
+   }
+
+   /* Đạn phép */
+   .hex-projectile-mage {
+       height: 7px;
+
+       background: repeating-linear-gradient(90deg,
+               #d8f4ff 0 5px,
+               #69bbff 5px 10px,
+               #306de0 10px 13px);
+   }
+
+   /* Vụ nổ kỹ năng pixel */
+   .hex-skill-burst {
+       border-radius: 0;
+       box-shadow: none;
+
+       animation: pixelBurst 0.4s steps(5, end) forwards;
+   }
+
+   /* Số sát thương kiểu retro */
+   .hex-floating-text {
+       font-family: monospace;
+       font-size: 11px;
+       font-weight: 900;
+
+       text-shadow:
+           1px 1px #111,
+           -1px 1px #111,
+           1px -1px #111,
+           -1px -1px #111;
+
+       animation: pixelFloat 0.7s steps(7, end) forwards;
+   }
+
+   @keyframes pixelAttack {
+
+       0%,
+       100% {
+           transform: translate(0, 0);
+       }
+
+       50% {
+           transform: translate(4px, -3px) scale(1.15);
+       }
+   }
+
+   @keyframes pixelHit {
+
+       0%,
+       100% {
+           filter: brightness(1);
+           opacity: 1;
+       }
+
+       25%,
+       75% {
+           filter: brightness(4);
+           opacity: 0.5;
+       }
+   }
+
+   @keyframes pixelCast {
+
+       0%,
+       100% {
+           transform: scale(1);
+           filter: brightness(1);
+       }
+
+       50% {
+           transform: translateY(-5px) scale(1.2);
+           filter: brightness(2);
+       }
+   }
+
+   @keyframes pixelProjectile {
+       0% {
+           opacity: 0;
+           clip-path: inset(0 100% 0 0);
+       }
+
+       30% {
+           opacity: 1;
+       }
+
+       85% {
+           clip-path: inset(0 0 0 0);
+       }
+
+       100% {
+           opacity: 0;
+           clip-path: inset(0 0 0 0);
+       }
+   }
+
+   @keyframes pixelBurst {
+       0% {
+           opacity: 1;
+           transform: translate(-50%, -50%) scale(0.3);
+       }
+
+       100% {
+           opacity: 0;
+           transform: translate(-50%, -50%) scale(1.8);
+       }
+   }
+
+   @keyframes pixelFloat {
+       0% {
+           opacity: 0;
+           transform: translate(-50%, 4px);
+       }
+
+       20% {
+           opacity: 1;
+       }
+
+       100% {
+           opacity: 0;
+           transform: translate(-50%, -24px);
+       }
+   }
+   /* =========================================
+   POKECHESS+ PIXEL COMBAT VFX V2
+   ========================================= */
+
+   /* Hiệu ứng va chạm */
+   .pixel-impact {
+       position: absolute;
+       left: 50%;
+       top: 40%;
+
+       width: 18px;
+       height: 18px;
+
+       transform: translate(-50%, -50%);
+
+       pointer-events: none;
+       z-index: 130;
+
+       background: #fff5c4;
+
+       clip-path: polygon(40% 0%, 60% 0%,
+               60% 30%, 100% 30%,
+               100% 50%, 65% 50%,
+               65% 100%, 35% 100%,
+               35% 65%, 0% 65%,
+               0% 35%, 40% 35%);
+
+       animation: pixelImpact 0.3s steps(4, end) forwards;
+   }
+
+   .pixel-impact-attack {
+       background: #ffe78c;
+       filter: drop-shadow(2px 2px #d87532);
+   }
+
+   .pixel-impact-skill {
+       background: #8ed8ff;
+       filter: drop-shadow(2px 2px #4875e6);
+   }
+
+   @keyframes pixelImpact {
+       0% {
+           opacity: 0;
+           transform: translate(-50%, -50%) scale(0.4);
+       }
+
+       35% {
+           opacity: 1;
+           transform: translate(-50%, -50%) scale(1.5);
+       }
+
+       100% {
+           opacity: 0;
+           transform: translate(-50%, -50%) scale(0.6);
+       }
+   }
+
+   /* Đạn bay */
+   .pixel-bullet {
+       position: absolute;
+
+       width: 8px;
+       height: 8px;
+
+       margin-left: -4px;
+       margin-top: -4px;
+
+       background: #ffec87;
+       border: 2px solid #e69a35;
+
+       box-sizing: border-box;
+       pointer-events: none;
+       z-index: 140;
+
+       image-rendering: pixelated;
+
+       animation: pixelBulletFly 0.25s linear forwards;
+   }
+
+   .pixel-bullet-mage {
+       background: #a5e9ff;
+       border-color: #477be5;
+   }
+
+   .pixel-bullet-marksman {
+       background: #fff3a0;
+       border-color: #e6a238;
+   }
+
+   @keyframes pixelBulletFly {
+       from {
+           opacity: 1;
+           transform: translate(0, 0) scale(1);
+       }
+
+       to {
+           opacity: 0;
+           transform:
+               translate(var(--bullet-x), var(--bullet-y)) scale(0.7);
+       }
+   }
+
+   /* Giao diện chiến đấu gọn hơn */
+   body.hex-combat-active .hex-combat-role {
+       transform: scale(0.8);
+       transform-origin: top right;
+       opacity: 0.75;
+   }
+
+   body.hex-combat-active .hex-combat-hp {
+       height: 4px;
+   }
+
+   body.hex-combat-active .hex-combat-mana {
+       height: 3px;
+   }
+
+   body.hex-combat-active .hex-floating-text {
+       font-size: 9px;
+   }
+
+   body.hex-combat-active .hex-float-skill-name {
+       font-size: 7px;
+       opacity: 0.85;
+   }
+
+   /* Giấu viền lưới Hex khi đang chiến đấu */
+   body.hex-mode.hex-combat-active .board .square::after {
+       opacity: 0 !important;
+       background: transparent !important;
+   }
+
+   /* ======================================
+   ELEMENTAL PIXEL VFX V3
+   ====================================== */
+
+   .elemental-projectile,
+   .elemental-impact {
+       --vfx-main: #fff2a0;
+       --vfx-edge: #d4a44d;
+
+       position: absolute;
+       pointer-events: none;
+       z-index: 145;
+
+       image-rendering: pixelated;
+   }
+
+   .elemental-fire {
+       --vfx-main: #ffb347;
+       --vfx-edge: #ef4931;
+   }
+
+   .elemental-water {
+       --vfx-main: #91e8ff;
+       --vfx-edge: #278bd5;
+   }
+
+   .elemental-electric {
+       --vfx-main: #fff36a;
+       --vfx-edge: #e4a526;
+   }
+
+   .elemental-grass {
+       --vfx-main: #a6ef77;
+       --vfx-edge: #3c9d54;
+   }
+
+   .elemental-ice {
+       --vfx-main: #d4fbff;
+       --vfx-edge: #65bde5;
+   }
+
+   .elemental-psychic {
+       --vfx-main: #ff9de1;
+       --vfx-edge: #9a50d9;
+   }
+
+   .elemental-ghost {
+       --vfx-main: #c7a2fa;
+       --vfx-edge: #6342a5;
+   }
+
+   .elemental-dark {
+       --vfx-main: #aa92c5;
+       --vfx-edge: #493b65;
+   }
+
+   .elemental-dragon {
+       --vfx-main: #a8b5ff;
+       --vfx-edge: #5264d6;
+   }
+
+   .elemental-poison {
+       --vfx-main: #d89cff;
+       --vfx-edge: #8945ba;
+   }
+
+   .elemental-fairy {
+       --vfx-main: #ffd0ef;
+       --vfx-edge: #dd74b9;
+   }
+
+   .elemental-rock,
+   .elemental-ground {
+       --vfx-main: #ddc18b;
+       --vfx-edge: #89704b;
+   }
+
+   .elemental-steel {
+       --vfx-main: #e3e9f3;
+       --vfx-edge: #8094ae;
+   }
+
+   .elemental-fighting {
+       --vfx-main: #ffc18e;
+       --vfx-edge: #b85a43;
+   }
+
+   .elemental-flying {
+       --vfx-main: #c7e9ff;
+       --vfx-edge: #79a5dc;
+   }
+
+   .elemental-bug {
+       --vfx-main: #d2ef8b;
+       --vfx-edge: #799e3e;
+   }
+
+   /* Viên đạn pixel */
+   .elemental-projectile {
+       width: 9px;
+       height: 9px;
+
+       margin-left: -4px;
+       margin-top: -4px;
+
+       background: var(--vfx-main);
+       border: 2px solid var(--vfx-edge);
+       box-sizing: border-box;
+
+       box-shadow:
+           3px 0 var(--vfx-edge),
+           -3px 0 var(--vfx-main);
+
+       animation: elementalFly 0.3s linear forwards;
+   }
+
+   /* Vụ nổ tại mục tiêu */
+   .elemental-impact {
+       width: 20px;
+       height: 20px;
+
+       left: 50%;
+       top: 40%;
+
+       background: var(--vfx-main);
+       border: 3px solid var(--vfx-edge);
+
+       clip-path: polygon(35% 0%, 65% 0%,
+               65% 30%, 100% 30%,
+               100% 65%, 65% 65%,
+               65% 100%, 35% 100%,
+               35% 65%, 0% 65%,
+               0% 30%, 35% 30%);
+
+       animation: elementalImpact 0.32s steps(5, end) forwards;
+   }
+
+   @keyframes elementalFly {
+       0% {
+           opacity: 1;
+           transform: translate(0, 0) scale(1);
+       }
+
+       100% {
+           opacity: 0;
+           transform:
+               translate(var(--vfx-dx), var(--vfx-dy)) scale(0.65);
+       }
+   }
+
+   @keyframes elementalImpact {
+       0% {
+           opacity: 0;
+           transform: translate(-50%, -50%) scale(0.3);
+       }
+
+       30% {
+           opacity: 1;
+           transform: translate(-50%, -50%) scale(1.5);
+       }
+
+       100% {
+           opacity: 0;
+           transform: translate(-50%, -50%) scale(0.5);
+       }
+   }
+
+
+   /* ====================================
+   POKEMON INFO - BELOW BATTLEFIELD
+   ==================================== */
+
+   body.hex-mode .arena-center .hex-pokemon-inspector {
+       position: relative !important;
+
+       top: auto !important;
+       right: auto !important;
+       left: auto !important;
+       bottom: auto !important;
+
+       transform: none !important;
+
+       width: min(100%, 570px) !important;
+       max-width: 100% !important;
+       max-height: none !important;
+
+       margin: 8px auto 4px !important;
+       flex-shrink: 0;
+       z-index: auto;
+
+       box-sizing: border-box;
+       overflow: hidden;
+
+       background: #111827;
+       border: 2px solid #d4a83e;
+       box-shadow: 0 4px 0 #070b12;
+   }
+
+   body.hex-mode .arena-center .hex-pokemon-inspector.visible {
+       display: block !important;
+   }
+
+   body.hex-mode .arena-center .hex-inspector-body {
+       padding: 6px 8px;
+   }
+
+   body.hex-mode .arena-center .hex-inspector-stats {
+       display: grid;
+       grid-template-columns: repeat(3, minmax(0, 1fr));
+       gap: 6px;
+   }
+
+   body.hex-mode .arena-center .hex-inspector-stat {
+       padding: 5px 3px;
+   }
+
+   body.hex-mode .arena-center .hex-inspector-stat strong {
+       font-size: 10px;
+   }
+
+   /* Keep the board and inspector in the center column's own scroll area. */
+   body.hex-mode .arena-center {
+       min-height: 0;
+   }
+
+   body.hex-mode .arena-center .board-view {
+       min-height: 0;
+       overflow-y: auto;
+       overflow-x: hidden;
+       scrollbar-width: thin;
+       scrollbar-color: #789b60 #17271d;
+       overscroll-behavior: contain;
+       padding: 8px 6px 6px;
+   }
+
+   body.hex-mode .board-top-controls,
+   body.hex-mode .board-wrapper {
+       flex-shrink: 0;
+   }
+
+   body.hex-mode .hex-inspector-header {
+       padding: 4px 8px;
+       font-family: 'Silkscreen', monospace;
+   }
+
+   body.hex-mode .hex-inspector-name {
+       font-size: 11px;
+   }
+
+   body.hex-mode .hex-inspector-class {
+       margin: 5px 0;
+       padding: 4px 6px;
+   }
+
+   body.hex-mode .hex-inspector-section {
+       margin-top: 5px;
+       padding-top: 4px;
+   }
+
+   .hex-inspector-section summary {
+       cursor: pointer;
+   }
+
+   .hex-inspector-shield {
+       margin-top: 4px;
+       color: #b5ddff;
+       font-size: 8px;
+   }
+
+   .hex-combat-unit:focus-visible {
+       outline: 2px solid #ffe475;
+       outline-offset: 2px;
+   }
+
+   .hex-float-effectiveness {
+       top: -18px;
+       color: #fff2a0;
+       font-size: 8px;
+   }
+
+   /* Shape and cadence vary by element; use hard edges and limited colors. */
+   .elemental-projectile {
+       animation-timing-function: steps(8, end);
+       border-radius: 0;
+   }
+
+   .elemental-projectile.elemental-fire {
+       width: 13px;
+       height: 16px;
+       clip-path: polygon(50% 0, 70% 35%, 100% 50%, 100% 100%, 0 100%, 0 50%, 30% 35%);
+       box-shadow: inset 0 -5px #ffe78c;
+   }
+
+   .elemental-projectile.elemental-water,
+   .elemental-projectile.elemental-ice {
+       width: 12px;
+       height: 16px;
+       clip-path: polygon(40% 0, 60% 0, 60% 20%, 80% 40%, 100% 60%, 100% 80%, 80% 100%, 20% 100%, 0 80%, 0 60%, 20% 40%, 40% 20%);
+       box-shadow: inset 3px 0 #e6fcff;
+   }
+
+   .elemental-projectile.elemental-electric {
+       width: 14px;
+       height: 20px;
+       border: 0;
+       clip-path: polygon(40% 0, 100% 0, 60% 40%, 100% 40%, 20% 100%, 40% 55%, 0 55%);
+   }
+
+   .elemental-projectile.elemental-grass,
+   .elemental-projectile.elemental-bug {
+       width: 16px;
+       height: 10px;
+       clip-path: polygon(0 40%, 40% 0, 100% 0, 100% 60%, 60% 100%, 0 100%);
+       box-shadow: inset 0 -3px var(--vfx-edge);
+   }
+
+   .elemental-impact.elemental-water,
+   .elemental-impact.elemental-ice {
+       clip-path: polygon(0 0, 30% 0, 30% 30%, 70% 30%, 70% 0, 100% 0, 100% 30%, 70% 30%, 70% 70%, 100% 70%, 100% 100%, 70% 100%, 70% 70%, 30% 70%, 30% 100%, 0 100%, 0 70%, 30% 70%, 30% 30%, 0 30%);
+   }
+
+   .hex-boss-unit {
+       z-index: 110;
+   }
+
+   .hex-boss-aura {
+       border-radius: 0;
+       background: transparent;
+       border: 2px dashed var(--boss-glow);
+       animation-timing-function: steps(4, end);
+   }
+
+   .hex-boss-ring {
+       border-radius: 0;
+       box-shadow: 2px 2px #17271d;
+       animation-timing-function: steps(4, end);
+   }
+
+   .hex-boss-unit[data-boss-phase="2"] .hex-boss-aura {
+       border-style: solid;
+       animation-duration: 0.8s;
+   }
+
+   .hex-boss-unit[data-boss-phase="3"] .hex-boss-aura {
+       border-width: 4px;
+       animation-duration: 0.4s;
+   }
+
+   @media (max-width: 700px) {
+       body.hex-mode .arena-center .hex-inspector-stats {
+           grid-template-columns: repeat(2, minmax(0, 1fr));
+       }
+   }
+
+   
