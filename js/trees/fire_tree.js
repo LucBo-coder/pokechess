@@ -63,8 +63,7 @@ TREE_REGISTRY['fire'] = {
     if (hasNode('fire_node_3')) hp += 8;
     if (hasNode('fire_node_4')) hp += 8;
     if (hasNode('fire_node_5')) hp += 8;
-    if (hasNode('fire_notable_2')) hp += 18;
-    if (hasNode('fire_keystone')) hp += 25;
+    if (hasNode('fire_notable_2')) hp += 15;
     return hp;
   },
 
@@ -75,7 +74,6 @@ TREE_REGISTRY['fire'] = {
     if (hasNode('fire_node_2')) dmg += 3;
     if (hasNode('fire_node_6')) dmg += 3;
     if (hasNode('fire_notable_1')) dmg += 6;
-    if (hasNode('fire_keystone')) dmg += 10;
     return dmg;
   }
 };

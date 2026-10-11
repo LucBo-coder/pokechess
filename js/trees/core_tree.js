@@ -224,6 +224,7 @@ TREE_REGISTRY['core'] = {
 
   getBonusHp(piece, stage, hasNode, selectedStarterId) {
     let hp = 0;
+    if (hasNode('m_root')) hp += 3;
     if (hasNode('m_hp_1')) hp += 3;
     if (hasNode('m_conn_1')) hp += 4;
     if (hasNode('m_hp_2')) hp += 5;
@@ -242,8 +243,8 @@ TREE_REGISTRY['core'] = {
 
     const isStarter = piece && (
       Array.isArray(selectedStarterId)
-        ? selectedStarterId.includes(piece.type)
-        : piece.type === selectedStarterId
+        ? selectedStarterId.includes(piece.starterSpeciesId ?? piece.type)
+        : (piece.starterSpeciesId ?? piece.type) === selectedStarterId
     );
 
     if (isStarter) {
@@ -258,20 +259,32 @@ TREE_REGISTRY['core'] = {
 
   getBonusAtk(piece, stage, hasNode, selectedStarterId) {
     let dmg = 0;
+    if (hasNode('m_conn_1')) dmg += 1;
+    if (hasNode('m_spine_1')) dmg += 4;
+    if (hasNode('m_spine_2')) dmg += 2;
+    if (hasNode('a_root')) dmg += 1;
+    if (hasNode('a_elem_1')) dmg += 2;
+    if (hasNode('a_elem_2')) dmg += 3;
+    if (hasNode('a_elem_3')) dmg += 2;
+    if (hasNode('a_notable_2')) dmg += 2;
+    if (hasNode('a_spine_2')) dmg += 2;
     if (hasNode('m_atk_1')) dmg += 1;
     if (hasNode('m_atk_2')) dmg += 2;
     if (hasNode('m_atk_3')) dmg += 3;
     if (hasNode('m_notable_2')) dmg += 6;
+    if (hasNode('m_notable_3')) dmg += 3;
 
     const isStarter = piece && (
       Array.isArray(selectedStarterId)
-        ? selectedStarterId.includes(piece.type)
-        : piece.type === selectedStarterId
+        ? selectedStarterId.includes(piece.starterSpeciesId ?? piece.type)
+        : (piece.starterSpeciesId ?? piece.type) === selectedStarterId
     );
 
     if (isStarter) {
+      if (hasNode('r_starter_1')) dmg += 2;
+      if (hasNode('r_notable_1')) dmg += 4;
+      if (hasNode('r_spine_2')) dmg += 3;
       if (hasNode('r_starter_2')) dmg += 3;
-      if (hasNode('r_notable_4')) dmg += 8;
     }
     return dmg;
   }

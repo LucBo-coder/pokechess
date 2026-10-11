@@ -46,12 +46,6 @@ Object.assign(RoguelikeUI.prototype, {
       typeof TypeSystem.getTypeEffectiveness === 'function' &&
       typeof TypeSystem.getEffectivePieceElements === 'function'
     ) {
-      const attackTypes = TypeSystem.getEffectivePieceElements(piece);
-      const types = [
-        attackTypes?.element,
-        attackTypes?.element2
-      ].filter(Boolean);
-
       for (const enemy of enemies) {
         const enemyTypes = TypeSystem.getEffectivePieceElements(enemy.piece);
         const defendTypes = [
@@ -61,33 +55,14 @@ Object.assign(RoguelikeUI.prototype, {
 
         if (!defendTypes.length) continue;
 
-        let bestMultiplier = 1;
-
-        for (const attackType of types) {
-          let multiplier = 1;
-
-          for (const defendType of defendTypes) {
-            const effectiveness = Number(
-              TypeSystem.getTypeEffectiveness(
-                String(attackType).toLowerCase(),
-                String(defendType).toLowerCase()
-              )
-            );
-
-            multiplier *= Number.isFinite(effectiveness)
-              ? effectiveness
-              : 1;
-          }
-
-          bestMultiplier = Math.max(bestMultiplier, multiplier);
-        }
+        const multiplier = TypeSystem.getHexAttack({ ...piece, square }, enemy.piece).multiplier;
 
         const enemyCol = enemy.square % 7;
         const columnDistance = Math.abs(col - enemyCol);
         const proximityWeight = Math.max(0, 4 - columnDistance);
 
         // Khắc hệ là ưu tiên bổ sung, không phá hoàn toàn đội hình class.
-        score += (bestMultiplier - 1) * proximityWeight * 6;
+        score += (multiplier - 1) * proximityWeight * 6;
       }
     }
 
@@ -421,7 +396,7 @@ Object.assign(RoguelikeUI.prototype, {
   
       if (this.phase === 'setup' && this.activeApplyingTalisman && p.color === W) {
         const talDef = TALISMANS[this.activeApplyingTalisman.talismanId];
-        const maxSlots = p.maxTalismans || 3;
+        const maxSlots = (p.maxTalismans || 3) + (window.MetaProgression?.getExtraTalismanSlots() ?? 0);
         const isSlotFull = talDef && !talDef.isSpell && (p.talismans || []).length >= maxSlots;
         const isEligible = typeof TalismanSystem !== 'undefined' && TalismanSystem.isApplicable(this.activeApplyingTalisman.talismanId, p.type) && !isSlotFull;
         el.classList.add(isEligible ? 'talisman-target-eligible' : 'talisman-target-ineligible');
@@ -456,7 +431,7 @@ Object.assign(RoguelikeUI.prototype, {
           const isWhite = typeof TypeSystem !== 'undefined' ? TypeSystem.isWhiteSquare(i) : true;
           const activeAtk = typeof TypeSystem !== 'undefined' ? TypeSystem.getAttackingType(p, i).toUpperCase() : t1;
           img.title = document.body.classList.contains('hex-mode')
-            ? `${pInfo.name || displayType} [${typeStr}]\nAttack: strongest elemental matchup\nDefense: ${typeStr}`
+            ? `${pInfo.name || displayType} [${typeStr}]\nAttack: ${TypeSystem.getHexAttackingType(p, i).toUpperCase()} (Hex ${i})\nDefense: ${typeStr}`
             : `${pInfo.name || displayType} [${typeStr}]\nAttack Element: ${activeAtk} (${isWhite ? 'White square: 1st Type' : 'Dark square: 2nd Type'})\nDefense: ${typeStr}`;
         }
       }
@@ -523,7 +498,7 @@ Object.assign(RoguelikeUI.prototype, {
         const st = this.phase === 'setup'
           ? this.getHexPieceStats(p, i)
           : this.getEffectivePieceStats(p);
-        const curHp = this.phase === 'setup' ? st.maxHp
+        const curHp = this.phase === 'setup' ? st.hp ?? st.maxHp
           : this.pieceHP[i] !== undefined ? Math.max(0, this.pieceHP[i]) : st.maxHp;
   
         const hud = document.createElement('div');
@@ -537,14 +512,14 @@ Object.assign(RoguelikeUI.prototype, {
         if (typeof TypeSystem !== 'undefined') {
           const hexMode = document.body.classList.contains('hex-mode');
           const elements = TypeSystem.getEffectivePieceElements(p);
-          const atkType = hexMode ? elements.element : TypeSystem.getAttackingType(p, i);
+          const atkType = hexMode ? TypeSystem.getHexAttackingType(p, i) : TypeSystem.getAttackingType(p, i);
           const isWhite = TypeSystem.isWhiteSquare(i);
           const typeBadge = document.createElement('img');
           typeBadge.className = 'hud-type-badge';
           typeBadge.src = TypeSystem.getIconUrl(atkType);
           typeBadge.alt = atkType.toUpperCase();
           typeBadge.title = hexMode
-            ? `Attack: ${[elements.element, elements.element2].filter(Boolean).join(' / ').toUpperCase()} (strongest matchup)`
+            ? `Attack: ${atkType.toUpperCase()} (Hex ${i}: ${TypeSystem.isWhiteHex(i) ? '1st type' : '2nd type or 1st'})`
             : `Active Attack: ${atkType.toUpperCase()} (${isWhite ? 'White square: 1st type' : 'Black square: 2nd type'})`;
           hud.appendChild(typeBadge);
         }
@@ -812,6 +787,12 @@ Object.assign(RoguelikeUI.prototype, {
 
   playBoardEvolutionSequence(evolutions) {
     if (!evolutions || evolutions.length === 0) return;
+    const revision = this.setupRevision;
+    const valid = () => this.setupRevision === revision;
+    const complete = evo => {
+      this.pendingEvolutions = (this.pendingEvolutions || []).filter(p => p.invId !== evo.invId);
+      this.saveRoguelikeProgress?.();
+    };
   
     this.isSetupAnimating = true;
   
@@ -819,6 +800,7 @@ Object.assign(RoguelikeUI.prototype, {
       const stepDelay = idx * 1100;
       setTimeout(() => {
         // Find square where piece is placed
+        if (!valid()) return;
         let sq = -1;
         for (let i = 0; i < 64; i++) {
           const p = this.game.board[i];
@@ -851,6 +833,7 @@ Object.assign(RoguelikeUI.prototype, {
   
           // 3. At climax (500ms): swap sprite, update stats & HUD
           setTimeout(() => {
+            if (!valid()) return;
             img.src = getPieceIconUrl(evo.nextType);
             img.alt = evo.newName;
   
@@ -882,9 +865,10 @@ Object.assign(RoguelikeUI.prototype, {
             // Update HUD HP
             const hpNum = sqEl.querySelector('.hud-hp-num');
             if (hpNum && this.game.board[sq]) {
-              const st = this.getEffectivePieceStats(this.game.board[sq]);
-              hpNum.textContent = `${st.maxHp}/${st.maxHp}`;
+              const st = this.getHexPieceStats(this.game.board[sq], sq);
+              hpNum.textContent = `${st.hp ?? st.maxHp}/${st.maxHp}`;
             }
+            complete(evo);
   
             this.addLog(`✨ EVOLUTION: Your ${evo.oldName} evolved into ${evo.newName}!`);
           }, 500);
@@ -903,6 +887,7 @@ Object.assign(RoguelikeUI.prototype, {
           }
           const form = this.setupFormation.find(f => f.invId === evo.invId);
           if (form) form.type = evo.nextType;
+          complete(evo);
           this.addLog(`✨ EVOLUTION: Your ${evo.oldName} evolved into ${evo.newName}!`);
         }
       }, stepDelay);
@@ -910,7 +895,11 @@ Object.assign(RoguelikeUI.prototype, {
   
     const totalTime = evolutions.length * 1100 + 500;
     setTimeout(() => {
+      if (!valid()) return;
       this.isSetupAnimating = false;
+      this.renderBoard();
+      this.renderInventory();
+      this.updateTurnIndicator();
       this.renderTalismans();
       this.renderShop();
       this.updateStats();

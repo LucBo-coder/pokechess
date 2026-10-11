@@ -474,6 +474,7 @@ const MetaProgression = {
   getBonusStartingSlots() {
     let slots = 0;
     if (this.hasNode('w_slot_1')) slots += 1;
+    if (this.hasNode('w_slot_2')) slots += 1;
     if (this.hasNode('w_notable_5')) slots += 1;
     return slots;
   },
@@ -493,6 +494,7 @@ const MetaProgression = {
   },
 
   getBonusMaxHp(piece, stage) {
+    if (!piece || piece.color !== W) return 0;
     let hp = 0;
     if (typeof TREE_REGISTRY === 'undefined') return 0;
 
@@ -519,6 +521,7 @@ const MetaProgression = {
   },
 
   getBonusDamage(piece, stage) {
+    if (!piece || piece.color !== W) return 0;
     let dmg = 0;
     if (typeof TREE_REGISTRY === 'undefined') return 0;
 
@@ -545,6 +548,7 @@ const MetaProgression = {
   },
 
   getCritChanceBonus(piece) {
+    if (!piece || piece.color !== W) return 0;
     let crit = 0;
     if (this.hasNode('m_crit_1')) crit += 0.03;
     if (this.hasNode('m_notable_3')) crit += 0.08;

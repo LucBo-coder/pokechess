@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi-VN">
 
 <head>
   <!-- Anti-cache meta headers for web hosting / public_html -->
@@ -7,6 +7,9 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <meta charset="UTF-8" />
+  <script src="locales/en-US.js"></script>
+  <script src="locales/vi-VN.js"></script>
+  <script src="js/i18n.js"></script>
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -104,6 +107,10 @@
           </button>
           <button id="btnNewRun" class="btn btn-secondary">NEW RUN</button>
           <button id="btnOpenMenu" class="btn btn-secondary" title="Open Game Menu / Save Vault (ESC)">MENU</button>
+          <select id="languageSelect" class="language-select" aria-label="Ngôn ngữ">
+            <option value="vi-VN">Tiếng Việt</option>
+            <option value="en-US">English</option>
+          </select>
         </div>
       </header>
 
@@ -587,7 +594,7 @@
           </div>
 
           <div class="main-menu-footer">
-            <span class="main-menu-version">POKÉCHESS+ v3.0.0</span>
+            <span class="main-menu-version">POKÉCHESS+ v3.5.0</span>
           </div>
         </div>
       </div>
@@ -777,6 +784,10 @@
   <script src="js/autochess/hex_skill_info.js"></script>
   <script src="js/autochess/hex_pokemon_info.js"></script>
   <script src="js/autochess/hex_preparation_info.js"></script>
+  <script src="js/roguelike_expansion.js"></script>
+  <script src="js/autochess/hex_traits.js"></script>
+  <script src="js/autochess/hex_effects.js"></script>
+  <script src="js/mastery.js"></script>
 </body>
 
 </html>

@@ -6708,16 +6708,16 @@ select option, select.editor-select option {
 .arena-center {
   justify-content: flex-start !important;
   min-height: 0 !important;
-  overflow-y: auto !important;
+  overflow-y: hidden !important;
   overflow-x: hidden !important;
   scrollbar-width: thin;
   scrollbar-color: #d4a83e #101521;
 }
 
 .arena-center .board-view {
-  height: auto !important;
-  min-height: min-content !important;
-  flex: 0 0 auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
   justify-content: flex-start !important;
 }
 
@@ -6740,7 +6740,7 @@ select option, select.editor-select option {
   min-height: 0 !important;
   max-height: none !important;
 
-  margin: 12px auto 24px !important;
+  margin: 8px auto 8px !important;
   overflow: hidden !important;
   box-sizing: border-box;
 }
@@ -6754,7 +6754,7 @@ select option, select.editor-select option {
   height: auto !important;
   max-height: none !important;
   overflow: visible !important;
-  padding: 12px !important;
+  padding: 6px !important;
 }
 
 .arena-center #hex-pokemon-inspector .hex-inspector-stats {
@@ -6765,4 +6765,37 @@ select option, select.editor-select option {
 
 .arena-center #hex-pokemon-inspector .hex-inspector-section {
   overflow-wrap: anywhere;
+}
+
+.language-select {
+  max-width: 74px;
+  min-width: 0;
+  font: 9px Consolas, 'Courier New', monospace;
+  color: var(--gold, #ffd76c);
+  background: #17243a;
+  border: 1px solid #526680;
+  padding: 3px;
+}
+
+.mastery-section label { display: block; margin-top: 5px; }
+.mastery-section select { display: block; width: 100%; min-width: 0; background: #142139; color: #eee; font: inherit; }
+.mastery-collection-box { max-width: 500px; width: 90%; }
+.mastery-collection-list { max-height: 220px; overflow-y: auto; margin: 8px 0; width: 100%; }
+.mastery-collection-row { display: flex; justify-content: space-between; gap: 8px; padding: 5px; border-bottom: 1px solid #526680; font: 11px Consolas, monospace; }
+.mastery-search { width: 100%; box-sizing: border-box; }
+.mastery-collection-entry p { text-align: left; font: 11px Consolas, monospace; margin: 4px 6px; }
+
+html[lang="vi-VN"] .btn,
+html[lang="vi-VN"] .modal-title,
+html[lang="vi-VN"] .hex-pokemon-inspector,
+html[lang="vi-VN"] .intel-item {
+  font-family: Consolas, 'Courier New', monospace;
+  line-height: 1.35;
+}
+
+html[lang="vi-VN"] .btn-menu-action,
+html[lang="vi-VN"] .intel-item,
+html[lang="vi-VN"] .hex-inspector-title {
+  white-space: normal;
+  overflow-wrap: break-word;
 }

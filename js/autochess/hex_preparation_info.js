@@ -47,7 +47,7 @@ window.HexPreparationInfo = {
 
         panel.innerHTML = `
             <div class="hex-inspector-header">
-                <span>POKÉMON INFO</span>
+                <span data-i18n="pokemon.info">${window.t ? t('pokemon.info') : 'POKÉMON INFO'}</span>
                 <button type="button"
                     class="hex-inspector-close">×</button>
             </div>
@@ -153,6 +153,13 @@ window.HexPreparationInfo = {
         // Không hiển thị chỉ số gốc giả làm
         // chỉ số chiến đấu khi chưa tìm thấy unit.
         if (combatActive && !unit) return;
+        const actualRole=unit?.combatRole??predicted?.combatRole??data.role;
+        if(actualRole!==data.role) {
+            data.className=t(`role.${actualRole}`);
+            data.classDescription=t(`role.${actualRole}.description`);
+            data.skillName=t(`skill.${actualRole}.name`);
+            data.skillDescription=window.HexSkillInfo?.getDescription(actualRole)??'';
+        }
 
         const maxHp = unit
             ? unit.maxHp
@@ -160,7 +167,7 @@ window.HexPreparationInfo = {
 
         const hp = unit
             ? unit.hp
-            : maxHp;
+            : predicted?.hp ?? maxHp;
 
         const damage = unit
             ? unit.attackDamage
@@ -199,17 +206,29 @@ window.HexPreparationInfo = {
         const elementText = [
             elements.element,
             elements.element2
-        ].filter(Boolean).join(' / ');
+        ].filter(Boolean).map(id=>window.t ? t(`type.${id}`,{defaultValue:id}) : id).join(' / ');
+        const activeElement = typeof TypeSystem !== 'undefined'
+            ? TypeSystem.getHexAttackingType(unit ?? { ...piece }, square)
+            : elements.element;
 
         const bossType = unit?.bossType ?? predicted?.bossType;
         const bossLabel = isBoss
-            ? `${bossType === 'miniBoss' ? '◆ MINI BOSS' : '♛ BOSS'}${unit ? ` · PHASE ${unit.bossPhase}` : ''}`
+            ? `${bossType === 'miniBoss' ? '◆ ' + t('combat.miniBoss') : '♛ ' + t('combat.boss')}${unit ? ' · ' + t('combat.phase',{phase:unit.bossPhase}) : ''}`
             : '';
         const shield = Math.round(unit?.shield ?? 0);
+        const movementSpeed = (ui.hexCombat?.tickRate ?? 30) / (unit?.moveCooldownTicks ?? predicted?.moveCooldownTicks ?? ui.hexCombat?.moveCooldownTicks ?? 15);
+        const eliteType = unit?.eliteType ?? predicted?.eliteType;
+        const hasBlast = (unit?.bossSkills ?? predicted?.bossSkills ?? []).includes('areaBlast');
+        const skillName = isBoss ? t(unit?.bossPhase >= 2 && hasBlast ? 'skill.boss.blast' : 'skill.boss.strike') : data.skillName;
+        const skillDescription = isBoss ? `${t('skill.boss.description')} ${hasBlast ? t('skill.boss.area') : ''}` : data.skillDescription;
+        const traitDescription = (unit?.traits ?? predicted?.traits ?? []).map(id => t(`trait.${id}.description`,{defaultValue:window.HexTraits?.CONFIG[id]?.description??id})).join(' ');
+        const traits = (unit?.traits ?? predicted?.traits ?? []).map(id => t(`trait.${id}`,{defaultValue:id})).join(', ') || t('pokemon.none');
+        const statuses = Object.entries(unit?.statuses ?? {}).map(([id,status]) => `${t(`status.${id}`,{defaultValue:t(`trait.${id}`,{defaultValue:status.name})})} (${I18n.number(Math.max(0, (status.expiresAt - (ui.hexCombat?.tickCount ?? 0)) / 30),{maximumFractionDigits:1})}s)`).join(', ') || t('pokemon.none');
         this.selectedUnitId = unit?.id ?? null;
         this.selectedSquare = square;
 
         const signature = [
+            window.I18n?.language,
             square,
             combatActive,
             hp,
@@ -221,8 +240,11 @@ window.HexPreparationInfo = {
             range,
             data.id,
             elementText,
+            activeElement,
             bossLabel,
-            shield
+            shield, movementSpeed, traits, statuses, eliteType, skillName,
+            ui.masteryProfile?.species?.[piece.type]?.xp,
+            JSON.stringify(ui.inventory?.find(item=>item.id===piece.invId)?.individualMastery??null)
         ].join('|');
 
         if (
@@ -243,46 +265,53 @@ window.HexPreparationInfo = {
 
             <div class="hex-inspector-subtitle">
                 #${e(data.id)} ·
-                ${e(data.rarity)} ·
-                ${e(elementText)}
+                ${e(t(`rarity.${data.rarity}`,{defaultValue:data.rarity}))} ·
+                ${e(elementText)} · ${e(t('pokemon.attack'))}: ${e(t(`type.${activeElement}`,{defaultValue:activeElement}))}
             </div>
 
             <div class="hex-inspector-class">
                 ${e(data.className)}
                 <span>
-                    ${combatActive ? 'BATTLE' : 'SETUP'}
+                    ${e(t(combatActive ? 'combat.battle' : 'combat.setup'))}
                     · ${e(range)} HEX
                 </span>
             </div>
 
             <div class="hex-inspector-stats">
                 ${stat('HP', `${Math.round(hp)}/${Math.round(maxHp)}`)}
-                ${stat('ATK', damage)}
-                ${stat('SPEED', speed)}
-                ${stat('ATK SPD', Number(attackSpeed).toFixed(2))}
-                ${stat('MANA', mana)}
-                ${stat('RANGE', range)}
+                ${stat(t('pokemon.attack'), damage)}
+                ${stat(t('pokemon.speed'), speed)}
+                ${stat(t('pokemon.attackSpeed'), I18n.number(attackSpeed,{minimumFractionDigits:2,maximumFractionDigits:2}))}
+                ${stat(t('pokemon.mana'), mana)}
+                ${stat(t('pokemon.range'), range)}
             </div>
 
-            <div class="hex-inspector-shield">SHIELD ${e(shield)}</div>
+            <div class="hex-inspector-shield">${e(t('combat.shield'))} ${e(shield)}</div>
+            <div class="hex-inspector-shield">${e(t('pokemon.move'))} ${e(I18n.number(movementSpeed,{maximumFractionDigits:2}))} HEX/s ${eliteType ? '· '+e(t('combat.elite'))+' '+ e(eliteType) : ''}</div>
 
             <details class="hex-inspector-section">
-                <summary class="hex-inspector-title">CLASS</summary>
+                <summary class="hex-inspector-title">${e(t('pokemon.role'))}</summary>
                 <strong>${e(data.className)}</strong>
                 <p>${e(data.classDescription)}</p>
             </details>
 
             <details class="hex-inspector-section">
-                <summary class="hex-inspector-title">SKILL · ${e(data.skillName)}</summary>
-                <strong>${e(data.skillName)}</strong>
-                <p>${e(data.skillDescription)}</p>
+                <summary class="hex-inspector-title">${e(t('pokemon.skill'))} · ${e(skillName)}</summary>
+                <strong>${e(skillName)}</strong>
+                <p>${e(skillDescription)}</p>
             </details>
+            <details class="hex-inspector-section">
+                <summary class="hex-inspector-title">${e(t('pokemon.traits'))}</summary>
+                <p>${e(traits)}</p><p>${e(traitDescription)}</p><p>${e(statuses)}</p>
+            </details>
+            ${window.MasterySystem?.inspector(ui,piece,square)??''}
         `;
         this.panel.querySelectorAll('details').forEach((detail, index) => {
             detail.open = expanded[index] ?? false;
         });
 
         this.panel.classList.add('visible');
+        window.MasterySystem?.bindInspector(this.panel,ui);
         this.panel.dataset.unitId = unit?.id ?? '';
         this.panel.dataset.square = String(square);
     },

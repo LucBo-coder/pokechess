@@ -16,11 +16,13 @@ class RoguelikeUI {
     if (!combat || this.hexBattleFinished) return;
 
     this.hexBattleFinished = true;
+    this.lastMasteryAwards = window.MasterySystem?.award(this,combat) ?? [];
 
     console.log('Finishing Hex Battle:', winner);
 
     // Keep the completed combat until rewards have read its units and timer.
     this.disposeHexBattle(true);
+    if (this.ensureRoguelikeState) this.ensureRoguelikeState().lastSummary = combat.getSummary();
 
     this.isAnimating = false;
 
@@ -34,6 +36,7 @@ class RoguelikeUI {
     } else {
       this.handleStageDraw();
     }
+    this.renderCombatSummary?.();
   }
 
   disposeHexBattle(keepResult = false) {
@@ -42,6 +45,7 @@ class RoguelikeUI {
     this.hexRenderer = null;
     this.hexBattlePaused = false;
     document.body.classList.remove('hex-combat-active');
+    document.body.classList.remove('hex-combat-paused');
     window.HexPreparationInfo?.hide();
     if (!keepResult) {
       this.hexCombat = null;
@@ -55,6 +59,7 @@ class RoguelikeUI {
     const blocked = !!document.querySelector(
       '.modal-overlay:not(.hidden), .main-menu-overlay:not(.hidden), .tutorial-overlay:not(.hidden)'
     );
+    document.body.classList.toggle('hex-combat-paused', blocked);
     if (blocked && combat.running) {
       combat.stop();
       this.hexBattlePaused = true;
@@ -83,8 +88,9 @@ class RoguelikeUI {
     // Roguelike Run State
     // Roguelike Run State: Starts with 0 gold (3 starters deployed automatically)
     this.stage = 1;
+    this.runState = window.RoguelikeExpansion?.createRun();
     this.gold = 0 + (typeof MetaProgression !== 'undefined' ? MetaProgression.getBonusStartingGold() : 0);
-    this.maxSlots = 3; // Starts with 3 slots
+    this.maxSlots = 3 + (window.MetaProgression?.getBonusStartingSlots() ?? 0);
     this.slotCosts = [10, 15, 20, 25, 30, 35, 45, 55, 70]; // Costs for slots 4 through 12 (max 12)
     this.slotUpgradeIndex = 0;
 
@@ -161,14 +167,23 @@ class RoguelikeUI {
 
 
 
-  getEffectivePieceStats(piece) {
+  getEffectivePieceStats(piece, options = {}) {
     if (!piece) return { maxHp: 1, damage: 1, speed: 100, baseSpeed: 100, hasStrikeFirst: false };
     const base = PIECE_STATS[piece.type] || PIECE_STATS.P;
     const baseSpd = (typeof getPokemonBaseSpeed === 'function') ? getPokemonBaseSpeed(base) : (base.speed || 100);
+    // Hex supplies class modifiers; legacy callers retain their existing stats.
+    const classConfig = options.classModifiers;
+    const baseHp = (base.maxHp || 1) * (classConfig?.hpMultiplier ?? 1);
+    const baseDmg = (base.damage !== undefined ? base.damage : 1) * (classConfig?.damageMultiplier ?? 1);
+    const includeTemporary = options.includeTemporary !== false;
+    const bonusPiece = includeTemporary ? piece : { ...piece, _battleBonusAtk: 0 };
+    const inventoryItem=this.inventory?.find(item=>item.id===(piece.invId??piece.id));
+    const astralPiece={...piece,starterSpeciesId:piece.starterSpeciesId??inventoryItem?.starterSpeciesId};
     
-    let bonusAtk = (typeof TalismanSystem !== 'undefined' && typeof TalismanSystem.getBonusAtk === 'function' ? TalismanSystem.getBonusAtk(piece) : 0);
+    let bonusAtk = (typeof TalismanSystem !== 'undefined' && typeof TalismanSystem.getBonusAtk === 'function' ? TalismanSystem.getBonusAtk(bonusPiece) : 0) + (options.startBonusAtk ?? 0);
     let bonusHp = (typeof TalismanSystem !== 'undefined' && typeof TalismanSystem.getBonusHp === 'function' ? TalismanSystem.getBonusHp(piece) : 0);
     let bonusSpd = 0;
+    const modifierBreakdown = { equipment: { hp: bonusHp, attack: bonusAtk, speed: 0 }, synergy: {}, astral: {} };
     if (typeof TalismanSystem !== 'undefined') {
       if (typeof TalismanSystem.getBonusSpeed === 'function') {
         bonusSpd += TalismanSystem.getBonusSpeed(piece);
@@ -177,29 +192,45 @@ class RoguelikeUI {
       }
     }
 
+    modifierBreakdown.equipment.speed = bonusSpd;
     // Strike First: +1000 SPD, but strictly in the first round (Round 1)
     const curRound = (this.battleRounds !== undefined) ? this.battleRounds : 1;
     const hasSF = piece.hasStrikeFirst || (typeof TalismanSystem !== 'undefined' && typeof TalismanSystem.hasStrikeFirst === 'function' && TalismanSystem.hasStrikeFirst(piece)) || (typeof SynergySystem !== 'undefined' && typeof SynergySystem.hasStrikeFirst === 'function' && SynergySystem.hasStrikeFirst(piece, this));
-    if (hasSF && curRound === 1) {
+    if (includeTemporary && hasSF && curRound === 1) {
       bonusSpd += 1000;
     }
 
     if (typeof SynergySystem !== 'undefined') {
+      modifierBreakdown.synergy = { hp: SynergySystem.getBonusHp(piece, this), attack: SynergySystem.getBonusAtk(piece, this), speed: SynergySystem.getBonusSpeed(piece, this) };
       if (typeof SynergySystem.getBonusAtk === 'function') bonusAtk += SynergySystem.getBonusAtk(piece, this);
       if (typeof SynergySystem.getBonusHp === 'function') bonusHp += SynergySystem.getBonusHp(piece, this);
       if (typeof SynergySystem.getBonusSpeed === 'function') bonusSpd += SynergySystem.getBonusSpeed(piece, this);
     }
-    if (typeof MetaProgression !== 'undefined') {
+    if (piece.color === W && typeof MetaProgression !== 'undefined') {
       const curStage = this.stage || 1;
-      bonusAtk += MetaProgression.getBonusDamage(piece, curStage);
-      bonusHp += MetaProgression.getBonusMaxHp(piece, curStage);
+      modifierBreakdown.astral = { hp: MetaProgression.getBonusMaxHp(astralPiece, curStage), attack: MetaProgression.getBonusDamage(astralPiece, curStage), crit: MetaProgression.getCritChanceBonus(piece) };
+      bonusAtk += modifierBreakdown.astral.attack;
+      bonusHp += modifierBreakdown.astral.hp;
+    }
+    if (classConfig && piece.color === W) {
+      bonusHp += this.runState?.upgrades?.hp ?? 0;
+      bonusAtk += this.runState?.upgrades?.attack ?? 0;
+      bonusSpd += this.runState?.upgrades?.speed ?? 0;
+    }
+    if (classConfig && window.HexTraits) {
+      const bonus=HexTraits.classBonus(this,piece);
+      bonusHp+=bonus.hp;bonusAtk+=bonus.attack;bonusSpd+=bonus.speed;
+      if(HexTraits.traitsFor(this,piece).includes('swift'))bonusSpd+=20;
     }
 
     // Temporary battle buffs/debuffs (e.g. Ice chill debuff)
-    if (piece._battleBonusSpeed) bonusSpd += piece._battleBonusSpeed;
-    if (piece._battleSpeedDebuff) bonusSpd -= piece._battleSpeedDebuff;
+    const temporarySpeed = (Number(piece._battleBonusSpeed) || 0) - (Number(piece._battleSpeedDebuff) || 0)
+      + (hasSF && curRound === 1 ? 1000 : 0);
+    if (includeTemporary) bonusSpd += (Number(piece._battleBonusSpeed) || 0) - (Number(piece._battleSpeedDebuff) || 0);
 
     const effSpeed = Math.max(10, baseSpd + bonusSpd);
+    const championMultiplier=piece.color===W&&window.MetaProgression?.hasKeystoneChosenChampion()&&MetaProgression.getSelectedStarters().includes(astralPiece.starterSpeciesId??piece.type)?1.5:1;
+    modifierBreakdown.astral.championMultiplier=championMultiplier;
 
     // Electric synergy speed damage bonus: e.g. 5% / 10% / 15% of Speed
     if (typeof SynergySystem !== 'undefined' && typeof SynergySystem.getSpeedDamageBonus === 'function') {
@@ -207,14 +238,18 @@ class RoguelikeUI {
       bonusAtk += speedDmg;
     }
 
-    const baseDmg = (base.damage !== undefined ? base.damage : 1);
     return {
       ...base,
       baseSpeed: baseSpd,
       speed: effSpeed,
       hasStrikeFirst: !!hasSF,
-      maxHp: (base.maxHp || 1) + bonusHp,
-      damage: Math.max(0, baseDmg + bonusAtk)
+      maxHp: (baseHp + bonusHp)*championMultiplier,
+      damage: Math.max(0, baseDmg + bonusAtk)*championMultiplier,
+      modifierBreakdown,
+      temporaryBonuses: {
+        attack: Number(piece._battleBonusAtk) || 0,
+        speed: temporarySpeed
+      }
     };
   }
 
@@ -355,6 +390,7 @@ class RoguelikeUI {
     this.inventory = starters.map(type => ({
       id: this.invNextId++,
       type: String(type),
+      starterSpeciesId: String(type),
       talismans: [],
       maxTalismans: 3
     }));
@@ -364,6 +400,8 @@ class RoguelikeUI {
 
 
   setupNewStage() {
+    this.setupRevision = (this.setupRevision || 0) + 1;
+    this.isSetupAnimating = false;
     this.disposeHexBattle();
     this.resetDittoTransformations();
     if (typeof soundManager !== 'undefined') {
@@ -453,6 +491,7 @@ class RoguelikeUI {
           bossStage: this.stage
         });
       }
+      if (window.HexTraits) piece.eliteType=HexTraits.eliteFor(this.stage,unit.square,formation[0]?.square);
 
       this.game.board[unit.square] = piece;
     }
@@ -530,6 +569,7 @@ class RoguelikeUI {
 
     this.updateStats();
     this.updateEnemyCard();
+    this.renderShop();
     if (this.inventory.length === 0 && this.placedPieces.length === 0) {
       this.setPokemonTab('recruit');
     } else {
@@ -541,11 +581,18 @@ class RoguelikeUI {
     this.updateAutoBattleUI();
 
     // Trigger board evolution animation for newly evolved pieces in next match
-    if (this.pendingEvolutions && this.pendingEvolutions.length > 0) {
+    if (this.runState?.lastVictoryStage === this.stage) {
+      document.getElementById('victoryModal')?.classList.remove('hidden');
+      this.renderCombatSummary?.();
+    }
+    if (this.runState?.pendingReward || this.runState?.pendingEvent) this.showRoguelikeChoices?.();
+    if (this.pendingEvolutions?.length && this.runState?.lastVictoryStage !== this.stage) {
       const evosToPlay = [...this.pendingEvolutions];
-      this.pendingEvolutions = [];
+      const revision = this.setupRevision;
+      this.isSetupAnimating = true;
+      this.updateTurnIndicator();
       setTimeout(() => {
-        this.playBoardEvolutionSequence(evosToPlay);
+        if (this.setupRevision === revision) this.playBoardEvolutionSequence(evosToPlay);
       }, 350);
     }
   }

@@ -43,9 +43,9 @@ window.HexPokemonInfo = {
             ),
 
             role,
-            className: skill.className ?? role,
+            className: window.t ? t(`role.${role}`) : skill.className ?? role,
             classDescription:
-                skill.classDescription ?? '',
+                window.t ? t(`role.${role}.description`) : skill.classDescription ?? '',
 
             attackRange: Number(
                 config.attackRange ?? 1
@@ -56,7 +56,7 @@ window.HexPokemonInfo = {
             ),
 
             skillName:
-                skill.skillName ?? 'Unknown Skill',
+                window.t ? t(`skill.${role}.name`) : skill.skillName ?? 'Unknown Skill',
 
             skillDescription:
                 window.HexSkillInfo?.getDescription(role) ?? skill.skillDescription ?? ''

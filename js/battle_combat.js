@@ -11,6 +11,9 @@
 Object.assign(RoguelikeUI.prototype, {
 
   startBattle() {
+    if (this.runState?.pendingReward || this.runState?.pendingEvent || this.runState?.lastVictoryStage === this.stage) {
+      this.showRoguelikeChoices?.(); return;
+    }
     if (this.phase === 'battle') return;
     if (this.isSetupAnimating) return;
     if (this.placedPieces.length === 0) {
@@ -1888,6 +1891,7 @@ Object.assign(RoguelikeUI.prototype, {
   },
 
   handleStageVictory() {
+    if (this.runState?.lastVictoryStage === this.stage) return;
     this.isAnimating = false;
     this.postMoveAttackPhase = null;
     this.updateSkipButton();
@@ -2002,6 +2006,7 @@ Object.assign(RoguelikeUI.prototype, {
       rewardPill.innerHTML = `+${totalReward} <img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="modal-coin-icon" alt="Gold" /> (+${survivingCount} units, +${speedBonus} speed bonus)`;
     }
     if (modal) modal.classList.remove('hidden');
+    this.beginRoguelikeReward?.(totalReward);
   },
 
   handleStageDefeat(reason) {

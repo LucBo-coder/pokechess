@@ -47,7 +47,8 @@ const HexView = {
                     (col * width + (row % 2) * offsetX) + 'px';
 
                 cell.style.top = (row * stepY) + 'px';
-                cell.title = `Hex ${sq} (${row}, ${col})`;
+                const attackSlot = (row + col) % 2 !== 0 ? 1 : 2;
+                cell.title = `Hex ${sq} (${row}, ${col}) · Attack type ${attackSlot}${attackSlot === 2 ? ' (or type 1)' : ''}`;
 
                 board.appendChild(cell);
             }

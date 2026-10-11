@@ -99,6 +99,7 @@ Object.assign(RoguelikeUI.prototype, {
       this.game.board[unit.sq] = {
         color: 'w',
         type: unit.type,
+        invId: unit.invId,
         talismans: [...(unit.talismans || [])],
         maxTalismans: unit.maxTalismans ?? 3
       };
@@ -477,6 +478,7 @@ Object.assign(RoguelikeUI.prototype, {
   },
 
   generateRewardCards() {
+    const choiceCount = 3 + (window.MetaProgression?.getExtraShopCards() ?? 0);
     // Normal Recruit Shop: Offer first-stage Pokemon by rarity weights
     const allStage1 = (typeof ALL_PIECE_KEYS !== 'undefined' ? ALL_PIECE_KEYS : Object.keys(PIECES))
       .filter(k => PIECES[k] && Number(PIECES[k].stage) === 1);
@@ -522,7 +524,7 @@ Object.assign(RoguelikeUI.prototype, {
     const choices = [];
     const used = new Set();
     let attempts = 0;
-    while (choices.length < 3 && attempts < 80) {
+    while (choices.length < choiceCount && attempts < 80) {
       attempts++;
       const targetRarity = rollRarity();
       let pool = groups[targetRarity];
@@ -535,14 +537,14 @@ Object.assign(RoguelikeUI.prototype, {
     }
   
     // Fallback if needed
-    while (choices.length < 3 && allStage1.length > 0) {
+    while (choices.length < choiceCount && allStage1.length > 0) {
       const rand = allStage1[Math.floor(Math.random() * allStage1.length)];
       if (!choices.includes(rand)) choices.push(rand);
       else if (choices.length < allStage1.length) continue;
       else choices.push(rand);
     }
   
-    this.cardChoices = choices.slice(0, 3);
+    this.cardChoices = choices.slice(0, choiceCount);
   },
   
   // ---- Update Header & Stats ----
@@ -566,23 +568,23 @@ Object.assign(RoguelikeUI.prototype, {
     // Header Slot Button
     const btnUp = document.getElementById('btnUpgradeSlot');
     if (btnUp) {
-      if (this.slotUpgradeIndex < this.slotCosts.length) {
+      if (this.slotUpgradeIndex < this.slotCosts.length && this.maxSlots < 12) {
         const nextCost = this.slotCosts[this.slotUpgradeIndex];
         const nextSlot = this.maxSlots + 1;
-        btnUp.innerHTML = `<img src="assets/ui/slot.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="Slot" /> +Slot ${nextSlot} (${nextCost} <img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />)`;
+        btnUp.innerHTML = `<img src="assets/ui/slot.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="" /> +${I18n.html('shop.slot')} ${nextSlot} (${nextCost} <img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />)`;
         btnUp.disabled = this.gold < nextCost;
       } else {
-        btnUp.innerHTML = `<span>⭐</span> Max Slots (12)`;
+        btnUp.innerHTML = `<span>⭐</span> ${I18n.html('shop.maxSlots')} (12)`;
         btnUp.disabled = true;
       }
     }
   
     // Roll Button with MetaProgression discount
     const discount = (typeof MetaProgression !== 'undefined') ? MetaProgression.getRerollDiscount() : 0;
-    const rerollCost = Math.max(1, 5 - discount);
+    const rerollCost = this.getRecruitRerollCost();
     const btnReroll = document.getElementById('btnReroll');
     if (btnReroll) {
-      btnReroll.innerHTML = `ROLL (${rerollCost} <img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />)`;
+      btnReroll.innerHTML = `${I18n.html('shop.roll')} (${rerollCost} <img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />)`;
       btnReroll.disabled = this.gold < rerollCost || this.phase === 'battle';
     }
   
@@ -605,7 +607,7 @@ Object.assign(RoguelikeUI.prototype, {
     const counterEl = document.getElementById('enemyCounter');
     const hpBar = document.getElementById('enemyHpBar');
   
-    if (nameEl) nameEl.textContent = `STAGE ${this.stage}`;
+    if (nameEl) nameEl.textContent = t('shop.stage',{stage:this.stage});
   
     const pieceCounts = {};
     for (const p of enemyConfig.pieces) {
@@ -634,18 +636,22 @@ Object.assign(RoguelikeUI.prototype, {
       return;
     }
     const discount = (typeof MetaProgression !== 'undefined') ? MetaProgression.getRerollDiscount() : 0;
-    const rerollCost = Math.max(1, 5 - discount);
+    const astralFree = window.MetaProgression?.hasFreeRerollPerStage() && this.runState?.astralRerollStage !== this.stage;
+    const rerollCost = this.getRecruitRerollCost();
     if (this.gold < rerollCost) {
       alert(`You need at least ${rerollCost} Gold to reroll recruitment cards!`);
       return;
     }
     this.gold -= rerollCost;
+    if (astralFree) this.ensureRoguelikeState().astralRerollStage = this.stage;
+    else if (rerollCost === 0) this.runState.freeRerolls--;
     if (typeof soundManager !== 'undefined') soundManager.playSfx('coin');
     this.hasRerolledStarter = true;
     this.generateRewardCards();
     this.renderShop();
     this.updateStats();
     this.addLog(`Rerolled piece recruitment cards for ${rerollCost}g.`);
+    this.saveRoguelikeProgress?.();
   },
   
   // ---- Piece Pricing by Rarity: Initial Starter Pick is FREE, then costs gold by rarity ----
@@ -660,7 +666,12 @@ Object.assign(RoguelikeUI.prototype, {
       legend: 12,
       legendary: 12
     };
-    return prices[rarity] || 5;
+    return Math.max(1, (prices[rarity] || 5) - (window.MetaProgression?.hasNode('w_keystone') ? 1 : 0));
+  },
+
+  getRecruitRerollCost() {
+    if (this.runState?.freeRerolls > 0 || (window.MetaProgression?.hasFreeRerollPerStage() && this.runState?.astralRerollStage !== this.stage)) return 0;
+    return Math.max(1, 5 - (window.MetaProgression?.getRerollDiscount() ?? 0));
   },
   
   // ---- Piece Sell Price by Rarity (~60-70% refund) ----
@@ -796,13 +807,13 @@ Object.assign(RoguelikeUI.prototype, {
     const subtitle = document.getElementById('marketSubtitle');
   
     if (this.phase === 'battle') {
-      if (subtitle) subtitle.textContent = 'Battle in progress — locked';
+      if (subtitle) subtitle.textContent = t('shop.lockedBattle');
       grid.innerHTML = `<div class="recruit-locked-msg">Finish battle to recruit units!</div>`;
       return;
     }
   
     if (!this.cardChoices || this.cardChoices.length === 0) {
-      if (subtitle) subtitle.textContent = 'Unit recruited for this stage';
+      if (subtitle) subtitle.textContent = t('shop.recruited');
       grid.innerHTML = `
         <div class="recruit-picked-msg">
           <span>Unit Added To Bench!</span>
@@ -814,9 +825,9 @@ Object.assign(RoguelikeUI.prototype, {
   
     if (subtitle) {
       if (this.inventory.length === 0 && this.placedPieces.length === 0) {
-        subtitle.textContent = 'Welcome Trainer! Choose 1 FREE Starter Pokémon:';
+        subtitle.textContent = t('shop.starterPrompt');
       } else {
-        subtitle.textContent = 'Recruit Pokémon (Hover to preview moves):';
+        subtitle.textContent = t('shop.recruitPrompt');
       }
     }
   
@@ -833,7 +844,7 @@ Object.assign(RoguelikeUI.prototype, {
       const rarityKey = (info.rarity === 'legendary' || info.rarity === 'legend') ? 'legend' : (info.rarity || 'common');
       const rarityLabel = rarityKey.toUpperCase();
       const typeStr = info.element2 ? `${info.element.toUpperCase()}/${info.element2.toUpperCase()}` : (info.element || 'NORMAL').toUpperCase();
-      card.title = `${info.name} [${typeStr}] (${rarityLabel})\nHP: ${st.maxHp} | ATK: ${st.damage}\nAttack: strongest elemental matchup\nCost: ${isFree ? 'FREE' : price + 'g'}`;
+      card.title = `${info.name} [${typeStr}] (${rarityLabel})\nHP: ${st.maxHp} | ATK: ${st.damage}\nAttack element depends on Hex position\nCost: ${isFree ? 'FREE' : price + 'g'}`;
   
       card.innerHTML = `
         <div class="reward-card-img-wrap">
@@ -929,7 +940,7 @@ Object.assign(RoguelikeUI.prototype, {
   // ---- Buy Slot Capacity Upgrade ----
 
   buySlotUpgrade() {
-    if (this.slotUpgradeIndex >= this.slotCosts.length) return;
+    if (this.slotUpgradeIndex >= this.slotCosts.length || this.maxSlots >= 12) return;
     const cost = this.slotCosts[this.slotUpgradeIndex];
     if (this.gold < cost) return;
   
@@ -966,7 +977,7 @@ Object.assign(RoguelikeUI.prototype, {
     const subtitle = document.getElementById('marketSubtitle');
     if (tab === 'bench') {
       if (subtitle) {
-        subtitle.textContent = `Squad (${this.placedPieces.length}/${this.maxSlots}) Bench (${this.inventory.length})`;
+        subtitle.textContent = t('shop.squadBench',{deployed:this.placedPieces.length,slots:this.maxSlots,count:this.inventory.length});
       }
       this.updateSellButton();
       this.renderInventory();
@@ -983,20 +994,12 @@ Object.assign(RoguelikeUI.prototype, {
       alert(`Board is full (${this.maxSlots}/${this.maxSlots} units). Recall a unit first or upgrade slot capacity!`);
       return;
     }
-    // Search ranks 6 & 7 (setup zone: squares 48 to 63)
+    // Use all 28 player Hex cells, including squads larger than eight units.
     let targetSq = -1;
-    for (let sq = 48; sq < 64; sq++) {
+    for (let sq = 55; sq >= 28; sq--) {
       if (!this.game.board[sq]) {
         targetSq = sq;
         break;
-      }
-    }
-    if (targetSq === -1) {
-      for (let sq = 0; sq < 64; sq++) {
-        if (!this.game.board[sq]) {
-          targetSq = sq;
-          break;
-        }
       }
     }
     if (targetSq !== -1) {
@@ -1019,7 +1022,7 @@ Object.assign(RoguelikeUI.prototype, {
   
     const subtitle = document.getElementById('marketSubtitle');
     if (subtitle && this.pokemonTab === 'bench') {
-      subtitle.textContent = `Squad (${this.placedPieces.length}/${this.maxSlots}) Bench (${this.inventory.length})`;
+      subtitle.textContent = t('shop.squadBench',{deployed:this.placedPieces.length,slots:this.maxSlots,count:this.inventory.length});
     }
   
     if (this.inventory.length === 0) {
@@ -1039,7 +1042,7 @@ Object.assign(RoguelikeUI.prototype, {
       const boardPiece = deployed ? this.game.board[deployed.sq] : null;
       const eff = this.getHexPieceStats(boardPiece ?? { ...item, color: W }, deployed?.sq ?? -1);
   
-      const maxSlots = item.maxTalismans || 3;
+      const maxSlots = (item.maxTalismans || 3) + (window.MetaProgression?.getExtraTalismanSlots() ?? 0);
       const talDef = this.activeApplyingTalisman ? TALISMANS[this.activeApplyingTalisman.talismanId] : null;
       const isSlotFull = talDef && !talDef.isSpell && (item.talismans || []).length >= maxSlots;
       const isEligible = this.activeApplyingTalisman && TalismanSystem.isApplicable(this.activeApplyingTalisman.talismanId, item.type) && !isSlotFull;
@@ -1094,7 +1097,7 @@ Object.assign(RoguelikeUI.prototype, {
       const talismanNames = (item.talismans && item.talismans.length > 0)
         ? `\nTalismans (${item.talismans.length}/${maxSlots}): ${item.talismans.map(tid => TALISMANS[tid]?.name || tid).join(', ')}`
         : `\nTalismans: 0/${maxSlots}`;
-      slot.title = `${displayName} [${typeStr}] (${rarityLabel})\nHP: ${eff.maxHp} | ATK: ${eff.damage}\nAttack: strongest elemental matchup${evoTooltip}${info.desc ? '\n' + info.desc : ''}${talismanNames}`;
+      slot.title = `${displayName} [${typeStr}] (${rarityLabel})\nHP: ${eff.maxHp} | ATK: ${eff.damage}\nAttack element depends on Hex position${evoTooltip}${info.desc ? '\n' + info.desc : ''}${talismanNames}`;
   
       let sealHtml = '';
       if (item.talismans && item.talismans.length > 0) {

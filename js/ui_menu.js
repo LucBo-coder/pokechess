@@ -106,6 +106,7 @@ Object.assign(RoguelikeUI.prototype, {
     const btnShopReward = document.getElementById('btnGoToShopReward');
     if (btnShopReward) {
       btnShopReward.addEventListener('click', () => {
+        if (this.advanceRoguelikeStage) { this.advanceRoguelikeStage(); return; }
         const modal = document.getElementById('victoryModal');
         if (modal) modal.classList.add('hidden');
         this.stage++;
@@ -563,6 +564,7 @@ Object.assign(RoguelikeUI.prototype, {
     this.isDrawWin = false;
     this.resetRepetitionTracking();
     this.stage = 1;
+    this.runState = window.RoguelikeExpansion?.createRun();
     this.gold = 0 + (typeof MetaProgression !== 'undefined' ? MetaProgression.getBonusStartingGold() : 0);
     this.maxSlots = 3 + (typeof MetaProgression !== 'undefined' ? MetaProgression.getBonusStartingSlots() : 0);
     this.slotUpgradeIndex = 0;
@@ -571,6 +573,7 @@ Object.assign(RoguelikeUI.prototype, {
     this.initStarterSquad();
     this.placedPieces = [];
     this.setupFormation = [];
+    this.pendingEvolutions = [];
     this.selectedInvId = null;
     this.selectedBoardSq = -1;
     this.phase = 'setup';
@@ -636,16 +639,16 @@ Object.assign(RoguelikeUI.prototype, {
     if (latestSlot) {
       const data = SaveSystem.getSlot(latestSlot);
       btnContinue.disabled = false;
-      btnContinue.textContent = `CONTINUE (SLOT ${latestSlot} • STAGE ${data?.stage || 1})`;
-      btnContinue.title = `Continue journey from Slot ${latestSlot}`;
+      btnContinue.textContent = t('menu.continueSlot',{slot:latestSlot,stage:data?.stage||1});
+      btnContinue.title = t('menu.continueSlotTitle',{slot:latestSlot});
     } else if (this.isGameActive && this.stage >= 1) {
       btnContinue.disabled = false;
-      btnContinue.textContent = `CONTINUE (STAGE ${this.stage})`;
-      btnContinue.title = 'Continue current battle';
+      btnContinue.textContent = t('menu.continueStage',{stage:this.stage});
+      btnContinue.title = t('menu.continueCurrent');
     } else {
       btnContinue.disabled = true;
-      btnContinue.textContent = 'CONTINUE JOURNEY';
-      btnContinue.title = 'No active save file or battle';
+      btnContinue.textContent = t('menu.continueJourney');
+      btnContinue.title = t('menu.noSave');
     }
   },
 
@@ -809,7 +812,7 @@ Object.assign(RoguelikeUI.prototype, {
       this.showToast(`Slot ${slotNum} is empty!`, 'warning');
       return;
     }
-    const ok = this.applySaveData(data);
+    const ok = this.applySaveData(data,slotNum);
     if (ok) {
       this.currentSaveSlot = slotNum;
       this.isGameActive = true;
@@ -818,7 +821,7 @@ Object.assign(RoguelikeUI.prototype, {
     }
   },
 
-  applySaveData(saveData) {
+  applySaveData(saveData,slotNum = null) {
     if (!saveData) return false;
     this.disposeHexBattle();
   
@@ -838,6 +841,7 @@ Object.assign(RoguelikeUI.prototype, {
   
     // Stats
     this.stage = saveData.stage || 1;
+    this.runState = window.RoguelikeExpansion?.restore(saveData.runState);
     this.gold = saveData.gold || 0;
     this.maxSlots = saveData.maxSlots || 3;
     this.slotUpgradeIndex = saveData.slotUpgradeIndex || 0;
@@ -847,6 +851,7 @@ Object.assign(RoguelikeUI.prototype, {
     this.inventory = (saveData.inventory || []).map(i => ({ ...i }));
     this.placedPieces = (saveData.placedPieces || []).map(p => ({ ...p }));
     this.setupFormation = (saveData.setupFormation || []).map(f => ({ ...f }));
+    this.pendingEvolutions = (saveData.pendingEvolutions || []).map(e => ({ ...e }));
   
     // Talisman system
     this.talismanNextId = saveData.talismanNextId || 1;
@@ -863,6 +868,7 @@ Object.assign(RoguelikeUI.prototype, {
       : [];
   
     // Stage reset & board populate
+    window.MasterySystem?.restore(this,saveData,slotNum);
     this.setupNewStage();
   
     this.showToast(`Loaded Game: Stage ${this.stage} (${this.gold}g)`, 'gold');
@@ -876,8 +882,8 @@ Object.assign(RoguelikeUI.prototype, {
   closeAllModals() {
     const modals = [
       'victoryModal', 'defeatModal', 'drawModal', 'confirmModal',
-      'promotionModal', 'inGameMenuModal', 'saveSlotsModal', 'howToPlayModal',
-      'moveEditorModal', 'starterSelectModal', 'skillTreeModal', 'coffeeDonateModal'
+      'promotionModal', 'inGameMenuModal', 'saveSlotsModal', 'howToPlayModal', 'roguelikeModal',
+      'moveEditorModal', 'starterSelectModal', 'skillTreeModal', 'coffeeDonateModal', 'masteryCollectionModal'
     ];
     for (const id of modals) {
       const el = document.getElementById(id);
@@ -1101,6 +1107,13 @@ Object.assign(RoguelikeUI.prototype, {
   closeSkillTreeModal() {
     const modal = document.getElementById('skillTreeModal');
     if (modal) modal.classList.add('hidden');
+    if (this.phase === 'setup') {
+      this.renderBoard?.();
+      this.renderBench?.();
+      this.renderShop?.();
+      this.renderSynergyPanel?.();
+      this.updateStats?.();
+    }
   },
   
   // =============================================

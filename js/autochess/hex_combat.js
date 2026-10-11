@@ -19,6 +19,10 @@ class HexCombat extends HexSimulation {
 
         // Skill cooldown: 3 giay.
         this.skillCooldownTicks = this.tickRate * (window.HexBalance?.SKILL_COOLDOWN_SECONDS ?? 3);
+        this.pendingHits = [];
+        this.deferDamage = false;
+        this.random = options.random ?? Math.random;
+        this.statistics = new Map();
     }
 
     // =========================================
@@ -41,7 +45,7 @@ class HexCombat extends HexSimulation {
             unit.attackSpeed ?? 1
         );
 
-        return super.addUnit(square, {
+        const added = super.addUnit(square, {
             ...unit,
 
             hp: Math.min(
@@ -64,6 +68,8 @@ class HexCombat extends HexSimulation {
 
             // Skill System
             skillCasts: 0,
+            traits: unit.traits ?? [],
+            statuses: {}, traitCooldowns: {}, lastStandUsed: false,
             nextSkillTick: 0,
 
             // Attack System
@@ -76,6 +82,74 @@ class HexCombat extends HexSimulation {
             bossBaseDamage: attackDamage,
             bossBaseAttackSpeed: attackSpeed
         });
+        if (added) this.statistics.set(unit.id ?? `unit_${square}`, {
+            id: unit.id ?? `unit_${square}`, name: window.PIECES?.[unit.pokemonId ?? unit.type]?.name ?? unit.type,
+            color: unit.color, invId: unit.sourcePiece?.invId, hp: unit.hp ?? maxHp, maxHp,
+            speciesId: String(unit.type), instanceId: unit.mastery?.instanceId,
+            damageDealt: 0, damageTaken: 0, healingDone: 0, skillsUsed: 0, shieldProvided: 0, aliveTicks: 0
+        });
+        return added;
+    }
+
+    emit(event) {
+        if (event.type === 'damage') {
+            const attacker = this.statistics?.get(event.attackerId), defender = this.statistics?.get(event.defenderId);
+            if (attacker) attacker.damageDealt += event.damage;
+            if (defender) { defender.damageTaken += event.damage; defender.hp = event.remainingHp; }
+        }
+        if (event.type === 'heal') {
+            const row = this.statistics?.get(event.unitId);
+            if (row) row.hp = event.remainingHp;
+            const healer = this.statistics?.get(event.healerId ?? event.unitId);
+            if (healer) healer.healingDone += event.amount;
+        }
+        if (event.type === 'skill-cast') {
+            const row = this.statistics?.get(event.unitId);
+            if (row) row.skillsUsed++;
+            const unit = this.units.get(event.unitId);
+            if (unit) window.MasterySystem?.onSkill(this,unit,event.targetId);
+        }
+        super.emit(event);
+    }
+
+    getSummary() {
+        const units = [...this.statistics.values()].map(row => ({ ...row }));
+        const mvp = units.filter(row => row.color === 'w').sort((a, b) => (b.damageDealt + b.healingDone) - (a.damageDealt + a.healingDone))[0];
+        return { winner: this.winner, seconds: this.tickCount / this.tickRate, units, mvp: mvp?.id ?? null };
+    }
+
+    getHitDelay(unit, source) {
+        return source === 'skill' ? 6 : unit.attackRange > 1 ? 8 : 4;
+    }
+
+    healUnit(unit, amount, revive = false, healer = unit) {
+        if (!unit || !Number.isFinite(amount) || this.units.get(unit.id)!==unit || (!revive && unit.hp<=0)) return 0;
+        const healed=Math.max(0,Math.min(unit.maxHp-unit.hp,Math.round(amount)));
+        unit.hp+=healed;
+        if(healed>0)this.emit({type:'heal',unitId:unit.id,healerId:healer?.id,amount:healed,remainingHp:unit.hp});
+        return healed;
+    }
+
+    addShield(unit, amount, owner = unit, seconds = 0) {
+        if (!unit || unit.hp <= 0 || !Number.isFinite(amount)) return 0;
+        const granted = Math.max(0,Math.min(unit.maxHp-(unit.shield??0),Math.round(amount)));
+        unit.shield=(unit.shield??0)+granted;
+        const row=this.statistics.get(owner.id);
+        if(row)row.shieldProvided+=granted;
+        if(seconds>0 && granted>0)(unit.timedShields??(unit.timedShields=[])).push({amount:granted,expiresAt:this.tickCount+seconds*this.tickRate});
+        this.emit({type:'status',unitId:unit.id,status:'shield',duration:seconds});
+        return granted;
+    }
+
+    resolvePendingHits() {
+        const ready = this.pendingHits.filter(hit => hit.due <= this.tickCount);
+        this.pendingHits = this.pendingHits.filter(hit => hit.due > this.tickCount);
+        for (const hit of ready) {
+            const attacker = this.units.get(hit.attackerId), defender = this.units.get(hit.defenderId);
+            if(hit.source==='attack' && attacker?.attackRange===1 && defender && this.hex.distance(attacker.square,defender.square)>1)continue;
+            if (!this.battleEnded && attacker?.hp > 0 && defender?.hp > 0)
+                this.dealDamage(attacker, defender, hit.amount, hit.source, hit.options);
+        }
     }
 
     getAttackCooldown(unit) {
@@ -193,13 +267,14 @@ class HexCombat extends HexSimulation {
             return false;
         }
 
-        const role =
-            unit.combatRole ?? 'fighter';
+        const role = unit.isBoss ? (unit.bossPhase>=2 && unit.bossSkills?.includes('areaBlast')?'mage':'fighter') : unit.combatRole ?? 'fighter';
 
         const skill = window.HexSkillInfo?.[role];
+        const damageOptions = this.getDamageOptions(unit, 'skill');
         const attackElement = typeof TypeSystem !== 'undefined'
-            ? TypeSystem.getHexAttack(unit, target).element
+            ? TypeSystem.getHexAttack(unit, target, damageOptions).element
             : unit.element;
+        damageOptions.element = attackElement;
         const affectedIds = [];
 
         let skillName = '';
@@ -216,9 +291,7 @@ class HexCombat extends HexSimulation {
                     unit.maxHp * 0.3
                 );
 
-                unit.shield =
-                    (unit.shield ?? 0) +
-                    shieldAmount;
+                this.addShield(unit,shieldAmount);
 
                 break;
             }
@@ -234,7 +307,7 @@ class HexCombat extends HexSimulation {
                     unit,
                     target,
                     unit.attackDamage * (skill?.damageMultiplier ?? 1.8),
-                    'skill'
+                    'skill', damageOptions
                 );
 
                 break;
@@ -251,7 +324,7 @@ class HexCombat extends HexSimulation {
                     unit,
                     target,
                     unit.attackDamage * (skill?.damageMultiplier ?? 2.2),
-                    'skill'
+                    'skill', damageOptions
                 );
 
                 break;
@@ -281,7 +354,7 @@ class HexCombat extends HexSimulation {
                         unit,
                         enemy,
                         unit.attackDamage * (skill?.damageMultiplier ?? 1.4),
-                        'skill'
+                        'skill', damageOptions
                     );
                 }
 
@@ -299,7 +372,7 @@ class HexCombat extends HexSimulation {
                     unit,
                     target,
                     unit.attackDamage * (skill?.damageMultiplier ?? 2),
-                    'skill'
+                    'skill', damageOptions
                 );
 
                 break;
@@ -319,6 +392,8 @@ class HexCombat extends HexSimulation {
 
         unit.skillCasts =
             (unit.skillCasts ?? 0) + 1;
+        if(unit.isBoss)skillName=role==='mage'?'Boss Area Blast':'Boss Strike';
+        window.HexTraits?.summon(this,unit);
 
         this.emit({
             type: 'skill-cast',
@@ -329,6 +404,7 @@ class HexCombat extends HexSimulation {
             skillName,
             role,
             element: attackElement,
+            delayTicks: this.deferDamage ? this.getHitDelay(unit, 'skill') : 0,
             affectedIds: role === 'tank' ? [] : affectedIds.length ? affectedIds : [target.id],
 
             mana: unit.mana
@@ -340,6 +416,11 @@ class HexCombat extends HexSimulation {
     // =========================================
     // DAMAGE SYSTEM
     // =========================================
+    getDamageOptions(unit, source) {
+        const skill = source === 'skill' ? window.HexSkillInfo?.[unit?.combatRole ?? 'fighter'] : null;
+        return { element: skill?.element ?? 'active', damageType: skill?.damageType ?? 'elemental' };
+    }
+
     getBossPhase(unit) {
         if (!unit || !unit.isBoss || unit.hp <= 0) {
             return 1;
@@ -419,7 +500,8 @@ class HexCombat extends HexSimulation {
         attacker,
         defender,
         amount,
-        source = 'attack'
+        source = 'attack',
+        options = this.getDamageOptions(attacker, source)
     ) {
         if (
             !attacker ||
@@ -429,9 +511,16 @@ class HexCombat extends HexSimulation {
             return 0;
         }
 
+        if (this.deferDamage && (source === 'attack' || source === 'skill')) {
+            const element = TypeSystem.getHexAttack(attacker, defender, options).element;
+            this.pendingHits.push({ attackerId: attacker.id, defenderId: defender.id, amount, source,
+                options: { ...options, element }, due: this.tickCount + this.getHitDelay(attacker, source) });
+            return 0;
+        }
         // Skill damage multiplier.
+        const isTrueDamage = options.damageType === 'true';
         const skillMultiplier =
-            source === 'skill'
+            source === 'skill' && !isTrueDamage
                 ? window.HexBalance?.SKILL_DAMAGE_MULTIPLIER ?? 0.65
                 : 1;
 
@@ -452,22 +541,29 @@ class HexCombat extends HexSimulation {
             )
         );
 
-        const suddenMultiplier =
+        const suddenMultiplier = isTrueDamage ? 1 :
             1 + ((window.HexBalance?.SUDDEN_DEATH_DAMAGE_MULTIPLIER ?? 3.5) - 1) * suddenProgress;
 
         const matchup = typeof TypeSystem !== 'undefined'
-            ? TypeSystem.getHexAttack(attacker, defender)
+            ? TypeSystem.getHexAttack(attacker, defender, options)
             : { element: attacker.element ?? 'normal', multiplier: 1 };
 
-        const damage = Math.max(
+        let damage = Math.max(
             0,
             Math.round(
-                amount *
+                (Number.isFinite(amount) ? Math.max(0, amount) : 0) *
                 skillMultiplier *
                 suddenMultiplier *
                 matchup.multiplier
             )
         );
+        if (!isTrueDamage && window.HexEffects) {
+            damage = Math.max(0, Math.round(HexEffects.outgoing(this, attacker, defender, damage, source, matchup)));
+            damage = HexEffects.incoming(this, defender, damage, source);
+        }
+        const elementalReduction=defender.eliteType==='elemental' && matchup.element===defender.element?0.25:0;
+        const ignoreReduction=source==='attack'&&window.HexEffects?.has(attacker,'hasProtectivePads');
+        const mitigatedDamage=isTrueDamage||ignoreReduction?damage:Math.max(0,Math.round(damage*(1-Math.min(0.75,(defender.damageReduction??0)+elementalReduction))-(defender.flatDamageReduction??0)));
 
         // La chan hap thu sat thuong truoc.
         const currentShield = Math.max(
@@ -475,19 +571,24 @@ class HexCombat extends HexSimulation {
             Number(defender.shield) || 0
         );
 
-        const absorbed = Math.min(
+        const absorbed = isTrueDamage ? 0 : Math.min(
             currentShield,
-            damage
+            mitigatedDamage
         );
 
         defender.shield =
             currentShield - absorbed;
+        let shieldConsumed=absorbed;
+        for(const timed of defender.timedShields??[]) {
+            const consumed=Math.min(timed.amount,shieldConsumed);timed.amount-=consumed;shieldConsumed-=consumed;
+        }
 
         // Phan sat thuong con lai tru vao HP.
-        const hpDamage = Math.min(
+        let hpDamage = Math.min(
             defender.hp,
-            damage - absorbed
+            mitigatedDamage - absorbed
         );
+        if (window.HexEffects) hpDamage = HexEffects.lethal(this, defender, hpDamage);
 
         defender.hp = Math.max(
             0,
@@ -507,6 +608,8 @@ class HexCombat extends HexSimulation {
             damage: hpDamage,
             absorbed,
             source,
+            damageType: options.damageType ?? 'elemental',
+            critical: !!options.critical,
             element: matchup.element,
             effectiveness: matchup.multiplier,
 
@@ -524,6 +627,9 @@ class HexCombat extends HexSimulation {
             );
         }
 
+        if(hpDamage>0 && attacker.hp>0 && attacker.lifesteal>0)this.healUnit(attacker,hpDamage*attacker.lifesteal);
+        window.HexTraits?.afterDamage(this,attacker,defender,hpDamage);
+        window.HexEffects?.afterDamage(this,attacker,defender,hpDamage,source,matchup,options);
         // Xu ly Pokemon chet.
         if (defender.hp <= 0) {
             this.killUnit(defender);
@@ -537,6 +643,7 @@ class HexCombat extends HexSimulation {
     // =========================================
 
     attack(attacker, targetSquare) {
+        if (!attacker || attacker.hp <= 0) return false;
         const defender =
             this.getUnitAt(targetSquare);
 
@@ -558,7 +665,8 @@ class HexCombat extends HexSimulation {
             return false;
         }
 
-        const damage = attacker.attackDamage;
+        const critical = this.random() < (attacker.critChance ?? 0);
+        const damage = attacker.attackDamage * (critical ? attacker.critMultiplier ?? 1.5 : 1);
         const element = typeof TypeSystem !== 'undefined'
             ? TypeSystem.getHexAttack(attacker, defender).element
             : attacker.element;
@@ -567,7 +675,7 @@ class HexCombat extends HexSimulation {
             attacker,
             defender,
             damage,
-            'attack'
+            'attack', { ...this.getDamageOptions(attacker, 'attack'), critical }
         );
 
         // Nhan Mana khi danh thuong.
@@ -592,6 +700,8 @@ class HexCombat extends HexSimulation {
 
             damage,
             element,
+            critical,
+            delayTicks: this.deferDamage ? this.getHitDelay(attacker, 'attack') : 0,
             remainingHp: defender.hp
         });
 
@@ -603,6 +713,7 @@ class HexCombat extends HexSimulation {
     // =========================================
 
     killUnit(unit) {
+        const row=this.statistics.get(unit.id);if(row)row.hp=0;
         const square = unit.square;
 
         if (
@@ -634,6 +745,12 @@ class HexCombat extends HexSimulation {
 
         this.battleEnded = true;
         this.winner = winner;
+        const survivors=new Set([...this.units.values()].filter(unit=>unit.hp>0).map(unit=>unit.color));
+        this.resultVerified = this.initialTeams?.has('w') && this.initialTeams?.has('b') && (
+            (reason==='timeout' && this.tickCount>=this.maxBattleTicks) ||
+            (reason==='elimination' && survivors.size<=1 && winner===(survivors.size?[...survivors][0]:'draw'))
+        );
+        this.pendingHits.length = 0;
 
         this.emit({
             type: 'battle-end',
@@ -716,6 +833,8 @@ class HexCombat extends HexSimulation {
         if (this.battleEnded) return;
 
         this.tickCount++;
+        this.resolvePendingHits();
+        this.deferDamage = true;
 
         // Moi Pokemon hanh dong toi da
         // mot lan trong mot tick.
@@ -727,6 +846,12 @@ class HexCombat extends HexSimulation {
             if (!unit || unit.hp <= 0) {
                 continue;
             }
+            const row=this.statistics.get(id);if(row)row.aliveTicks++;
+            for(const timed of unit.timedShields??[])if(timed.expiresAt<=this.tickCount && timed.amount>0){unit.shield=Math.max(0,unit.shield-timed.amount);timed.amount=0;}
+            if(unit.timedShields)unit.timedShields=unit.timedShields.filter(shield=>shield.amount>0);
+            window.HexEffects?.update(this,unit);
+            if (unit.hp <= 0 || !this.units.has(id)) continue;
+            window.HexTraits?.update(this,unit);
 
             // Tu dong dung skill khi du Mana.
             // Neu skill dang cooldown,
@@ -774,7 +899,7 @@ class HexCombat extends HexSimulation {
 
                     unit.nextMoveTick =
                         this.tickCount +
-                        this.moveCooldownTicks;
+                        (unit.moveCooldownTicks??this.moveCooldownTicks);
 
                     this.emit({
                         type: 'move',
@@ -787,6 +912,7 @@ class HexCombat extends HexSimulation {
             }
         }
 
+        this.deferDamage = false;
         // Kiem tra doi nao da bi tieu diet.
         if (!this.battleEnded) {
             this.checkBattleEnd();
@@ -874,6 +1000,9 @@ class HexCombat extends HexSimulation {
 
     reset() {
         super.reset();
+        this.pendingHits = [];
+        this.deferDamage = false;
+        this.statistics.clear();
 
         this.battleEnded = false;
         this.winner = null;

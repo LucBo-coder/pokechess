@@ -14,6 +14,7 @@ window.HexSkillInfo = {
     },
 
     fighter: {
+        element: 'active',
         damageMultiplier: 1.8,
         className: 'Fighter',
         classDescription:
@@ -26,6 +27,7 @@ window.HexSkillInfo = {
     },
 
     assassin: {
+        element: 'active',
         damageMultiplier: 2.2,
         className: 'Assassin',
         classDescription:
@@ -38,6 +40,7 @@ window.HexSkillInfo = {
     },
 
     mage: {
+        element: 'active',
         damageMultiplier: 1.4,
         className: 'Mage',
         classDescription:
@@ -50,6 +53,7 @@ window.HexSkillInfo = {
     },
 
     marksman: {
+        element: 'active',
         damageMultiplier: 2,
         className: 'Marksman',
         classDescription:
@@ -64,9 +68,10 @@ window.HexSkillInfo = {
     getDescription(role) {
         const skill = this[role];
         if (!skill) return '';
-        if (!skill.damageMultiplier) return skill.skillDescription;
+        const description = window.t ? t(`skill.${role}.description`) : skill.skillDescription;
+        if (!skill.damageMultiplier) return description;
         const scale = window.HexBalance?.SKILL_DAMAGE_MULTIPLIER ?? 0.65;
         const percent = Math.round(skill.damageMultiplier * scale * 100);
-        return `${skill.skillDescription} Sau cân bằng kỹ năng: ${percent}% ATK trước tương khắc hệ và Sudden Death.`;
+        return `${description} ${window.t ? t('skill.balance',{percent}) : `Sau cân bằng kỹ năng: ${percent}% ATK trước tương khắc hệ và Sudden Death.`}`;
     }
 };

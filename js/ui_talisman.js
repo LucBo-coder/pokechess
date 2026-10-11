@@ -243,7 +243,7 @@ Object.assign(RoguelikeUI.prototype, {
     const invItem = this.inventory.find(i => i.id === targetInvId);
     const boardPiece = placed ? this.game.board[placed.sq] : (pieceOrItem.sq !== undefined ? this.game.board[pieceOrItem.sq] : null);
   
-    const maxSlots = pieceOrItem.maxTalismans || (invItem && invItem.maxTalismans) || (placed && placed.maxTalismans) || (boardPiece && boardPiece.maxTalismans) || 3;
+    const maxSlots = (pieceOrItem.maxTalismans || (invItem && invItem.maxTalismans) || (placed && placed.maxTalismans) || (boardPiece && boardPiece.maxTalismans) || 3) + (window.MetaProgression?.getExtraTalismanSlots() ?? 0);
   
     if (!pieceOrItem.talismans) {
       pieceOrItem.talismans = [];
@@ -355,6 +355,7 @@ Object.assign(RoguelikeUI.prototype, {
       if (footer) footer.style.display = 'none';
       if (typeof SynergySystem !== 'undefined') {
         SynergySystem.renderSynergyPanel(this, content);
+        window.HexTraits?.renderSynergies(this, content);
       }
       return;
     }
@@ -404,7 +405,7 @@ Object.assign(RoguelikeUI.prototype, {
         const placed = (this.selectedBoardSq !== -1)
           ? this.placedPieces.find(p => p.sq === this.selectedBoardSq)
           : this.placedPieces.find(p => p.invId === (selectedPiece.invId || selectedPiece.id));
-        const maxSlots = selectedPiece.maxTalismans || (invItem && invItem.maxTalismans) || (placed && placed.maxTalismans) || 3;
+        const maxSlots = (selectedPiece.maxTalismans || (invItem && invItem.maxTalismans) || (placed && placed.maxTalismans) || 3) + (window.MetaProgression?.getExtraTalismanSlots() ?? 0);
   
         const attachedTalismans = (selectedPiece.talismans && selectedPiece.talismans.length > 0)
           ? selectedPiece.talismans

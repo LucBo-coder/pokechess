@@ -189,10 +189,34 @@ const TypeSystem = {
   // Đánh giá hệ của Pokémon khi xếp đội hình Hex.
   // Không sử dụng quy tắc ô trắng/đen của bàn cờ cũ.
   getHexTypeAdvantage(attacker, defender) {
-    return this.getHexAttack(attacker, defender).multiplier;
+    return this.getHexBestAttack(attacker, defender).multiplier;
   },
 
-  getHexAttack(attacker, defender) {
+  isWhiteHex(square) {
+    if (!Number.isInteger(square) || square < 0 || square >= 56) return true;
+    return (Math.floor(square / 7) + square % 7) % 2 !== 0;
+  },
+
+  getHexAttackingType(piece, square = piece?.square) {
+    if (!piece) return 'normal';
+    const { element, element2 } = this.getEffectivePieceElements(piece);
+    return this.isWhiteHex(square) ? element : element2 || element;
+  },
+
+  getHexAttack(attacker, defender, options = {}) {
+    if (options.damageType === 'true' || options.damageType === 'non-elemental') {
+      return { element: null, multiplier: 1 };
+    }
+    const element = options.element && options.element !== 'active'
+      ? options.element.toLowerCase()
+      : this.getHexAttackingType(attacker);
+    const defendingTypes = [...new Set(this.getDefendingTypes(defender))];
+    return { element, multiplier: this.getEffectiveness(element, defendingTypes) };
+  },
+
+  // A positional attack uses getHexAttack. This remains an estimate for
+  // undeployed Pokémon where no attacking square has been chosen yet.
+  getHexBestAttack(attacker, defender) {
     if (!attacker || !defender) return { element: 'normal', multiplier: 1 };
 
     const atk = this.getEffectivePieceElements(attacker);

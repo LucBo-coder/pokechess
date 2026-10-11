@@ -758,7 +758,8 @@ const SynergySystem = {
       const data = counts[tKey] || { count: 0, pieces: [] };
       let activeTier = null;
       for (const tier of def.tiers) {
-        if (data.count >= tier.count) {
+        const required = Math.max(1, tier.count - (window.MetaProgression?.hasKeystonePrimordialCatalyst() ? 1 : 0));
+        if (data.count >= required) {
           activeTier = tier;
         }
       }
@@ -789,7 +790,7 @@ const SynergySystem = {
    * Stat Bonus: Attack (ATK)
    */
   getBonusAtk(piece, ui) {
-    if (!piece || !ui) return 0;
+    if (!piece || !ui || piece.color !== W) return 0;
     const syns = this.getActiveSynergies(ui);
     const elements = this.getPieceElements(piece);
     let bonus = 0;
@@ -810,7 +811,7 @@ const SynergySystem = {
    * Stat Bonus: HP
    */
   getBonusHp(piece, ui) {
-    if (!piece || !ui) return 0;
+    if (!piece || !ui || piece.color !== W) return 0;
     const syns = this.getActiveSynergies(ui);
     const elements = this.getPieceElements(piece);
     let bonus = 0;
@@ -831,7 +832,7 @@ const SynergySystem = {
    * Stat Bonus: Speed (SPD)
    */
   getBonusSpeed(piece, ui) {
-    if (!piece || !ui) return 0;
+    if (!piece || !ui || piece.color !== W) return 0;
     const syns = this.getActiveSynergies(ui);
     const elements = this.getPieceElements(piece);
     let bonus = 0;
@@ -852,7 +853,7 @@ const SynergySystem = {
    * Electric Synergy: Bonus Damage = % of Speed (e.g. 5% / 10% / 15%)
    */
   getSpeedDamageBonus(piece, speed, ui) {
-    if (!piece || !ui || !speed) return 0;
+    if (!piece || !ui || piece.color !== W || !speed) return 0;
     const syns = this.getActiveSynergies(ui);
     const elements = this.getPieceElements(piece);
     const electric = syns.electric;

@@ -10,10 +10,24 @@ class HexRenderer {
         );
 
         this.sprites = new Map();
+        this.effectivenessFeedbackTicks = new Map();
         this.selectedUnitId = null;
         this.destroyed = false;
         this.hoveredUnitId = null;
         this.tooltipEvent = null;
+        this.reducedEffects = localStorage.getItem('pokechess_reduced_fx') === '1';
+        let toggle = document.getElementById('hex-fx-toggle');
+        if (!toggle) {
+            toggle = document.createElement('button'); toggle.id = 'hex-fx-toggle'; toggle.type = 'button';
+            document.querySelector('.board-top-controls')?.appendChild(toggle);
+        }
+        toggle.textContent = t(this.reducedEffects ? 'vfx.low' : 'vfx.full');
+        toggle.onclick = () => {
+            this.reducedEffects = !this.reducedEffects;
+            localStorage.setItem('pokechess_reduced_fx', this.reducedEffects ? '1' : '0');
+            toggle.textContent = t(this.reducedEffects ? 'vfx.low' : 'vfx.full');
+        };
+        this.fxToggle = toggle;
 
         this.originalOnEvent = combat.onEvent;
         this.originalOnTick = combat.onTick;
@@ -38,6 +52,7 @@ class HexRenderer {
             }
 
             this.updateHP();
+            this.updateProjectiles();
             if (this.selectedUnitId) window.HexPreparationInfo?.showCombatUnit(this.selectedUnitId);
             if (this.hoveredUnitId && !this.tooltip.hidden) {
                 this.showTooltip(this.hoveredUnitId, this.tooltipEvent);
@@ -60,6 +75,11 @@ class HexRenderer {
         return this.boardElement?.querySelector(
             `.square[data-sq="${square}"]`
         );
+    }
+
+    allowEffect() {
+        return !this.destroyed && !this.reducedEffects &&
+            (this.boardElement?.querySelectorAll('.elemental-projectile,.elemental-impact,.pixel-impact,.hex-skill-burst').length ?? 0) < 80;
     }
 
     getCellPosition(square) {
@@ -185,6 +205,13 @@ class HexRenderer {
         }
         sprite.classList.add('hex-combat-unit');
         sprite.dataset.unitId = unit.id;
+        if(unit.eliteType)sprite.dataset.elite=unit.eliteType;
+        if(unit.traits?.length){
+            const badge=document.createElement('div');badge.className='hex-trait-indicator';
+            badge.textContent=unit.traits.map(id=>t(`trait.${id}`,{defaultValue:id})).join(' / ');
+            badge.title=unit.traits.map(id=>window.HexTraits?.CONFIG[id]?.description??id).join('\n');
+            sprite.appendChild(badge);
+        }
         sprite.setAttribute('role', 'button');
         sprite.tabIndex = 0;
         sprite.setAttribute('aria-label', `Inspect ${this.getPokemonName(unit)}`);
@@ -331,8 +358,8 @@ class HexRenderer {
             label.className = 'hex-boss-intro-label';
 
             label.textContent = boss.bossType === 'boss'
-                ? '⚔ BOSS XUẤT HIỆN'
-                : '◆ MINI BOSS';
+                ? '⚔ '+t('combat.arrival')
+                : '◆ '+t('combat.miniBoss');
 
             sprite.element.appendChild(label);
 
@@ -365,6 +392,25 @@ class HexRenderer {
                 this.updateHP();
                 break;
 
+            case 'spawn':
+                if(this.getUnit(event.unitId))this.createSprite(this.getUnit(event.unitId));
+                this.updateHP();
+                break;
+
+            case 'heal': {
+                const sprite=this.sprites.get(event.unitId);
+                if(sprite)this.spawnFloatingText(sprite.element,`+${event.amount}`,'hex-float-heal');
+                this.updateHP();
+                break;
+            }
+
+            case 'status': {
+                const sprite=this.sprites.get(event.unitId);
+                if(sprite)this.spawnFloatingText(sprite.element,window.HexTraits?.CONFIG[event.status]?.name??event.status,'hex-float-skill-name');
+                this.updateHP();
+                break;
+            }
+
             case 'skill-cast':
                 this.showSkill(event);
                 this.updateHP();
@@ -392,7 +438,7 @@ class HexRenderer {
                 const label = document.getElementById('enemyName');
                 const ui = window.roguelikeUI;
                 if (label && ui?.hexCombat === this.combat) {
-                    label.textContent = `STAGE ${ui.stage} · ${event.remainingSeconds}s`;
+                    label.textContent = t('combat.time',{stage:ui.stage,seconds:event.remainingSeconds});
                 }
                 break;
             }
@@ -426,6 +472,7 @@ class HexRenderer {
 
         sprite.element.style.left = `${position.x}px`;
         sprite.element.style.top = `${position.y}px`;
+        this.playAnimation(sprite.element, 'hex-moving');
 
         if (this.selectedUnitId === unitId) {
             this.highlightUnitRange(unitId);
@@ -438,6 +485,7 @@ class HexRenderer {
         element.classList.remove(className);
         void element.offsetWidth;
         element.classList.add(className);
+        element.addEventListener('animationend', () => element.classList.remove(className), { once: true });
     }
     getVfxElement(unitId) {
         const unit = this.getUnit(unitId);
@@ -463,8 +511,19 @@ class HexRenderer {
         return element || 'normal';
     }
 
+    localize() {
+        if(this.fxToggle)this.fxToggle.textContent=t(this.reducedEffects?'vfx.low':'vfx.full');
+        for(const [id,sprite] of this.sprites) {
+            const unit=this.getUnit(id);if(!unit)continue;
+            const badge=sprite.element.querySelector('.hex-trait-indicator');
+            if(badge)badge.textContent=unit.traits.map(trait=>t(`trait.${trait}`,{defaultValue:trait})).join(' / ');
+            const role=sprite.element.querySelector('.hex-combat-role');
+            if(role)role.title=t(`role.${this.getRole(unit)}`);
+        }
+    }
+
     createElementalImpact(parent, element = 'normal') {
-        if (!parent || this.destroyed) return;
+        if (!parent || !this.allowEffect()) return;
 
         const impact = document.createElement('div');
 
@@ -480,8 +539,8 @@ class HexRenderer {
         );
     }
 
-    createElementalProjectile(fromId, toId, element = 'normal') {
-        if (!this.boardElement || this.destroyed) return;
+    createElementalProjectile(fromId, toId, element = 'normal', duration = 0.267) {
+        if (!this.boardElement || !this.allowEffect()) return;
 
         const from = this.sprites.get(fromId);
         const to = this.sprites.get(toId);
@@ -502,8 +561,11 @@ class HexRenderer {
 
         projectile.className =
             `elemental-projectile elemental-${element}`;
+        projectile.dataset.attackerId = fromId;
+        projectile.dataset.defenderId = toId;
 
         projectile.style.left = `${startX}px`;
+        projectile.style.setProperty('--vfx-duration', `${duration}s`);
         projectile.style.top = `${startY}px`;
 
         projectile.style.setProperty(
@@ -525,6 +587,18 @@ class HexRenderer {
         );
     }
 
+    updateProjectiles() {
+        for(const projectile of this.boardElement?.querySelectorAll('.elemental-projectile')??[]){
+            const from=this.getUnit(projectile.dataset.attackerId),to=this.getUnit(projectile.dataset.defenderId);
+            if(!from||!to){projectile.remove();continue;}
+            const end=this.getSpritePosition(to.id);
+            if(end){
+                projectile.style.setProperty('--vfx-dx',`${end.x-parseFloat(projectile.style.left)}px`);
+                projectile.style.setProperty('--vfx-dy',`${end.y-parseFloat(projectile.style.top)}px`);
+            }
+        }
+    }
+
     showAttack(event) {
         const attacker = this.sprites.get(event.attackerId);
         const defender = this.sprites.get(event.defenderId);
@@ -537,12 +611,7 @@ class HexRenderer {
         }
 
         if (defender) {
-            this.playAnimation(
-                defender.element,
-                'hex-hit'
-            );
-
-            const element = event.element ?? this.getVfxElement(event.attackerId);
+            const element = event.element === null ? 'normal' : event.element ?? this.getVfxElement(event.attackerId);
 
             const attackerUnit = this.getUnit(event.attackerId);
 
@@ -550,7 +619,7 @@ class HexRenderer {
                 this.createElementalProjectile(
                     event.attackerId,
                     event.defenderId,
-                    element
+                    element, (event.delayTicks || 8) / this.combat.tickRate
                 );
             }
         }
@@ -563,22 +632,18 @@ class HexRenderer {
 
         if (!defender) return;
 
+        this.showEffectiveness(event, defender.element);
+        const amount = Number(event.damage) || 0;
+        const absorbed = Number(event.absorbed) || 0;
+        // An immune target receives feedback, but no hit reaction or impact.
+        if (amount <= 0 && absorbed <= 0) return;
+        if (event.critical) this.spawnFloatingText(defender.element, t('combat.critPopup'), 'hex-float-effective');
+
         this.createPixelImpact(
             defender.element,
             event.source === 'skill' ? 'skill' : 'attack'
         );
-        this.createElementalImpact(defender.element, event.element ?? 'normal');
-        if (event.effectiveness !== undefined && event.effectiveness !== 1) {
-            this.spawnFloatingText(
-                defender.element,
-                event.effectiveness === 0 ? 'IMMUNE' : `×${event.effectiveness}`,
-                'hex-float-effectiveness'
-            );
-        }
-
-
-        const amount = Number(event.damage) || 0;
-        const absorbed = Number(event.absorbed) || 0;
+        if (event.element) this.createElementalImpact(defender.element, event.element);
 
         if (amount > 0) {
             this.spawnFloatingText(
@@ -604,6 +669,19 @@ class HexRenderer {
         );
     }
 
+    showEffectiveness(event, parent) {
+        const multiplier = event.effectiveness;
+        if (multiplier === undefined || multiplier === 1) return;
+        const tick = event.tick ?? this.combat.tickCount;
+        const last = this.effectivenessFeedbackTicks.get(event.defenderId);
+        if (last !== undefined && tick - last < this.combat.tickRate) return;
+        this.effectivenessFeedbackTicks.set(event.defenderId, tick);
+        parent.querySelectorAll('.hex-float-effectiveness').forEach(label => label.remove());
+        const kind = multiplier === 0 ? 'immune' : multiplier > 1 ? 'effective' : 'resisted';
+        const text = multiplier === 0 ? t('combat.immune') : `${t(multiplier > 1 ? 'combat.super' : 'combat.resist')} ×${I18n.number(multiplier)}`;
+        this.spawnFloatingText(parent, text, `hex-float-effectiveness hex-float-${kind}`);
+    }
+
     showSkill(event) {
         const caster = this.sprites.get(event.unitId);
         const target = this.sprites.get(event.targetId);
@@ -611,8 +689,8 @@ class HexRenderer {
         const role = event.role ??
             this.getRole(this.getUnit(event.unitId));
 
-        const skillName = event.skillName ??
-            this.getSkillName(role);
+        const casterUnit=this.getUnit(event.unitId);
+        const skillName = casterUnit?.isBoss ? t(event.skillName==='Boss Area Blast'?'skill.boss.blast':'skill.boss.strike') : t(`skill.${role}.name`,{defaultValue:event.skillName??this.getSkillName(role)});
 
         if (caster) {
             this.playAnimation(
@@ -640,7 +718,7 @@ class HexRenderer {
                 );
             }
         } else if (target) {
-            const element = event.element ?? this.getVfxElement(event.unitId);
+            const element = event.element === null ? 'normal' : event.element ?? this.getVfxElement(event.unitId);
 
             if (
                 role === 'marksman' ||
@@ -649,7 +727,7 @@ class HexRenderer {
                 this.createElementalProjectile(
                     event.unitId,
                     event.targetId,
-                    element
+                    element, (event.delayTicks || 6) / this.combat.tickRate
                 );
             }
         }
@@ -686,7 +764,7 @@ class HexRenderer {
         );
     }
     createPixelImpact(parent, type = 'attack') {
-        if (!parent || this.destroyed) return;
+        if (!parent || !this.allowEffect()) return;
 
         const impact = document.createElement('div');
         impact.className = `pixel-impact pixel-impact-${type}`;
@@ -701,7 +779,7 @@ class HexRenderer {
     }
 
     createBurst(parent, role) {
-        if (!parent) return;
+        if (!parent || !this.allowEffect()) return;
 
         const burst = document.createElement('div');
 
@@ -754,6 +832,7 @@ class HexRenderer {
         for (const unit of this.combat.units.values()) {
             const sprite = this.sprites.get(unit.id);
             if (!sprite) continue;
+            sprite.element.classList.toggle('hex-berserker-active',!!unit.statuses?.berserker);
 
             const hpPercent = unit.maxHp > 0
                 ? Math.max(
@@ -889,7 +968,7 @@ class HexRenderer {
 
         const classTitle = document.createElement('div');
         classTitle.className = 'hex-info-section';
-        classTitle.textContent = 'CLASS';
+        classTitle.textContent = t('pokemon.role');
 
         const classText = document.createElement('div');
         classText.className = 'hex-info-description';
@@ -897,7 +976,7 @@ class HexRenderer {
 
         const skillTitle = document.createElement('div');
         skillTitle.className = 'hex-info-section';
-        skillTitle.textContent = `SKILL — ${skillName}`;
+        skillTitle.textContent = `${t('pokemon.skill')} — ${skillName}`;
 
         const skillText = document.createElement('div');
         skillText.className = 'hex-info-description';
@@ -906,7 +985,7 @@ class HexRenderer {
         const hint = document.createElement('div');
         hint.className = 'hex-info-hint';
         hint.textContent =
-            'Nhấp Pokémon để xem vùng tầm đánh.';
+            t('pokemon.rangeHint');
 
         this.tooltip.append(
             title,
@@ -1008,6 +1087,8 @@ class HexRenderer {
     }
 
     removeSprite(unitId) {
+        for(const projectile of this.boardElement?.querySelectorAll('.elemental-projectile')??[])
+            if(projectile.dataset.attackerId===unitId||projectile.dataset.defenderId===unitId)projectile.remove();
         const sprite = this.sprites.get(unitId);
         if (!sprite) return;
 
@@ -1024,11 +1105,13 @@ class HexRenderer {
         );
 
         this.sprites.delete(unitId);
+        this.effectivenessFeedbackTicks.delete(unitId);
     }
 
     destroy() {
         if (this.destroyed) return;
         this.destroyed = true;
+        if (this.fxToggle) this.fxToggle.onclick = null;
 
         this.combat.onEvent = this.originalOnEvent;
         this.combat.onTick = this.originalOnTick;
@@ -1046,6 +1129,7 @@ class HexRenderer {
         }
 
         this.sprites.clear();
+        this.effectivenessFeedbackTicks.clear();
 
         this.boardElement?.querySelectorAll(
             ':scope > .hex-combat-unit, :scope > .hex-projectile, ' +

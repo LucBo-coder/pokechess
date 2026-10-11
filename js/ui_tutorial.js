@@ -98,7 +98,9 @@ Object.assign(RoguelikeUI.prototype, {
           pointer: { x: 730, y: 30 }
         }
       }
-    ];
+    ].map((step,index)=>({ ...step, title:t(`tutorial.title${index+1}`), body:I18n.html([
+      'guide.deploy','tutorial.body2','guide.synergy','tutorial.body4','guide.combat','guide.combat','tutorial.body7'
+    ][index]) }));
   },
 
   startInteractiveTutorial() {
@@ -157,7 +159,7 @@ Object.assign(RoguelikeUI.prototype, {
     const btnPrev = document.getElementById('btnTutorialPrev');
     const btnNext = document.getElementById('btnTutorialNext');
   
-    if (badge) badge.textContent = `STEP ${this.tutorialStepIndex + 1}/${steps.length}`;
+    if (badge) badge.textContent = t('tutorial.step',{step:this.tutorialStepIndex+1,count:steps.length});
     if (title) title.textContent = step.title;
     if (body) body.innerHTML = step.body;
     if (hand) hand.textContent = step.hand || '▼';
@@ -167,7 +169,7 @@ Object.assign(RoguelikeUI.prototype, {
       btnPrev.style.opacity = (this.tutorialStepIndex === 0) ? '0.4' : '1';
     }
     if (btnNext) {
-      btnNext.innerHTML = (this.tutorialStepIndex === steps.length - 1) ? 'FINISH' : 'NEXT';
+      btnNext.textContent = t(this.tutorialStepIndex === steps.length - 1 ? 'tutorial.finish' : 'tutorial.next');
     }
   
     const overlay = document.getElementById('tutorialOverlay');

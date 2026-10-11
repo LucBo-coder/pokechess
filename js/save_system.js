@@ -69,6 +69,7 @@ const SaveSystem = {
     if (!app) return false;
     try {
       const now = new Date();
+      const masteryProfile = window.MasterySystem?.bindSlot(app,slotIndex) ?? null;
       const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       // Gather placed pieces and verify
@@ -83,9 +84,14 @@ const SaveSystem = {
       const inventory = (app.inventory || []).map(item => ({
         id: item.id,
         type: item.type,
+        starterSpeciesId: item.starterSpeciesId,
+        instanceId: item.instanceId,
+        individualMastery: item.individualMastery ? JSON.parse(JSON.stringify(item.individualMastery)) : null,
         battlesFought: item.battlesFought || 0,
         talismans: item.talismans ? [...item.talismans] : [],
-        maxTalismans: item.maxTalismans || 3
+        maxTalismans: item.maxTalismans || 3,
+        traits: [...(item.traits || [])],
+        wounds: Math.max(0,Math.min(0.5,item.wounds||0))
       }));
 
       const talismanInventory = (app.talismanInventory || []).map(t => ({
@@ -96,7 +102,9 @@ const SaveSystem = {
       }));
 
       const saveData = {
-        version: '2.8.0',
+        version: '3.5.0',
+        masteryProfile,
+        runState: app.runState ? JSON.parse(JSON.stringify(app.runState)) : null,
         timestamp: dateStr,
         timeEpoch: Date.now(),
         stage: app.stage || 1,
@@ -107,6 +115,7 @@ const SaveSystem = {
         inventory,
         placedPieces: placed,
         setupFormation: app.setupFormation ? JSON.parse(JSON.stringify(app.setupFormation)) : [],
+        pendingEvolutions: JSON.parse(JSON.stringify(app.pendingEvolutions || [])),
         talismanNextId: app.talismanNextId || 1,
         talismanInventory,
         talismanChoices: app.talismanChoices ? JSON.parse(JSON.stringify(app.talismanChoices)) : [],
@@ -149,7 +158,13 @@ const SaveSystem = {
     const payload = {
       game: 'Chess+ Roguelike',
       exportedAt: new Date().toISOString(),
-      slots: this.getAllSlots()
+      slots: this.getAllSlots().map(item=>{
+        if(item.data && window.MasterySystem) {
+          const profileId=`slot:${item.slot}`;
+          item.data.masteryProfile=MasterySystem.merge(profileId,MasterySystem.readProfiles()[profileId],item.data.masteryProfile);
+        }
+        return item;
+      })
     };
     const jsonStr = JSON.stringify(payload, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
