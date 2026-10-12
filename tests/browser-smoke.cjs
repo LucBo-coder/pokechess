@@ -578,8 +578,10 @@ async function main() {
     await evaluate('roguelikeUI.resetRun();roguelikeUI.closeMainMenu();NotificationCenter.dismiss();');
 
     const biomeEvidence=[];
-    for(const viewport of [{width:1920,height:1080},{width:1366,height:768},{width:1280,height:720},{width:768,height:432},{width:812,height:375}]){
+    for(const viewport of [{width:1920,height:1080},{width:1366,height:768},{width:1280,height:720},{width:1150,height:768},{width:768,height:432},{width:812,height:375}]){
         await command('Emulation.setDeviceMetricsOverride',{...viewport,deviceScaleFactor:1,mobile:false});await sleep(120);
+        const mapControls=await evaluate(`[...document.querySelectorAll('.biome-controls select')].map(select=>{const r=select.getBoundingClientRect(),bar=document.getElementById('boardTopControls').getBoundingClientRect();return {left:r.left,right:r.right,barRight:bar.right,visible:r.width>0&&r.left>=bar.left&&r.right<=bar.right+1};})`);
+        assert.equal(mapControls.length,2);assert.ok(mapControls.every(c=>c.visible),'Biome selectors must fit toolbar at '+viewport.width+': '+JSON.stringify(mapControls));
         await evaluate(`BattlefieldBiomes.selectMap('forest');BattlefieldBiomes.apply('forest')`);await sleep(150);
         const baseline=await evaluate(`(()=>{window.biomeFormation=JSON.stringify(roguelikeUI.placedPieces);window.biomeEngine=roguelikeUI.hexCombat;return [...document.querySelectorAll('.board .square')].map(c=>{const r=c.getBoundingClientRect();return [r.x,r.y,r.width,r.height];});})()`);
         await screenshot('biome-forest-'+viewport.width);

@@ -32,7 +32,7 @@
       "factionColors": true,
       "thresholdColors": true,
       "max": 4,
-      "elapsed": 245,
+      "elapsed": 230.60000000149012,
       "log": true
     },
     {
@@ -43,7 +43,7 @@
       "factionColors": true,
       "thresholdColors": true,
       "max": 16,
-      "elapsed": 538.8999999985099,
+      "elapsed": 449.69999999925494,
       "log": true
     },
     {
@@ -54,7 +54,7 @@
       "factionColors": true,
       "thresholdColors": true,
       "max": 24,
-      "elapsed": 988.1999999992549,
+      "elapsed": 1022.5,
       "log": true
     }
   ],

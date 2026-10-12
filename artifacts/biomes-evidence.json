@@ -109,6 +109,42 @@
   },
   {
     "viewport": {
+      "width": 1150,
+      "height": 768
+    },
+    "map": "volcano",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1150,
+      "height": 768
+    },
+    "map": "ice_cavern",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1150,
+      "height": 768
+    },
+    "map": "swamp",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
       "width": 768,
       "height": 432
     },

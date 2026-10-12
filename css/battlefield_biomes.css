@@ -4,7 +4,8 @@ body.hex-mode .board-wrapper { image-rendering: pixelated; }
    translucent floor; placement/selection colors remain above this surface. */
 body.hex-mode .board-wrapper[data-biome]:not([data-biome="forest"]) .board .square::before { background:rgba(18,25,35,.22); filter:none; }
 body.hex-mode .board-wrapper[data-biome]:not([data-biome="forest"]) .board .square:is(.selected,.deploy-zone)::before { background:rgba(240,203,78,.45); }
-.biome-controls { display:flex; align-items:center; gap:4px; min-width:0; flex-wrap:wrap; }
+body.hex-mode .board-top-controls .phase-buttons { flex:1 1 0; min-width:0; flex-wrap:wrap; justify-content:flex-end; }
+.biome-controls { display:flex; align-items:center; gap:4px; min-width:0; flex:0 0 auto; flex-wrap:wrap; }
 .biome-controls label { display:flex; align-items:center; gap:4px; font-size:11px; }
 .biome-controls select { max-width:120px; min-width:0; height:28px; font:inherit; color:#f4e8c8; background:#17263f; border:2px solid #d6ac50; border-radius:2px; }
 .biome-controls select:disabled { opacity:.65; }

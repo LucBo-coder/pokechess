@@ -54,3 +54,11 @@ Serve the repository root, for example `python -m http.server 8000`, then open `
 [Forest 1366](../../artifacts/visual-biome-forest-1366.png) · [Volcano 1366](../../artifacts/visual-biome-volcano-1366.png) · [Ice Cavern 1366](../../artifacts/visual-biome-ice_cavern-1366.png) · [Swamp 1366](../../artifacts/visual-biome-swamp-1366.png)
 
 [Ice landscape 812](../../artifacts/visual-biome-ice_cavern-812.png) · [Swamp landscape 812](../../artifacts/visual-biome-swamp-812.png)
+
+## Follow-up: selectors clipped on narrow laptops
+
+The initial geometry tests did not assert that the selectors themselves fit inside the toolbar. A new assertion reproduced overflow at 1280px; narrower desktop layouts could push the Map selector outside the clipped board view. The toolbar inherited `flex-shrink: 0`, and the combined controls exceeded the center panel width. The biome stylesheet now lets the toolbar shrink and wrap, keeping the two selectors grouped. Its cache version is bumped to 5.0.5.
+
+Executed the full Edge browser smoke with screenshots after the fix: passed, including selector bounds at 1920, 1366, 1280, **1150**, 768 and 812px. The evidence now contains 18 biome/viewport combinations and 24 matched screenshots. Map switching still preserves formation, hit targets and engine identity; combat regression checks passed. Asset validation and `git diff --check` also passed. This fix is local; no deployment was performed.
+
+[Visible selectors at 1150px](../../artifacts/visual-biome-forest-1150.png)
