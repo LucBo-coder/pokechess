@@ -11,7 +11,7 @@ Object.assign(RoguelikeUI.prototype, {
   getTalismanSellPrice(item) {
     if (!item) return 2;
     const tid = item.talismanId || item;
-    const def = (typeof TalismanSystem !== 'undefined') ? TalismanSystem.get(tid) : null;
+    const def = (typeof TalismanSystem !== 'undefined') ? I18n.itemDefinition(tid) : null;
     const baseCost = (def && def.price) ? def.price : 5;
     const ratio = (item.maxUses && item.usesLeft) ? (item.usesLeft / item.maxUses) : 1;
     return Math.max(1, Math.round(baseCost * 0.5 * ratio));
@@ -50,9 +50,9 @@ Object.assign(RoguelikeUI.prototype, {
     }
     if (!item) return;
     const idx = this.talismanInventory.findIndex(i => i.id === item.id);
-    if (idx !== -1) return;
+    if (idx === -1) return;
   
-    const def = (typeof TalismanSystem !== 'undefined') ? TalismanSystem.get(item.talismanId) : null;
+    const def = (typeof TalismanSystem !== 'undefined') ? I18n.itemDefinition(item.talismanId) : null;
     const talName = def ? def.name : 'Talisman';
     const sellPrice = this.getTalismanSellPrice(item);
   
@@ -103,7 +103,7 @@ Object.assign(RoguelikeUI.prototype, {
     const shuffled = [...keys].sort(() => Math.random() - 0.5);
     const picked = shuffled.slice(0, 3);
     this.talismanChoices = picked.map(tid => {
-      const def = TalismanSystem.get(tid);
+      const def = I18n.itemDefinition(tid);
       return {
         talismanId: tid,
         price: def ? def.price : 5
@@ -138,7 +138,7 @@ Object.assign(RoguelikeUI.prototype, {
       return;
     }
   
-    const def = TalismanSystem.get(talismanId);
+    const def = I18n.itemDefinition(talismanId);
     if (!def) return;
   
     this.gold -= price;
@@ -182,7 +182,7 @@ Object.assign(RoguelikeUI.prototype, {
       banner.classList.remove('hidden');
       const msg = banner.querySelector('.talisman-apply-msg');
       if (msg) {
-        const talDef = TalismanSystem.get(talismanItem.talismanId);
+        const talDef = I18n.itemDefinition(talismanItem.talismanId);
         msg.textContent = (talDef && talDef.isSpell)
           ? `Use [${talDef.name}] on a compatible Pokémon (${talDef.targetDesc})!`
           : `Select a Pokémon to equip [${talDef?.name || 'Talisman'}]!`;
@@ -208,7 +208,7 @@ Object.assign(RoguelikeUI.prototype, {
     if (!this.activeApplyingTalisman) return;
   
     const talId = this.activeApplyingTalisman.talismanId;
-    const talDef = TalismanSystem.get(talId);
+    const talDef = I18n.itemDefinition(talId);
     if (!talDef) return;
   
     if (!TalismanSystem.isApplicable(talId, pieceOrItem.type)) {
@@ -256,7 +256,7 @@ Object.assign(RoguelikeUI.prototype, {
         : (placed && placed.talismans ? placed.talismans : []);
   
     if (currentTalismans.length >= maxSlots) {
-      alert(`This Pokémon has reached its talisman capacity (${currentTalismans.length}/${maxSlots})!`);
+      this.showToast(t('equipment.full',{count:currentTalismans.length,max:maxSlots}), 'warning');
       return;
     }
   
@@ -380,17 +380,17 @@ Object.assign(RoguelikeUI.prototype, {
         const selectedItem = this.talismanInventory.find(i => i.id === this.selectedBagTalismanId);
         if (this.phase === 'battle') {
           btnSellTalisman.disabled = true;
-          btnSellTalisman.innerHTML = 'SELL';
+          btnSellTalisman.innerHTML = t('shop.sell');
           btnSellTalisman.title = 'Cannot sell talismans during combat';
         } else if (selectedItem) {
           const sellPrice = this.getTalismanSellPrice(selectedItem);
-          const def = TalismanSystem.get(selectedItem.talismanId);
+          const def = I18n.itemDefinition(selectedItem.talismanId);
           btnSellTalisman.disabled = false;
           btnSellTalisman.innerHTML = `SELL +${sellPrice}<img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />`;
           btnSellTalisman.title = `Sell [${def?.name || 'Talisman'}] for ${sellPrice} Gold`;
         } else {
           btnSellTalisman.disabled = (this.talismanInventory.length === 0);
-          btnSellTalisman.innerHTML = 'SELL';
+          btnSellTalisman.innerHTML = t('shop.sell');
           btnSellTalisman.title = (this.talismanInventory.length === 0)
             ? 'Talisman bag is empty'
             : 'Select a talisman in bag to sell';
@@ -422,7 +422,7 @@ Object.assign(RoguelikeUI.prototype, {
   
         if (attachedTalismans.length > 0) {
           for (const tid of attachedTalismans) {
-            const def = TalismanSystem.get(tid);
+            const def = I18n.itemDefinition(tid);
             if (!def) continue;
   
             const card = document.createElement('div');
@@ -453,15 +453,15 @@ Object.assign(RoguelikeUI.prototype, {
         }
   
         for (const item of this.talismanInventory) {
-          const def = TalismanSystem.get(item.talismanId);
+          const def = I18n.itemDefinition(item.talismanId);
           if (!def) continue;
   
           const isSelected = this.selectedBagTalismanId === item.id;
           const isApplying = this.activeApplyingTalisman && this.activeApplyingTalisman.id === item.id;
           const isSpell = !!def.isSpell;
-          const badgeText = isSpell ? 'SPELL' : `${item.usesLeft}/${item.maxUses}`;
+          const badgeText = isSpell ? I18n.legacy('SPELL') : `${item.usesLeft}/${item.maxUses}`;
           const badgeClass = isSpell ? 'talisman-uses-badge talisman-spell-badge' : 'talisman-uses-badge';
-          const actionText = isApplying ? 'CANCEL' : (isSpell ? 'USE' : 'EQUIP');
+          const actionText = I18n.legacy(isApplying ? 'CANCEL' : (isSpell ? 'USE' : 'EQUIP'));
   
           const card = document.createElement('div');
           card.className = `talisman-card ${isSelected ? 'bag-selected' : ''} ${isApplying ? 'applying-active' : ''} ${isSpell ? 'spell-card' : ''}`;
@@ -525,18 +525,19 @@ Object.assign(RoguelikeUI.prototype, {
       }
   
       for (const choice of this.talismanChoices) {
-        const def = TalismanSystem.get(choice.talismanId);
+        const def = I18n.itemDefinition(choice.talismanId);
         if (!def) continue;
   
         const price = choice.price || 5;
         const canAfford = this.gold >= price;
         const isBattle = this.phase === 'battle';
         const isSpell = !!def.isSpell;
-        const badgeText = isSpell ? 'SPELL' : `${def.maxUses}/${def.maxUses}`;
+        const badgeText = isSpell ? I18n.legacy('SPELL') : `${def.maxUses}/${def.maxUses}`;
         const badgeClass = isSpell ? 'talisman-uses-badge talisman-spell-badge' : 'talisman-uses-badge';
   
         const card = document.createElement('div');
         card.className = `talisman-card ${!canAfford ? 'cant-afford' : ''} ${isSpell ? 'spell-card' : ''}`;
+        card.dataset.slotState = !canAfford ? 'disabled' : isBattle ? 'locked' : 'normal';
   
         card.innerHTML = `
           <div class="talisman-card-header">

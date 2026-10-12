@@ -1,0 +1,112 @@
+{
+  "assets": [
+    {
+      "id": "slot-selected",
+      "file": "ui/slot_states/slot-selected.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "center_alpha_extrema": [
+        0,
+        1
+      ],
+      "opaque_bounds": [
+        133,
+        159,
+        1121,
+        1095
+      ],
+      "nine_slice": null,
+      "status": "overlay-design-needs-alignment-validation",
+      "source": "OpenAI imagegen",
+      "license": "No third-party licensing or exclusivity certification",
+      "prompt": "Create one isolated TRANSPARENT game inventory-slot STATE OVERLAY, ID slot-selected (never render the ID). Reference is the existing empty slot shape ONLY. Draw only its outline geometry as two thin concentric pixel lines, clearly selected, colored golden yellow #F5C65B with pale cream top-left edge, tiny dark pixel edging. IMPORTANT: REMOVE the entire navy center, so both the entire inside and outside of the square border are TRUE alpha transparent. This is a hollow square frame with stepped clipped corners, not a filled panel. No fill whatsoever, no shadow, no glow, no background/checkerboard paint. No icon, text, numbers, lock, ticks or objects. Style crisp 16-bit pixel art, flat colors. Symmetric square, equal border width, occupies 80 percent of a square canvas with uniform 10 percent outer transparent margins. Border about 3 percent of square width, corners step inward by 8 percent. Overlay will be placed on top of existing icons and must not hide their center. One PNG asset, not an atlas."
+    },
+    {
+      "id": "slot-equipped",
+      "file": "ui/slot_states/slot-equipped.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "center_alpha_extrema": [
+        0,
+        1
+      ],
+      "opaque_bounds": [
+        128,
+        158,
+        1126,
+        1094
+      ],
+      "nine_slice": null,
+      "status": "overlay-design-needs-alignment-validation",
+      "source": "OpenAI imagegen",
+      "license": "No third-party licensing or exclusivity certification",
+      "prompt": "Create one isolated TRANSPARENT game inventory-slot STATE OVERLAY, ID slot-equipped (never render the ID). Reference is the existing empty slot shape ONLY. Draw only its outline geometry as single continuous thin pixel border, four slightly wider square corner brackets, colored emerald green #56D68B with pale mint top-left edge, tiny dark pixel edging. IMPORTANT: REMOVE the entire navy center, so both the entire inside and outside of the square border are TRUE alpha transparent. This is a hollow square frame with stepped clipped corners, not a filled panel. No fill whatsoever, no shadow, no glow, no background/checkerboard paint. No icon, text, numbers, lock, ticks or objects. Style crisp 16-bit pixel art, flat colors. Symmetric square, equal border width, occupies 80 percent of a square canvas with uniform 10 percent outer transparent margins. Border about 3 percent of square width, corners step inward by 8 percent. Overlay will be placed on top of existing icons and must not hide their center. One PNG asset, not an atlas."
+    },
+    {
+      "id": "slot-locked",
+      "file": "ui/slot_states/slot-locked.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "center_alpha_extrema": [
+        0,
+        0
+      ],
+      "opaque_bounds": [
+        129,
+        131,
+        1126,
+        1122
+      ],
+      "nine_slice": null,
+      "status": "overlay-design-needs-alignment-validation",
+      "source": "OpenAI imagegen",
+      "license": "No third-party licensing or exclusivity certification",
+      "prompt": "Create one isolated TRANSPARENT game inventory-slot STATE OVERLAY, ID slot-locked (never render the ID). Reference is the existing empty slot shape ONLY. Draw only its outline geometry as thin dashed pixel outline, short equal dashes, no padlock symbol, colored muted slate gray #65758A, tiny dark pixel edging. IMPORTANT: REMOVE the entire navy center, so both the entire inside and outside of the square border are TRUE alpha transparent. This is a hollow square frame with stepped clipped corners, not a filled panel. No fill whatsoever, no shadow, no glow, no background/checkerboard paint. No icon, text, numbers, lock, ticks or objects. Style crisp 16-bit pixel art, flat colors. Symmetric square, equal border width, occupies 80 percent of a square canvas with uniform 10 percent outer transparent margins. Border about 3 percent of square width, corners step inward by 8 percent. Overlay will be placed on top of existing icons and must not hide their center. One PNG asset, not an atlas."
+    },
+    {
+      "id": "slot-disabled",
+      "file": "ui/slot_states/slot-disabled.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "center_alpha_extrema": [
+        0,
+        0
+      ],
+      "opaque_bounds": [
+        126,
+        158,
+        1128,
+        1096
+      ],
+      "nine_slice": null,
+      "status": "overlay-design-needs-alignment-validation",
+      "source": "OpenAI imagegen",
+      "license": "No third-party licensing or exclusivity certification",
+      "prompt": "Create one isolated TRANSPARENT game inventory-slot STATE OVERLAY, ID slot-disabled (never render the ID). Reference is the existing empty slot shape ONLY. Draw only its outline geometry as single faint continuous pixel border, subdued but visible, colored desaturated dark blue-gray #435166, tiny dark pixel edging. IMPORTANT: REMOVE the entire navy center, so both the entire inside and outside of the square border are TRUE alpha transparent. This is a hollow square frame with stepped clipped corners, not a filled panel. No fill whatsoever, no shadow, no glow, no background/checkerboard paint. No icon, text, numbers, lock, ticks or objects. Style crisp 16-bit pixel art, flat colors. Symmetric square, equal border width, occupies 80 percent of a square canvas with uniform 10 percent outer transparent margins. Border about 3 percent of square width, corners step inward by 8 percent. Overlay will be placed on top of existing icons and must not hide their center. One PNG asset, not an atlas."
+    }
+  ]
+}

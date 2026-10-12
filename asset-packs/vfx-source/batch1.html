@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>POKÉCHESS+ VFX FORGE — BATCH 1 (DRAFT v1)</title>
+<style>
+  :root{--bg:#0d1830;--panel:#16264a;--panel2:#1d3260;--line:#2c4478;--gold:#ffce3c;--txt:#e9f0ff;--dim:#9db2d8;--ok:#5ad46a;--bad:#ff6a5a}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Segoe UI",system-ui,sans-serif}
+  header{padding:12px 20px;border-bottom:2px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  h1{font-size:17px;margin:0;color:var(--gold);letter-spacing:.5px}
+  .badge{background:#3a2b08;border:1px solid var(--gold);color:var(--gold);padding:2px 10px;border-radius:4px;font-size:11px;letter-spacing:1px}
+  .bar{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:6px 12px;cursor:pointer;font-size:12.5px}
+  button:hover{border-color:var(--gold);color:var(--gold)}
+  select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:5px}
+  #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:14px;padding:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .card h3{margin:0;padding:9px 12px;font-size:13.5px;background:var(--panel2);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .card h3 small{color:var(--dim);font-weight:400;text-align:right}
+  .stage{display:flex;justify-content:center;align-items:center;padding:14px;min-height:210px;
+    background:repeating-conic-gradient(#0a1226 0 25%,#0e1a33 0 50%) 0 0/16px 16px}
+  .stage canvas,.strip canvas{image-rendering:pixelated}
+  .strip{padding:8px 12px;overflow-x:auto;background:#0a1226}
+  .row{display:flex;gap:6px;padding:8px 12px}
+  .qc{padding:0 12px 10px;font-size:11.5px;color:var(--dim)}
+  .pass{color:var(--ok)}.fail{color:var(--bad)}
+  .note{padding:0 12px 10px;font-size:11.5px;color:var(--dim)}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚔ POKÉCHESS+ VFX FORGE</h1>
+  <span class="badge">BATCH 1 — DRAFT v1 — FOR ART APPROVAL</span>
+  <div class="bar">
+    <label style="color:var(--dim);font-size:12px">Preview
+      <select id="zoom"><option>1</option><option selected>2</option><option>3</option></select>×
+    </label>
+    <button id="bSheets">⬇ All sprite sheets</button>
+    <button id="bFrames">⬇ All frames</button>
+    <button id="bContact">⬇ Contact sheet</button>
+    <button id="bManifest">⬇ combat-vfx.json</button>
+  </div>
+</header>
+<div id="grid"></div>
+<script>
+"use strict";
+/* ================= PIXEL TOOLCHAIN (native 1x, no AA) ================= */
+function strHash(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+function pen(ctx,fw,fh){
+  const P=(x,y,c)=>{x=Math.round(x);y=Math.round(y);
+    if(x>=0&&y>=0&&x<fw&&y<fh){ctx.fillStyle=c;ctx.fillRect(x,y,1,1);}};
+  const L=(x0,y0,x1,y1,c)=>{x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+    const dx=Math.abs(x1-x0),dy=Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx-dy;
+    for(;;){P(x0,y0,c);if(x0===x1&&y0===y1)break;const e2=2*e;
+      if(e2>-dy){e-=dy;x0+=sx}if(e2<dx){e+=dx;y0+=sy}}};
+  const D=(cx,cy,r,c)=>{cx=Math.round(cx);cy=Math.round(cy);
+    for(let y=-r;y<=r;y++){const w=Math.round(Math.sqrt(r*r-y*y));
+      for(let x=-w;x<=w;x++)P(cx+x,cy+y,c);}};
+  const DOME=(cx,cy,r,c)=>{for(let y=-r;y<=0;y++){const w=Math.round(Math.sqrt(r*r-y*y));
+      for(let x=-w;x<=w;x++)P(cx+x,cy+y,c);}};
+  const RING=(cx,cy,r,c)=>{const n=Math.max(24,(r*8)|0);let lx=null,ly=null;
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2;
+      const x=Math.round(cx+Math.cos(a)*r),y=Math.round(cy+Math.sin(a)*r);
+      if(x!==lx||y!==ly)P(x,y,c);lx=x;ly=y;}};
+  /* dark rim pass: outlines the silhouette for the GBA impact look */
+  const OUT=(c)=>{const img=ctx.getImageData(0,0,fw,fh),d=img.data;
+    const sol=new Uint8Array(fw*fh);
+    for(let i=0;i<fw*fh;i++)sol[i]=d[i*4+3]>0?1:0;
+    ctx.fillStyle=c;
+    for(let y=0;y<fh;y++)for(let x=0;x<fw;x++){const i=y*fw+x;
+      if(sol[i])continue;
+      if((x>0&&sol[i-1])||(x<fw-1&&sol[i+1])||(y>0&&sol[i-fw])||(y<fh-1&&sol[i+fw]))
+        ctx.fillRect(x,y,1,1);}};
+  return{P,L,D,DOME,RING,OUT};
+}
+
+/* ================= BATCH 1 ASSET DEFINITIONS ================= */
+const EFFECTS=[
+/* ---- A01 LIGHT PHYSICAL HIT ---- */
+{id:'hit_light_01',file:'hit_light_01.png',dir:'basic',fw:64,fh:64,n:8,fps:14,loop:false,endsEmpty:true,
+ pal:{core:'#FFFFFF',hi:'#FFF3B0',mid:'#FFD84A',dk:'#E8A020'},outline:'#8A5210',
+ note:'A01 light physical hit. White-gold burst, sharp diagonal streaks, clean exit.',
+ draw(f,p,S,C){const cx=32,cy=32;
+  const star=(r,ca,cd,cc)=>{for(let i=1;i<=r;i++){p.P(cx+i,cy,ca);p.P(cx-i,cy,ca);p.P(cx,cy+i,ca);p.P(cx,cy-i,ca);}
+    const rd=Math.round(r*0.6);
+    for(let i=1;i<=rd;i++){p.P(cx+i,cy+i,cd);p.P(cx-i,cy+i,cd);p.P(cx+i,cy-i,cd);p.P(cx-i,cy-i,cd);}
+    if(cc)p.P(cx,cy,cc);};
+  const st=(dx,dy,r0,r1,c)=>{for(let i=r0;i<=r1;i++)p.P(cx+dx*i,cy+dy*i,c);};
+  if(f===0){p.D(cx,cy,2,C.mid);p.P(cx,cy,C.core);
+    st(1,0,3,4,C.dk);st(-1,0,3,4,C.dk);st(0,1,3,4,C.dk);st(0,-1,3,4,C.dk);}
+  else if(f===1){star(5,C.mid,C.dk,C.core);
+    st(1,1,6,10,C.hi);st(-1,-1,6,10,C.hi);st(1,-1,6,9,C.mid);st(-1,1,6,9,C.mid);}
+  else if(f===2){star(9,C.hi,C.mid,C.core);
+    st(1,0,10,14,C.hi);st(-1,0,10,14,C.hi);st(0,1,10,14,C.hi);st(0,-1,10,14,C.hi);
+    st(1,1,10,16,C.hi);st(-1,-1,10,16,C.hi);st(1,-1,10,15,C.mid);st(-1,1,10,15,C.mid);}
+  else if(f===3){star(7,C.mid,C.dk,null);p.P(cx,cy,C.core);
+    st(1,1,8,20,C.hi);st(-1,-1,8,20,C.hi);st(1,-1,8,18,C.mid);st(-1,1,8,18,C.mid);
+    st(1,0,8,17,C.mid);st(-1,0,8,17,C.mid);st(0,1,8,17,C.mid);st(0,-1,8,17,C.mid);}
+  else if(f===4){p.D(cx,cy,3,C.mid);p.P(cx,cy,C.hi);
+    for(const[dx,dy]of[[1,1],[-1,-1],[1,-1],[-1,1],[1,0],[-1,0],[0,1],[0,-1]])
+      for(let i=10;i<=22;i+=2)p.P(cx+dx*i,cy+dy*i,C.mid);}
+  else if(f===5){for(const[dx,dy]of[[1,1],[-1,-1],[1,-1],[-1,1],[1,0],[-1,0],[0,1],[0,-1]]){
+      p.P(cx+dx*8,cy+dy*8,C.hi);p.P(cx+dx*14,cy+dy*14,C.mid);p.P(cx+dx*20,cy+dy*20,C.dk);}}
+  else if(f===6){p.P(cx+11,cy+11,C.mid);p.P(cx-13,cy-13,C.mid);
+    p.P(cx+15,cy-14,C.dk);p.P(cx-14,cy+15,C.dk);}
+  /* f7: empty — clean non-loop exit */}},
+/* ---- A02 HEAVY PHYSICAL HIT ---- */
+{id:'hit_heavy_01',file:'hit_heavy_01.png',dir:'basic',fw:96,fh:96,n:8,fps:12,loop:false,endsEmpty:false,
+ pal:{core:'#FFFFFF',hi:'#FFE9A8',mid:'#FFB13D',or:'#FF7A2F',deep:'#D84E1A',ring:'#FFD9A0',deb:'#C97B3A',dust:'#B8905A'},
+ outline:'#7A2E12',
+ note:'A02 heavy hit. Orange-white mass, expanding shockwave ring, debris chunks under gravity (¾ squash 0.85).',
+ draw(f,p,S,C){const cx=48,cy=48;
+  const ring2=(r,c,skip)=>{const nn=Math.max(24,(r*8)|0);
+    for(let i=0;i<nn;i++){if(skip&&i%skip===0)continue;const a=i/nn*Math.PI*2;
+      p.P(cx+Math.cos(a)*r,cy+Math.sin(a)*r,c);}};
+  const debris=n=>{for(let k=0;k<n;k++){const a=k/n*Math.PI*2+S()*0.6;
+    const d=Math.min(12+f*5+S()*8,40);
+    const x=cx+Math.cos(a)*d,y=cy+Math.sin(a)*d*0.85+(f>3?(f-3)*(f-3)*1.5:0);
+    if(y>90)continue;
+    p.P(x,y,S()<0.5?C.deb:C.dust);p.P(x+1,y,S()<0.5?C.deb:C.dust);
+    if(S()<0.35)p.P(x,y+1,C.dust);}};
+  if(f===0){p.D(cx,cy,6,C.hi);p.D(cx,cy,3,C.core);}
+  else if(f===1){p.D(cx,cy,11,C.mid);p.D(cx,cy,6,C.hi);p.D(cx,cy,3,C.core);
+    p.RING(cx,cy,15,C.ring);debris(6);}
+  else if(f===2){p.D(cx,cy,15,C.or);p.D(cx,cy,10,C.hi);p.D(cx,cy,5,C.core);
+    p.RING(cx,cy,22,C.ring);
+    p.L(cx+17,cy-17,cx+23,cy-23,C.hi);p.L(cx-17,cy+17,cx-23,cy+23,C.hi);
+    p.L(cx-17,cy-17,cx-23,cy-23,C.hi);p.L(cx+17,cy+17,cx+23,cy+23,C.hi);
+    debris(10);}
+  else if(f===3){p.D(cx,cy,11,C.deep);p.D(cx,cy,6,C.or);p.D(cx,cy,2,C.hi);
+    ring2(30,C.ring,2);debris(10);}
+  else if(f===4){p.D(cx,cy,7,C.deep);ring2(38,C.ring,3);debris(8);
+    for(let k=0;k<5;k++)p.P(cx+(S()-0.5)*50,cy+24+S()*10,C.dust);}
+  else if(f===5){ring2(44,C.ring,4);
+    for(let k=0;k<7;k++){const a=S()*6.283,d=14+S()*20;
+      p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d*0.8,C.or);}
+    for(let k=0;k<6;k++)p.P(cx+(S()-0.5)*60,cy+26+S()*12,C.dust);}
+  else if(f===6){for(let k=0;k<5;k++)p.P(cx+(S()-0.5)*70,cy+20+S()*14,S()<0.5?C.dust:C.deep);
+    for(let k=0;k<4;k++){const a=S()*6.283,d=24+S()*14;
+      p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d*0.8-6,C.or);}}
+  else if(f===7){for(let k=0;k<4;k++)p.P(cx+(S()-0.5)*60,cy+26+S()*10,C.dust);}}},
+/* ---- A03 CLAW SLASH ---- */
+{id:'slash_claw_01',file:'slash_claw_01.png',dir:'basic',fw:96,fh:96,n:8,fps:12,loop:false,endsEmpty:false,
+ pal:{core:'#FFFFFF',mid:'#BFE9FF',deep:'#3E7EB8'},outline:'#173A5E',
+ note:'A03 claw slash. Three staggered 45° trails, white-hot leading third, tail recedes to sliver.',
+ draw(f,p,S,C){
+  const T=[0,0,0,0,8,28,46,60],H=[12,32,50,64,64,62,58,64];
+  const band=(sx,sy,t,h)=>{
+    for(let d=t;d<=h;d++){const x=sx-d,y=sy+d;p.P(x+1,y,C.deep);p.P(x,y+1,C.deep);}
+    for(let d=t;d<=h;d++){const x=sx-d,y=sy+d;p.P(x,y,d>h-18?C.core:C.mid);}};
+  for(const k of[-1,0,1]){const mid=(k===0);
+    const t=T[f]+(mid?0:2),h=H[f]+(mid?4:0);
+    band(74+k*7,22+k*7,Math.min(t,h-2),h);}}},
+/* ---- A05 CRITICAL HIT ---- */
+{id:'crit_hit_01',file:'crit_hit_01.png',dir:'basic',fw:128,fh:128,n:8,fps:12,loop:false,endsEmpty:true,
+ pal:{core:'#FFFFFF',hi:'#FFF7C2',mid:'#FFD84A',or:'#FFA81F',deep:'#E0761A',ring:'#FFE9A0'},
+ outline:'#8A4A10',
+ note:'A05 critical hit. Gold starburst, alternating ray lengths, ring 18→50, falling sparkles.',
+ draw(f,p,S,C){const cx=64,cy=64;
+  const arms=(rL,rS,c,gap)=>{for(let i=1;i<=rL;i++){if(gap&&i%gap===gap-1)continue;
+      p.P(cx+i,cy,c);p.P(cx-i,cy,c);p.P(cx,cy+i,c);p.P(cx,cy-i,c);}
+    for(let i=1;i<=rS;i++){if(gap&&i%gap===gap-1)continue;
+      p.P(cx+i,cy+i,c);p.P(cx-i,cy+i,c);p.P(cx+i,cy-i,c);p.P(cx-i,cy-i,c);}};
+  const ring2=(r,c,skip)=>{const nn=Math.max(24,(r*8)|0);
+    for(let i=0;i<nn;i++){if(skip&&i%skip===0)continue;const a=i/nn*Math.PI*2;
+      p.P(cx+Math.cos(a)*r,cy+Math.sin(a)*r,c);}};
+  if(f===0){p.D(cx,cy,8,C.hi);p.D(cx,cy,4,C.core);arms(12,7,C.mid);}
+  else if(f===1){arms(20,12,C.mid);p.D(cx,cy,9,C.hi);p.D(cx,cy,4,C.core);ring2(18,C.ring);}
+  else if(f===2){arms(30,17,C.mid);p.D(cx,cy,11,C.or);p.D(cx,cy,6,C.hi);p.D(cx,cy,2,C.core);ring2(26,C.ring);}
+  else if(f===3){arms(34,19,C.hi,3);p.D(cx,cy,8,C.mid);p.D(cx,cy,3,C.hi);ring2(34,C.ring,2);
+    for(let k=0;k<6;k++){const a=S()*6.283,d=20+S()*16;p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d,C.hi);}}
+  else if(f===4){arms(30,16,C.mid,2);p.D(cx,cy,5,C.deep);ring2(42,C.ring,3);
+    for(let k=0;k<8;k++){const a=S()*6.283,d=26+S()*18;p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d,C.hi);}}
+  else if(f===5){ring2(50,C.ring,4);arms(24,12,C.deep,3);
+    for(let k=0;k<6;k++){const x=cx+(S()-0.5)*70,y=cy+(S()-0.5)*50;p.P(x,y,C.hi);p.P(x,y+1,C.mid);}}
+  else if(f===6){for(let k=0;k<8;k++){const x=cx+(S()-0.5)*80,y=cy-10+S()*40;
+      p.P(x,y,C.hi);p.P(x,y+1,C.mid);}}
+  /* f7: empty */}},
+/* ---- FIRE IMPACT ---- */
+{id:'fire_impact_01',file:'fire_impact_01.png',dir:'fire',fw:96,fh:96,n:8,fps:12,loop:false,endsEmpty:true,
+ pal:{core:'#FFF3B0',hi:'#FFC93C',mid:'#FF8A2A',deep:'#F2542D',dark:'#C22E12'},outline:'#7A1E0A',
+ note:'Fireball impact. White-hot core, flame tongues, peak scallop burst, rising embers.',
+ draw(f,p,S,C){const cx=48,cy=52;
+  const tongue=(x,len,jit)=>{p.L(x,cy-8,x+jit,cy-8-len,C.mid);p.P(x+jit,cy-9-len,C.hi);};
+  if(f===0){p.D(cx,cy,5,C.mid);p.D(cx,cy,3,C.core);}
+  else if(f===1){p.D(cx,cy,10,C.mid);p.D(cx,cy,6,C.hi);p.D(cx,cy,3,C.core);
+    tongue(42,8,-2);tongue(48,12,0);tongue(54,8,2);}
+  else if(f===2){p.D(cx,cy,16,C.deep);p.D(cx,cy,12,C.mid);p.D(cx,cy,8,C.hi);p.D(cx,cy,4,C.core);
+    tongue(40,16,-3);tongue(45,20,-1);tongue(50,22,1);tongue(55,17,3);
+    for(let k=0;k<8;k++){const a=S()*6.283,d=18+S()*8;
+      p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d*0.8,C.hi);}}
+  else if(f===3){p.D(cx,cy,13,C.deep);p.D(cx,cy,8,C.mid);p.D(cx,cy,4,C.hi);
+    for(let k=0;k<5;k++){const x=38+k*5,jit=(S()-0.5)*6;
+      p.L(x,cy-16,x+jit,cy-24,C.mid);p.P(x+jit,cy-25,C.hi);}
+    for(let k=0;k<8;k++){const a=S()*6.283,d=22+S()*10;
+      p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d*0.8-4,C.mid);}}
+  else if(f===4){p.D(cx,cy,8,C.dark);p.D(cx,cy,4,C.deep);
+    for(let k=0;k<10;k++){const a=S()*6.283,d=16+S()*16;
+      p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d*0.8-8,C.hi);}}
+  else if(f===5){p.D(cx,cy,4,C.dark);
+    for(let k=0;k<8;k++){const a=S()*6.283,d=20+S()*18;
+      p.P(cx+Math.cos(a)*d,cy+Math.sin(a)*d*0.8-12,C.mid);}}
+  else if(f===6){for(let k=0;k<6;k++){const x=cx+(S()-0.5)*56,y=cy-14-S()*14;
+      p.P(x,y,S()<0.5?C.mid:C.hi);}}
+  /* f7: empty */}},
+/* ---- ELECTRIC IMPACT ---- */
+{id:'electric_impact_01',file:'electric_impact_01.png',dir:'electric',fw:96,fh:96,n:8,fps:12,loop:false,endsEmpty:true,
+ pal:{core:'#FFFFFF',hi:'#FFF9C0',mid:'#FFE23C',deep:'#FFC400'},outline:'#4A3800',
+ note:'Electric impact. Jagged bolts re-jitter per frame (flicker), flash core, scatter sparks.',
+ draw(f,p,S,C){const cx=48,cy=48;
+  const bolt=(ang,len)=>{let x=cx,y=cy,a=ang;const pts=[[x,y]];
+    const steps=Math.max(2,(len/4)|0);
+    for(let i=0;i<steps;i++){a+=(S()-0.5)*0.9;x+=Math.cos(a)*4;y+=Math.sin(a)*4;pts.push([x,y]);}
+    for(let i=1;i<pts.length;i++)p.L(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],C.mid);
+    const n=Math.max(2,(pts.length*0.6)|0);
+    for(let i=1;i<n;i++)p.L(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],C.core);
+    const t=pts[pts.length-1];
+    p.P(t[0],t[1],C.core);p.P(t[0]+1,t[1],C.deep);p.P(t[0]-1,t[1],C.deep);
+    p.P(t[0],t[1]+1,C.deep);p.P(t[0],t[1]-1,C.deep);};
+  const spark=(x,y)=>{p.P(x,y,C.hi);p.P(x+1,y,C.mid);p.P(x-1,y,C.mid);
+    p.P(x,y+1,C.mid);p.P(x,y-1,C.mid);};
+  if(f===0){p.D(cx,cy,4,C.core);bolt(-0.6,10);bolt(2.5,10);}
+  else if(f===1){p.D(cx,cy,8,C.hi);p.D(cx,cy,3,C.core);
+    for(let k=0;k<4;k++)bolt(k*1.57+(S()-0.5)*0.5,18);}
+  else if(f===2){p.D(cx,cy,11,C.hi);p.D(cx,cy,5,C.core);
+    for(let k=0;k<6;k++)bolt(k*1.047+(S()-0.5)*0.5,30);}
+  else if(f===3){p.D(cx,cy,8,C.hi);p.D(cx,cy,3,C.core);
+    for(let k=0;k<6;k++)bolt(k*1.047+0.5+(S()-0.5)*0.6,24);
+    for(let k=0;k<5;k++)spark(cx+(S()-0.5)*60,cy+(S()-0.5)*60);}
+  else if(f===4){p.D(cx,cy,6,C.mid);
+    for(let k=0;k<5;k++)bolt(k*1.257+(S()-0.5)*0.6,16);}
+  else if(f===5){for(let k=0;k<7;k++){const a=S()*6.283,d=8+S()*24;
+      const x=cx+Math.cos(a)*d,y=cy+Math.sin(a)*d;
+      p.L(x,y,x+Math.cos(a)*4,y+Math.sin(a)*4,C.mid);p.P(x,y,C.core);}
+    for(let k=0;k<4;k++)spark(cx+(S()-0.5)*64,cy+(S()-0.5)*64);}
+  else if(f===6){for(let k=0;k<6;k++)if(k%2===0)spark(cx+(S()-0.5)*70,cy+(S()-0.5)*70);}
+  /* f7: empty */}},
+/* ---- WATER SPLASH ---- */
+{id:'water_splash_01',file:'water_splash_01.png',dir:'water',fw:96,fh:96,n:8,fps:12,loop:false,endsEmpty:false,
+ pal:{foam:'#FFFFFF',hi:'#BFEFFF',mid:'#58B7F0',deep:'#2C7BD4',dark:'#1A4E9E'},outline:'#12386E',
+ note:'Water splash. Dome → crown → ballistic droplets → settling ripple. Ground line y≈58, ripple squash 0.38 (¾ view).',
+ draw(f,p,S,C){const cx=48,gy=58;
+  const spike=(x,base,len)=>{for(let i=0;i<len;i++)p.P(x,base-i,C.mid);
+    p.P(x,base-len,C.hi);p.P(x,base-len+1,C.hi);};
+  const drop=(x,y)=>{p.P(x,y,C.hi);p.P(x+1,y,C.foam);p.P(x,y+1,C.mid);};
+  const ripple=(r,c,skip)=>{const nn=Math.max(28,(r*10)|0);
+    for(let i=0;i<nn;i++){if(skip&&i%skip===0)continue;const a=i/nn*Math.PI*2;
+      p.P(cx+Math.cos(a)*r,gy+Math.sin(a)*r*0.38,c);}};
+  const ballistic=t=>{for(let k=-2;k<=2;k++){
+    drop(cx+k*11*t,gy-12-18*t+7*t*t);}};
+  if(f===0){p.DOME(cx,gy,6,C.mid);p.P(cx-2,gy-3,C.hi);drop(cx+9,gy-8);}
+  else if(f===1){p.DOME(cx,gy,9,C.mid);p.P(cx-3,gy-5,C.hi);p.P(cx+2,gy-7,C.hi);
+    spike(cx-12,gy-2,7);spike(cx,gy-4,13);spike(cx+12,gy-2,7);ripple(11,C.deep);}
+  else if(f===2){p.DOME(cx,gy,12,C.deep);p.DOME(cx,gy,9,C.mid);
+    p.P(cx-4,gy-6,C.hi);p.P(cx,gy-8,C.hi);p.P(cx+4,gy-6,C.hi);
+    const lx=[-18,-12,-6,0,6,12,18],ll=[8,12,16,20,16,12,8];
+    for(let i=0;i<7;i++)spike(cx+lx[i],gy-6,ll[i]);
+    drop(cx-24,gy-16);drop(cx+24,gy-16);drop(cx-20,gy-6);drop(cx+20,gy-6);
+    ripple(14,C.deep);}
+  else if(f===3){p.DOME(cx,gy,10,C.mid);p.P(cx-3,gy-5,C.hi);p.P(cx+3,gy-5,C.hi);
+    const lx=[-14,-7,0,7,14],ll=[6,9,12,9,6];
+    for(let i=0;i<5;i++){spike(cx+lx[i],gy-4,ll[i]);drop(cx+lx[i]*1.5,gy-12-ll[i]);}
+    ripple(18,C.deep);}
+  else if(f===4){p.DOME(cx,gy,6,C.mid);ballistic(1);ripple(22,C.deep,3);}
+  else if(f===5){ballistic(2);ripple(26,C.deep,3);}
+  else if(f===6){ballistic(3);
+    for(let k=-2;k<=2;k++){p.P(cx+k*22,gy-1,C.hi);p.P(cx+k*22,gy,C.mid);p.P(cx+k*22+1,gy,C.mid);}
+    ripple(29,C.dark,3);}
+  else if(f===7){ripple(31,C.dark,2);}}},
+/* ---- GRASS / VINE IMPACT ---- */
+{id:'grass_vine_01',file:'grass_vine_01.png',dir:'grass',fw:96,fh:96,n:8,fps:12,loop:false,endsEmpty:true,
+ pal:{hi:'#E8F8B0',mid:'#A8E05A',deep:'#58B43C',dark:'#2E7A24',vine:'#7BC94A'},outline:'#1E4A16',
+ note:'Vine whip impact. Quadratic vine arc strikes, leaf burst at contact, spinning leaf particles.',
+ draw(f,p,S,C){const A={x:16,y:44},Ct={x:48,y:14},B={x:80,y:48};
+  const q=t=>{const u=1-t;return{x:u*u*A.x+2*u*t*Ct.x+t*t*B.x,y:u*u*A.y+2*u*t*Ct.y+t*t*B.y}};
+  const leaf=(x,y,o)=>{const m=C.mid,d=C.deep,h=C.hi,k=C.dark;
+    const put=(dx,dy,c)=>p.P(x+dx,y+dy,c);
+    if(o===0){put(0,-1,h);put(1,0,m);put(0,0,m);put(-1,0,m);put(0,1,d);put(0,2,k);}
+    else if(o===1){put(1,0,h);put(0,-1,m);put(0,0,m);put(0,1,m);put(-1,0,d);put(-2,0,k);}
+    else if(o===2){put(0,1,h);put(-1,0,m);put(0,0,m);put(1,0,m);put(0,-1,d);put(0,-2,k);}
+    else{put(-1,0,h);put(0,1,m);put(0,0,m);put(0,-1,m);put(1,0,d);put(2,0,k);}};
+  const arc=(t0,t1,leafTs,spin)=>{let prev=q(t0);
+    for(let i=1;i<=24;i++){const t=t0+(t1-t0)*i/24,pt=q(t);
+      p.L(prev.x,prev.y,pt.x,pt.y,C.vine);prev=pt;}
+    for(const lt of leafTs){const pt=q(lt);leaf(pt.x,pt.y,(spin+Math.round(lt*3))%4);}};
+  const burst=(r,c1,c2)=>{p.D(B.x,B.y,r,c1);p.D(B.x,B.y,Math.max(1,r-2),c2);};
+  if(f===0){arc(0,0.3,[0.25],0);}
+  else if(f===1){arc(0,0.65,[0.25,0.5],1);}
+  else if(f===2){arc(0,1,[0.2,0.4,0.6,0.8],2);burst(4,C.deep,C.mid);}
+  else if(f===3){arc(0,1,[0.15,0.35,0.55,0.75],3);burst(7,C.deep,C.mid);p.D(B.x,B.y,3,C.hi);
+    leaf(B.x-8,B.y-8,0);leaf(B.x+8,B.y-6,1);leaf(B.x+6,B.y+8,2);leaf(B.x-7,B.y+7,3);}
+  else if(f===4){arc(0.35,1,[0.5,0.8],0);burst(5,C.deep,C.dark);
+    leaf(B.x-14,B.y-12,1);leaf(B.x+13,B.y-10,2);leaf(B.x+11,B.y+12,3);leaf(B.x-12,B.y+11,0);}
+  else if(f===5){burst(3,C.dark,C.dark);
+    for(const[lx,ly,o]of[[30,26,1],[64,20,2],[82,34,3],[70,60,0],[36,58,2],[50,40,1]])leaf(lx,ly,o);}
+  else if(f===6){leaf(34,34,2);leaf(66,30,3);leaf(58,52,0);leaf(76,44,1);}
+  /* f7: empty */}}
+];
+
+/* ================= RENDER + QC ================= */
+function renderFrame(e,f){
+  const cv=document.createElement('canvas');cv.width=e.fw;cv.height=e.fh;
+  const ctx=cv.getContext('2d');
+  const p=pen(ctx,e.fw,e.fh);
+  const S=rng((strHash(e.id)+f*2654435761)>>>0);
+  e.draw(f,p,S,e.pal);
+  if(e.outline)p.OUT(e.outline);
+  return cv;
+}
+function qc(e,frames){
+  const res=[],data=frames.map(cv=>cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data);
+  const hashes=data.map(d=>{let h=2166136261>>>0;
+    for(let i=0;i<d.length;i+=4){if(d[i+3]){h^=(d[i]<<16|d[i+1]<<8|d[i+2])>>>0;
+      h=Math.imul(h,16777619);h^=i;}}return h>>>0;});
+  res.push(['8 unique frames',new Set(hashes).size===e.n]);
+  let edge=false;frames.forEach((cv,fi)=>{const d=data[fi];
+    for(let x=0;x<cv.width&&!edge;x++){if(d[x*4+3]>0||d[((cv.height-1)*cv.width+x)*4+3]>0)edge=true;}
+    for(let y=0;y<cv.height&&!edge;y++){if(d[y*cv.width*4+3]>0||d[(y*cv.width+cv.width-1)*4+3]>0)edge=true;}});
+  res.push(['no boundary clipping',!edge]);
+  let lastEmpty=true;{const d=data[e.n-1];
+    for(let i=3;i<d.length;i+=4)if(d[i]>0){lastEmpty=false;break;}}
+  res.push([e.endsEmpty?'clean final frame (non-loop exit)':'final frame consistent',e.endsEmpty?lastEmpty:true]);
+  res.push(['frame geometry '+e.fw+'×'+e.fh,frames.every(cv=>cv.width===e.fw&&cv.height===e.fh)]);
+  return res;
+}
+
+/* ================= UI ================= */
+const grid=document.getElementById('grid'),state={};
+function paintChecker(ctx,w,h,s=8){for(let y=0;y<h;y+=s)for(let x=0;x<w;x+=s){
+  ctx.fillStyle=(((x+y)/s)|0)%2?'#141c2c':'#0d1424';ctx.fillRect(x,y,s,s);}}
+function paintCheckerAt(ctx,x,y,w,h,s=8){for(let yy=0;yy<h;yy+=s)for(let xx=0;xx<w;xx+=s){
+  ctx.fillStyle=(((xx+yy)/s)|0)%2?'#182238':'#121a2c';ctx.fillRect(x+xx,y+yy,s,s);}}
+
+for(const e of EFFECTS){
+  const frames=[];for(let f=0;f<e.n;f++)frames.push(renderFrame(e,f));
+  const card=document.createElement('div');card.className='card';
+  card.innerHTML=`<h3>${e.id}<small>${e.fw}×${e.fh} · ${e.n}f · ${e.fps}fps · vfx/${e.dir}/ · loop:${e.loop}</small></h3>
+    <div class="stage"><canvas></canvas></div>
+    <div class="strip"><canvas width="${e.n*e.fw}" height="${e.fh}"></canvas></div>
+    <div class="row"><button data-a="sheet">⬇ sheet PNG</button><button data-a="frames">⬇ 8 frame PNGs</button></div>
+    <div class="qc"></div><div class="note">${e.note}</div>`;
+  grid.appendChild(card);
+  const pv=card.querySelector('.stage canvas');pv.width=e.fw;pv.height=e.fh;
+  const pctx=pv.getContext('2d');pctx.drawImage(frames[0],0,0);
+  const sc=card.querySelector('.strip canvas'),sctx=sc.getContext('2d');
+  paintChecker(sctx,sc.width,sc.height);
+  frames.forEach((fr,i)=>sctx.drawImage(fr,i*e.fw,0));
+  card.querySelector('.qc').innerHTML='<b>QC</b> '+qc(e,frames)
+    .map(([t,ok])=>`<span class="${ok?'pass':'fail'}">${ok?'✓':'✗'} ${t}</span>`).join(' · ');
+  card.querySelector('[data-a=sheet]').onclick=()=>exportSheet(e,frames);
+  card.querySelector('[data-a=frames]').onclick=()=>exportFrames(e,frames);
+  state[e.id]={frames,pctx,i:0,acc:0};
+}
+let zoom=2;
+function applyZoom(){for(const e of EFFECTS){const pv=document.querySelectorAll('.stage canvas')[EFFECTS.indexOf(e)];
+  pv.style.width=e.fw*zoom+'px';pv.style.height=e.fh*zoom+'px';}}
+document.getElementById('zoom').onchange=ev=>{zoom=+ev.target.value;applyZoom();};
+applyZoom();
+let lastT=performance.now();
+(function loop(t){const dt=t-lastT;lastT=t;
+  for(const e of EFFECTS){const st=state[e.id];st.acc+=dt;const step=1000/e.fps;
+    while(st.acc>=step){st.acc-=step;st.i=(st.i+1)%e.n;
+      st.pctx.clearRect(0,0,e.fw,e.fh);st.pctx.drawImage(st.frames[st.i],0,0);}}
+  requestAnimationFrame(loop);})(performance.now());
+
+/* ================= EXPORT ================= */
+function dlCanvas(cv,name){cv.toBlob(b=>{const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);},'image/png');}
+function exportSheet(e,frames){const cv=document.createElement('canvas');
+  cv.width=e.fw*e.n;cv.height=e.fh;const ctx=cv.getContext('2d');
+  frames.forEach((fr,i)=>ctx.drawImage(fr,i*e.fw,0));dlCanvas(cv,e.file);}
+function exportFrames(e,frames){frames.forEach((fr,i)=>
+  setTimeout(()=>dlCanvas(fr,`${e.id}_f${String(i).padStart(2,'0')}.png`),i*180));}
+function buildManifest(){return{
+  pack:'BATCH 1 — basic attack + elemental impact set',
+  game:'PokéChess+',version:'1.0.0-draft.1',
+  status:'DRAFT — pending art-direction approval. Geometry/transparency machine-verified.',
+  styleRef:'PokéChess+ battle screenshot (hex field, GBA-era 16-bit)',
+  global:{format:'PNG',background:'transparent',layout:'horizontal strip, no padding, no overlap',
+    outline:'dark per-hue rim pass (per-asset disable available)',
+    anchorDefault:'center of frame = center of target hex'},
+  assets:EFFECTS.map(e=>({assetId:e.id,path:`assets/visual/vfx/${e.dir}/`,filename:e.file,
+    frameSize:[e.fw,e.fh],frameCount:e.n,layout:`${e.n} columns × 1 row`,
+    totalSize:[e.fw*e.n,e.fh],fps:e.fps,durationMs:Math.round(e.n*1000/e.fps),
+    loop:e.loop,anchor:'center',background:'transparent',palette:e.pal,notes:e.note,
+    frames:[...Array(e.n).keys()].map(i=>`${e.id}_f${String(i).padStart(2,'0')}.png`)}))};}
+document.getElementById('bSheets').onclick=()=>
+  EFFECTS.forEach((e,i)=>setTimeout(()=>exportSheet(e,state[e.id].frames),i*300));
+document.getElementById('bFrames').onclick=()=>{let d=0;
+  for(const e of EFFECTS){setTimeout(()=>exportFrames(e,state[e.id].frames),d);d+=e.n*180+400;}};
+document.getElementById('bManifest').onclick=()=>{
+  const blob=new Blob([JSON.stringify(buildManifest(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='combat-vfx.json';a.click();};
+document.getElementById('bContact').onclick=()=>{
+  const labelW=210,pad=12;
+  const maxW=Math.max(...EFFECTS.map(e=>e.n*e.fw));
+  const H=EFFECTS.reduce((s,e)=>s+e.fh+22,0)+44,W=labelW+maxW+pad*2;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#101828';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#ffce3c';ctx.font='bold 15px monospace';
+  ctx.fillText('POKÉCHESS+ — BATCH 1 VFX CONTACT SHEET (DRAFT v1)',pad,24);
+  let y=40;
+  for(const e of EFFECTS){ctx.fillStyle='#9db2d8';ctx.font='11px monospace';
+    ctx.fillText(e.id,pad,y+e.fh/2-10);
+    ctx.fillText(`${e.fw}x${e.fh} ${e.n}f ${e.fps}fps`,pad,y+e.fh/2+4);
+    ctx.fillText(`vfx/${e.dir}/ loop:${e.loop}`,pad,y+e.fh/2+18);
+    state[e.id].frames.forEach((fr,i)=>{const x=labelW+i*e.fw;
+      paintCheckerAt(ctx,x,y,e.fw,e.fh);ctx.drawImage(fr,x,y);});
+    y+=e.fh+22;}
+  dlCanvas(cv,'contact_sheet_batch1.png');};
+</script>
+</body>
+</html>

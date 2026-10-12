@@ -9,7 +9,7 @@ class SoundManager {
   constructor() {
     this.tracks = {
       tavern: {
-        src: 'assets/audio/tavern.mp3',
+        src: 'assets/audio/tavern.wav',
         title: 'Tavern Theme',
         loop: true,
         baseVol: 0.6
@@ -174,15 +174,14 @@ class SoundManager {
     }
     if (btn) {
       btn.classList.toggle('music-muted', this.isMuted || this.volume === 0);
-      btn.title = this.isMuted
-        ? 'Unmute Music (Press M)'
-        : `Mute Music (Press M) — Vol: ${Math.round(this.volume * 100)}%`;
+      btn.title = t('audio.mute'); btn.setAttribute('aria-label',t('audio.mute'));
     }
     if (slider) {
       slider.value = this.isMuted ? 0 : Math.round(this.volume * 100);
+      slider.setAttribute('aria-label',t('audio.volume')); slider.title = t('audio.volume');
     }
     if (widget) {
-      widget.title = 'BGM: Tavern Theme (Press M to toggle)';
+      widget.title = t('audio.mute');
     }
   }
 
@@ -198,10 +197,15 @@ class SoundManager {
 
     try {
       const now = ctx.currentTime;
+      this.sfxVoices = (this.sfxVoices || []).filter(end => end > now);
+      this.sfxLast = this.sfxLast || new Map();
+      if (this.sfxVoices.length >= 8 || now - (this.sfxLast.get(type) ?? -Infinity) < .08) return;
+      this.sfxLast.set(type, now); this.sfxVoices.push(now + 1.2);
       const sfxVol = Math.max(0.1, Math.min(1.0, this.volume * 1.1));
       const masterGain = ctx.createGain();
       masterGain.gain.setValueAtTime(sfxVol, now);
       masterGain.connect(ctx.destination);
+      setTimeout(() => { try { masterGain.disconnect(); } catch (_) {} }, 1600);
 
       switch (type) {
         case 'move': {

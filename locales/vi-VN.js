@@ -121,3 +121,56 @@ Object.assign(PokeChessLocales['vi-VN'], {
     'trait.laststand.description':'Thoát chết một lần mỗi trận với 20% HP.',
     'rarity.common':'Phổ thông','rarity.rare':'Hiếm','rarity.epic':'Sử thi','rarity.legend':'Huyền thoại','rarity.legendary':'Huyền thoại'
 });
+
+Object.assign(window.PokeChessLocales["vi-VN"], {"menu.settings": "Cài đặt", "shop.backRecruit": "← Tuyển quân"});
+Object.assign(window.PokeChessLocales['vi-VN'], {'visual.bagSynergy':'TÚI & HỆ','visual.synergy':'HỆ','visual.equipped':'Đã trang bị'});
+Object.assign(window.PokeChessLocales['vi-VN'], {'visual.autoFormation':'TỰ XẾP','visual.confirmNewRun':'Bắt đầu hành trình mới từ ải 1? Tiến trình lượt chơi hiện tại sẽ mất.'});
+
+Object.assign(PokeChessLocales["vi-VN"], {
+  "layout.collapse": "Thu gọn / Mở rộng",
+  "layout.utility": "Tiện ích",
+  "layout.motion": "Giảm chuyển động",
+  "info.overview": "Tổng quan",
+  "info.skills": "Kỹ năng",
+  "info.equipment": "Trang bị",
+  "info.passive": "Nội tại / Trạng thái",
+  "skill.basic": "Đánh thường",
+  "skill.active": "Kỹ năng chủ động",
+  "skill.cooldown": "Hồi chiêu",
+  "skill.windup": "Thời gian thi triển",
+  "skill.unlimited": "Không giới hạn khoảng cách thi triển",
+  "log.title": "Nhật ký",
+  "log.system": "Hệ thống",
+  "log.recruit": "Tuyển quân",
+  "log.equipment": "Trang bị",
+  "log.evolution": "Tiến hóa",
+  "log.combat": "Chiến đấu",
+  "log.boss": "Trùm",
+  "bench.inspect": "Thông tin",
+  "bench.deploy": "Ra sân",
+  "bench.recall": "Về dự bị",
+  "bench.ready": "Sẵn sàng ra sân",
+  "bench.deployed": "Đang trên sân",
+  "bench.full": "Đã đủ quân ra sân — vẫn có thể tuyển vào dự bị",
+  "bench.locked": "Khóa thao tác trong trận",
+  "shop.noGold": "Không đủ vàng: cần {gold} vàng.",
+  "shop.fullTeam": "Đã đủ {count}/{count} Pokémon trên sân. Hãy thu quân hoặc nâng sức chứa.",
+  "equipment.full": "Đã đạt giới hạn Talisman ({count}/{max}). Hãy chọn Pokémon khác hoặc tăng sức chứa trang bị.",
+  "equipment.apply": "Đang dùng {name}. Chọn Pokémon trên sân hoặc dự bị; nhấn Hủy để thoát.",
+  "save.importOk": "Đã nhập bản lưu. Bản trước khi nhập được giữ để khôi phục.",
+  "save.invalid": "Tệp lưu không hợp lệ hoặc thiếu dữ liệu đội hình.",
+  "save.backup": "Sao lưu trước khi nhập",
+  "save.rollback": "Khôi phục bản sao lưu",
+  "save.backupOk": "Đã sao lưu bản lưu, tinh thông và thiết lập.",
+  "save.rollbackOk": "Đã khôi phục bản sao lưu. Tải hồ sơ để tiếp tục.",
+  "save.noBackup": "Chưa có bản sao lưu để khôi phục.",
+  "audio.mute": "Bật / tắt âm thanh (M)",
+  "audio.volume": "Âm lượng",
+  "vfx.ready": "Hoạt ảnh skill",
+  "status.freeze": "Đóng băng",
+  "status.paralysis": "Tê liệt",
+  "status.sleep": "Ngủ",
+  "status.heal": "Hồi phục",
+  "status.atkup": "Tăng công",
+  "status.defup": "Tăng thủ"
+});

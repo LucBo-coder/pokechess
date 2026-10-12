@@ -187,27 +187,51 @@ const SaveSystem = {
     reader.onload = (e) => {
       try {
         const parsed = JSON.parse(e.target.result);
-        if (parsed && Array.isArray(parsed.slots)) {
-          for (const item of parsed.slots) {
-            if (item && item.slot && item.data) {
-              localStorage.setItem(this.PREFIX + item.slot, JSON.stringify(item.data));
-            }
-          }
-          if (callback) callback(true, 'Saves imported successfully!');
-        } else if (parsed && parsed.stage !== undefined) {
-          // Direct single save format -> Save to Slot 1
-          localStorage.setItem(this.PREFIX + '1', JSON.stringify(parsed));
-          if (callback) callback(true, 'Save imported to Slot 1!');
-        } else {
-          if (callback) callback(false, 'Invalid save file format.');
+        const writes = parsed && Array.isArray(parsed.slots)
+          ? parsed.slots.filter(item=>item?.data).map(item=>({slot:Number(item.slot),data:item.data}))
+          : parsed?.stage !== undefined ? [{slot:1,data:parsed}] : [];
+        if (!writes.length || new Set(writes.map(item=>item.slot)).size !== writes.length || writes.some(({slot,data})=>
+          !Number.isInteger(slot)||slot<1||slot>this.MAX_SLOTS||!Number.isFinite(data.stage)||data.stage<1||!Array.isArray(data.inventory))) {
+          callback?.(false,t('save.invalid')); return;
         }
+        // Serialize and back up before any write; retain legacy fields verbatim.
+        const serialized=writes.map(({slot,data})=>({key:this.PREFIX+slot,value:JSON.stringify(data)}));
+        this.backup();
+        const before=serialized.map(({key})=>({key,value:localStorage.getItem(key)}));
+        try { for(const {key,value} of serialized)localStorage.setItem(key,value); }
+        catch(error) { for(const {key,value} of before)value===null?localStorage.removeItem(key):localStorage.setItem(key,value); throw error; }
+        callback?.(true,t('save.importOk'));
       } catch (err) {
-        if (callback) callback(false, 'Failed to parse JSON file.');
+        if (callback) callback(false, t('save.invalid'));
       }
     };
     reader.onerror = () => {
-      if (callback) callback(false, 'Error reading file.');
+      if (callback) callback(false, t('save.invalid'));
     };
     reader.readAsText(file);
+  },
+
+  BACKUP_KEY:'pokechess_storage_backup_v1',
+  storageKeys() {
+    return Array.from({length:localStorage.length},(_,i)=>localStorage.key(i)).filter(key=>
+      key && key !== this.BACKUP_KEY && /^(chess_plus_save_slot_|pokechess_mastery_|chessplus_meta_|chess_music_|pokechess_language$|pokechess_reduced_|chess_tutorial_seen$)/.test(key));
+  },
+  backup() {
+    const snapshot={version:1,time:Date.now(),values:Object.fromEntries(this.storageKeys().map(key=>[key,localStorage.getItem(key)]))};
+    localStorage.setItem(this.BACKUP_KEY,JSON.stringify(snapshot)); return snapshot;
+  },
+  restoreBackup() {
+    const snapshot=JSON.parse(localStorage.getItem(this.BACKUP_KEY)??'null');
+    if(snapshot?.version!==1||!snapshot.values||typeof snapshot.values!=='object')return false;
+    const current=Object.fromEntries(this.storageKeys().map(key=>[key,localStorage.getItem(key)]));
+    try {
+      for(const key of this.storageKeys())localStorage.removeItem(key);
+      for(const [key,value] of Object.entries(snapshot.values))localStorage.setItem(key,value);
+      return true;
+    } catch(error) {
+      for(const key of this.storageKeys())localStorage.removeItem(key);
+      for(const [key,value] of Object.entries(current))localStorage.setItem(key,value);
+      throw error;
+    }
   }
 };

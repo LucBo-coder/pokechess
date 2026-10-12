@@ -320,7 +320,7 @@ Object.assign(RoguelikeUI.prototype, {
       );
       sq.querySelectorAll(
         '.piece, .piece-shadow, .preview-piece, .preview-shadow, ' +
-        '.hp-bar-wrap, .piece-hud, .ui-talisman-mark, .setup-boss-crown'
+        '.hp-bar-wrap, .piece-hud, .unit-healthbar, .ui-talisman-mark, .setup-boss-crown'
       ).forEach(e => e.remove());
     });
     // Drag & drop cho tất cả ô Hex, kể cả ô trống
@@ -508,6 +508,7 @@ Object.assign(RoguelikeUI.prototype, {
         hpNum.className = 'hud-hp-num';
         hpNum.textContent = `${curHp}/${st.maxHp}`;
         hud.appendChild(hpNum);
+        if (window.UnitHealthBar) el.appendChild(UnitHealthBar.create(curHp, st.maxHp));
 
         if (typeof TypeSystem !== 'undefined') {
           const hexMode = document.body.classList.contains('hex-mode');
@@ -567,7 +568,8 @@ Object.assign(RoguelikeUI.prototype, {
       btnFormation.id = 'btnAutoFormation';
       btnFormation.type = 'button';
       btnFormation.className = btnRecall.className;
-      btnFormation.textContent = 'AUTO FORM';
+      btnFormation.dataset.i18n = 'visual.autoFormation';
+      btnFormation.textContent = t('visual.autoFormation');
       btnFormation.title = 'Tự xếp đội hình theo class và khắc hệ';
 
       btnFormation.addEventListener('click', () => {
@@ -597,7 +599,7 @@ Object.assign(RoguelikeUI.prototype, {
       if (btnBattle) {
         btnBattle.style.display = 'inline-flex';
         btnBattle.disabled = !canDeploy;
-        btnBattle.innerHTML = 'BATTLE';
+        btnBattle.textContent = t('combat.battle');
       }
       if (btnAuto) {
         btnAuto.style.display = 'none';
@@ -608,13 +610,13 @@ Object.assign(RoguelikeUI.prototype, {
       if (btnRecall) {
         btnRecall.style.display = 'inline-flex';
       }
-      if (enemyName) enemyName.textContent = `STAGE ${this.stage}`;
+      if (enemyName) enemyName.textContent = t('shop.stage',{stage:this.stage});
     } else {
       if (phaseDot) { phaseDot.classList.add('battle'); }
       if (btnBattle) {
         btnBattle.style.display = 'inline-flex';
         btnBattle.disabled = true;
-        btnBattle.innerHTML = this.isAutoBattle ? 'BATTLE' : 'BATTLING';
+        btnBattle.textContent = t('combat.battle');
       }
       if (btnAuto) {
         btnAuto.style.display = 'none';
@@ -626,7 +628,7 @@ Object.assign(RoguelikeUI.prototype, {
       if (phaseText) { phaseText.textContent = ''; }
       if (enemyName) {
         const turnWho = this.hexCombat ? 'HEX BATTLE' : this.game.turn === W ? 'YOUR TURN' : 'ENEMY TURN';
-        enemyName.textContent = `STAGE ${this.stage} • ${turnWho}`;
+        enemyName.textContent = `${t('combat.stage')} ${this.stage} • ${this.hexCombat ? t('combat.battle') : I18n.legacy(turnWho)}`;
       }
     }
     this.updateAutoBattleUI();

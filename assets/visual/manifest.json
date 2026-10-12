@@ -1,0 +1,1199 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "dialogue-frame",
+      "path": "assets/visual/ui/dialogue-frame.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/dialogue/dialogue-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        255,
+        32
+      ],
+      "crop_rectangle": [
+        9,
+        227,
+        2154,
+        270
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": false
+    },
+    {
+      "id": "inventory-slot",
+      "path": "assets/visual/ui/inventory-slot.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/left_panel/inventory-slot.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        64,
+        64
+      ],
+      "crop_rectangle": [
+        126,
+        157,
+        1001,
+        935
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "recruit-row",
+      "path": "assets/visual/ui/recruit-row.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/right_panel/recruit-row.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        183,
+        32
+      ],
+      "crop_rectangle": [
+        26,
+        163,
+        2120,
+        370
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "header-red",
+      "path": "assets/visual/ui/header-red.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/shared/header-red.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        240,
+        32
+      ],
+      "crop_rectangle": [
+        37,
+        222,
+        2099,
+        280
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "panel-main",
+      "path": "assets/visual/ui/panel-main.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/shared/panel-main.png",
+      "source_dimensions": [
+        887,
+        1774
+      ],
+      "derived_dimensions": [
+        164,
+        348
+      ],
+      "crop_rectangle": [
+        40,
+        19,
+        807,
+        1736
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "portrait-frame",
+      "path": "assets/visual/ui/portrait-frame.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/shared/portrait-frame.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        64,
+        64
+      ],
+      "crop_rectangle": [
+        118,
+        142,
+        1019,
+        968
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Center has baked artifact: retained, not used.",
+      "used": false
+    },
+    {
+      "id": "tab-active",
+      "path": "assets/visual/ui/tab-active.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/shared/tab-active.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        160,
+        32
+      ],
+      "crop_rectangle": [
+        36,
+        161,
+        2100,
+        379
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "tab-inactive",
+      "path": "assets/visual/ui/tab-inactive.png",
+      "source_pack": "PokeChess-Batch01-Panel-Designs",
+      "source_file": "PokeChess-Batch01-Panel-Designs/01_panels/shared/tab-inactive.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        160,
+        32
+      ],
+      "crop_rectangle": [
+        39,
+        158,
+        2095,
+        402
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "hud-journey-frame",
+      "path": "assets/visual/ui/hud-journey-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/actions/hud-journey-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        266,
+        32
+      ],
+      "crop_rectangle": [
+        24,
+        234,
+        2125,
+        256
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": false
+    },
+    {
+      "id": "hud-menu-frame",
+      "path": "assets/visual/ui/hud-menu-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/actions/hud-menu-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        240,
+        32
+      ],
+      "crop_rectangle": [
+        35,
+        222,
+        2103,
+        280
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": false
+    },
+    {
+      "id": "hud-dropdown-frame",
+      "path": "assets/visual/ui/hud-dropdown-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/language/hud-dropdown-frame.png",
+      "source_dimensions": [
+        1086,
+        1448
+      ],
+      "derived_dimensions": [
+        24,
+        32
+      ],
+      "crop_rectangle": [
+        84,
+        121,
+        918,
+        1207
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": false
+    },
+    {
+      "id": "hud-language-frame",
+      "path": "assets/visual/ui/hud-language-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/language/hud-language-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        181,
+        32
+      ],
+      "crop_rectangle": [
+        27,
+        164,
+        2119,
+        375
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": false
+    },
+    {
+      "id": "hud-logo-frame",
+      "path": "assets/visual/ui/hud-logo-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/logo/hud-logo-frame.png",
+      "source_dimensions": [
+        2079,
+        756
+      ],
+      "derived_dimensions": [
+        269,
+        32
+      ],
+      "crop_rectangle": [
+        24,
+        257,
+        2031,
+        242
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "hud-compact-frame",
+      "path": "assets/visual/ui/hud-compact-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/shared/hud-compact-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        240,
+        32
+      ],
+      "crop_rectangle": [
+        35,
+        222,
+        2103,
+        280
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "hud-value-inset",
+      "path": "assets/visual/ui/hud-value-inset.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/shared/hud-value-inset.png",
+      "source_dimensions": [
+        1774,
+        887
+      ],
+      "derived_dimensions": [
+        142,
+        32
+      ],
+      "crop_rectangle": [
+        134,
+        274,
+        1506,
+        339
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": false
+    },
+    {
+      "id": "hud-currency-frame",
+      "path": "assets/visual/ui/hud-currency-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/status/hud-currency-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        240,
+        32
+      ],
+      "crop_rectangle": [
+        35,
+        222,
+        2103,
+        280
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "hud-stage-frame",
+      "path": "assets/visual/ui/hud-stage-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/status/hud-stage-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        219,
+        32
+      ],
+      "crop_rectangle": [
+        17,
+        203,
+        2139,
+        313
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "hud-team-frame",
+      "path": "assets/visual/ui/hud-team-frame.png",
+      "source_pack": "PokeChess-Batch02-HUD-Designs",
+      "source_file": "PokeChess-Batch02-HUD-Designs/02_hud/status/hud-team-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        240,
+        32
+      ],
+      "crop_rectangle": [
+        35,
+        222,
+        2103,
+        280
+      ],
+      "nine_slice": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "three_slice": null,
+      "padding": [
+        6,
+        6,
+        6,
+        6
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "button-danger",
+      "path": "assets/visual/ui/button-danger.png",
+      "source_pack": "PokeChess-Buttons-Adaptive",
+      "source_file": "PokeChess-Buttons-Adaptive/assets/button-danger.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        136,
+        32
+      ],
+      "crop_rectangle": [
+        68,
+        118,
+        2037,
+        477
+      ],
+      "nine_slice": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "three_slice": null,
+      "padding": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal",
+        "hover-code",
+        "pressed-code",
+        "disabled-code"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "button-primary",
+      "path": "assets/visual/ui/button-primary.png",
+      "source_pack": "PokeChess-Buttons-Adaptive",
+      "source_file": "PokeChess-Buttons-Adaptive/assets/button-primary.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        136,
+        32
+      ],
+      "crop_rectangle": [
+        71,
+        124,
+        2031,
+        463
+      ],
+      "nine_slice": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "three_slice": null,
+      "padding": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "normal",
+        "hover-code",
+        "pressed-code",
+        "disabled-code"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "forest-background",
+      "path": "assets/visual/maps/forest-background.png",
+      "source_pack": "PokeChess-Forest-Map",
+      "source_file": "PokeChess-Forest-Map/maps/forest/backgrounds/forest-background.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        1024,
+        1024
+      ],
+      "crop_rectangle": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "forest-grass-texture",
+      "path": "assets/visual/maps/forest-grass-texture.png",
+      "source_pack": "PokeChess-Forest-Map",
+      "source_file": "PokeChess-Forest-Map/maps/forest/ground/forest-grass-texture.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        1024,
+        1024
+      ],
+      "crop_rectangle": [
+        0,
+        0,
+        1254,
+        1254
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "center",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Retained, not used; runtime slice validation pending.",
+      "limitations": "Seamless unverified; retained, not tiled.",
+      "used": false
+    },
+    {
+      "id": "hp-bar-fill",
+      "path": "assets/visual/combat/hp-bar-fill.png",
+      "source_pack": "PokeChess-HP-Selection",
+      "source_file": "PokeChess-HP-Selection/combat/hp_bars/hp-bar-fill.png",
+      "source_dimensions": [
+        1774,
+        887
+      ],
+      "derived_dimensions": [
+        90,
+        5
+      ],
+      "crop_rectangle": [
+        204,
+        390,
+        1367,
+        110
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "unit-ground",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "hp-bar-frame",
+      "path": "assets/visual/combat/hp-bar-frame.png",
+      "source_pack": "PokeChess-HP-Selection",
+      "source_file": "PokeChess-HP-Selection/combat/hp_bars/hp-bar-frame.png",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "derived_dimensions": [
+        96,
+        8
+      ],
+      "crop_rectangle": [
+        82,
+        279,
+        2009,
+        158
+      ],
+      "nine_slice": null,
+      "three_slice": [
+        4,
+        4
+      ],
+      "padding": null,
+      "anchor": "unit-ground",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "unit-selection-ring",
+      "path": "assets/visual/combat/unit-selection-ring.png",
+      "source_pack": "PokeChess-HP-Selection",
+      "source_file": "PokeChess-HP-Selection/combat/selection/unit-selection-ring.png",
+      "source_dimensions": [
+        1774,
+        887
+      ],
+      "derived_dimensions": [
+        64,
+        25
+      ],
+      "crop_rectangle": [
+        359,
+        236,
+        1057,
+        414
+      ],
+      "nine_slice": null,
+      "three_slice": null,
+      "padding": null,
+      "anchor": "unit-ground",
+      "minimum_size": null,
+      "maximum_size": null,
+      "states": [
+        "normal"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "slot-disabled",
+      "path": "assets/visual/ui/slot-disabled.png",
+      "source_pack": "PokeChess-Slot-Overlays",
+      "source_file": "PokeChess-Slot-Overlays/ui/slot_states/slot-disabled.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        64,
+        64
+      ],
+      "crop_rectangle": [
+        126,
+        157,
+        1002,
+        940
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "disabled"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "slot-equipped",
+      "path": "assets/visual/ui/slot-equipped.png",
+      "source_pack": "PokeChess-Slot-Overlays",
+      "source_file": "PokeChess-Slot-Overlays/ui/slot_states/slot-equipped.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        64,
+        64
+      ],
+      "crop_rectangle": [
+        127,
+        157,
+        1000,
+        938
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "equipped"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "slot-locked",
+      "path": "assets/visual/ui/slot-locked.png",
+      "source_pack": "PokeChess-Slot-Overlays",
+      "source_file": "PokeChess-Slot-Overlays/ui/slot_states/slot-locked.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        64,
+        64
+      ],
+      "crop_rectangle": [
+        128,
+        131,
+        999,
+        991
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "locked"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    },
+    {
+      "id": "slot-selected",
+      "path": "assets/visual/ui/slot-selected.png",
+      "source_pack": "PokeChess-Slot-Overlays",
+      "source_file": "PokeChess-Slot-Overlays/ui/slot_states/slot-selected.png",
+      "source_dimensions": [
+        1254,
+        1254
+      ],
+      "derived_dimensions": [
+        64,
+        64
+      ],
+      "crop_rectangle": [
+        133,
+        159,
+        988,
+        936
+      ],
+      "nine_slice": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "three_slice": null,
+      "padding": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "anchor": "center",
+      "minimum_size": [
+        24,
+        24
+      ],
+      "maximum_size": null,
+      "states": [
+        "selected"
+      ],
+      "transformation": "Crop alpha >=128 bounds, nearest-neighbor resize. Source ZIP unchanged.",
+      "validation": "Inspected source sheet and Edge runtime captures; asset-path and dimension validation passed. Slice/clarity review limited to tested viewports.",
+      "limitations": "Source gradients/partial alpha retained; not a strict flat-palette pixel master.",
+      "used": true
+    }
+  ],
+  "forest_playable_rect": [
+    0.18,
+    0.19,
+    0.82,
+    0.81
+  ],
+  "reference_image": "Missing from supplied files; layout follows written specification"
+}

@@ -57,7 +57,7 @@ const CustomMoveSystem = {
     }
 
     // 2. Dev server API: /api/list-pieces
-    if (fileList.length === 0 && typeof fetch !== 'undefined') {
+    if (fileList.length === 0 && window.POKECHESS_EDITOR_API && typeof fetch !== 'undefined') {
       try {
         const res = await fetch(`/api/list-pieces?_t=${Date.now()}`);
         if (res.ok) {
@@ -76,7 +76,7 @@ const CustomMoveSystem = {
       'weedle.js', 'kakuna.js', 'beedrill.js', 'pidgey.js', 'pidgeotto.js', 'pidgeot.js',
       'rattata.js', 'raticate.js', 'spearow.js', 'fearow.js', 'ekans.js', 'arbok.js',
       'pikachu.js', 'raichu.js', 'sandshrew.js', 'sandslash.js', 'nidoran_f.js', 'nidorina.js',
-      'nidoqueen.js', 'nidoran_m.js', 'nidorino.js', 'nidoking.js', 'clefairy.js', 'clefable.js',
+      'nidoqueen.js', 'nidorino.js', 'nidoking.js', 'clefairy.js', 'clefable.js',
       'vulpix.js', 'ninetales.js', 'jigglypuff.js', 'wigglytuff.js', 'zubat.js', 'golbat.js',
       'oddish.js', 'gloom.js', 'vileplume.js', 'paras.js', 'parasect.js', 'venonat.js',
       'venomoth.js', 'diglett.js', 'dugtrio.js', 'meowth.js', 'persian.js', 'psyduck.js',
@@ -140,7 +140,7 @@ const CustomMoveSystem = {
     }
 
     // 2. Dev server API
-    if (!code && typeof fetch !== 'undefined') {
+    if (!code && window.POKECHESS_EDITOR_API && typeof fetch !== 'undefined') {
       try {
         const res = await fetch(`/api/read-piece?filename=${encodeURIComponent(fileName)}&_t=${Date.now()}`);
         if (res.ok) {

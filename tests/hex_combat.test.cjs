@@ -485,13 +485,35 @@ test('Type Gem changes both displayed elements and Hex damage; immunities stay z
     assert.match(result.skillDescription, /117% ATK/);
 });
 
+test('skill metadata preserves existing range policy and invalid casts never spend mana', () => {
+    const {run}=loadGame();
+    const result=run(`(() => {
+        const c=new HexCombat(new HexBoard());
+        c.addUnit(0,{id:'caster',type:'4',color:'w',combatRole:'fighter',maxHp:100,attackDamage:10,attackRange:1,maxMana:100,mana:100});
+        c.addUnit(55,{id:'enemy',type:'4',color:'b',maxHp:100,attackDamage:10});
+        const a=c.units.get('caster'),b=c.units.get('enemy');
+        a.mana=99;const low=!c.castSkill(a)&&a.mana===99;
+        a.mana=100;a.nextSkillTick=10;const cooldown=!c.castSkill(a)&&a.mana===100;
+        a.nextSkillTick=0;b.hp=0;const dead=!c.castSkill(a)&&a.mana===100;
+        b.hp=100;a.combatRole='unsupported';const unsupported=!c.castSkill(a)&&a.mana===100;
+        a.combatRole='fighter';a.targetId=a.id;const valid=c.castSkill(a)&&a.mana===0&&b.hp===94&&a.skillCasts===1;
+        return {low,cooldown,dead,unsupported,valid,distance:c.hex.distance(0,55),range:HexSkillInfo.fighter.range,
+            basic:HexSkillInfo.basicAttack(a).category,active:HexSkillInfo.fighter.category,passive:HexTraits.CONFIG.guardian.category};
+    })()`);
+    assert.ok(result.low&&result.cooldown&&result.dead&&result.unsupported&&result.valid);
+    assert.equal(result.distance,10);assert.equal(result.range,null);
+    assert.equal(result.basic,'basic');assert.equal(result.active,'active');assert.equal(result.passive,'passive');
+});
+
 test('inspector follows stable unit ID while moving and hides when it dies', () => {
     const { context, run } = loadGame();
     const classes = new Set();
-    const body = { innerHTML: '' };
+    const body = { innerHTML: '', children:[], querySelectorAll:()=>[], append() {} };
+    context.document.createElement = () => ({dataset:{},append() {},innerHTML:''});
+    context.document.createTextNode = text => ({textContent:text});
     context.HexPreparationInfo.panel = {
         classList: { contains: name => classes.has(name), add: name => classes.add(name), remove: name => classes.delete(name) },
-        querySelector: selector => selector === '.hex-inspector-body' ? body : null, querySelectorAll: () => [], dataset: {}
+        querySelector: selector => selector === '.hex-inspector-body' ? body : null, querySelectorAll: () => [], dataset: {}, contains:()=>false
     };
     const result = run(`(() => {
         const ui = Object.create(RoguelikeUI.prototype);

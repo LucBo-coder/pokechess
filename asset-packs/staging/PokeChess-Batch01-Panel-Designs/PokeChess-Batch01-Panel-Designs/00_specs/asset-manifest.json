@@ -1,0 +1,197 @@
+{
+  "batch": 1,
+  "assets": [
+    {
+      "id": "panel-main",
+      "file": "01_panels/shared/panel-main.png",
+      "dimensions": [
+        887,
+        1774
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        35,
+        16,
+        852,
+        1758
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Empty navy tall panel frame, no text or icons; style from supplied screenshot."
+    },
+    {
+      "id": "header-red",
+      "file": "01_panels/shared/header-red.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        0,
+        85,
+        2139,
+        724
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: a wide shallow RED section header, width to height ratio 8:1, warm crimson fill #BA2942, thick cream-white outer border and navy pixel outline, tiny square bevel highlights, blank uninterrupted center. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    },
+    {
+      "id": "tab-active",
+      "file": "01_panels/shared/tab-active.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        33,
+        158,
+        2139,
+        543
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: a wide GOLD active tab, width to height ratio 4:1, golden fill #F5C65B, pale yellow top edge, dark navy stepped pixel outline, straight bottom edge. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    },
+    {
+      "id": "tab-inactive",
+      "file": "01_panels/shared/tab-inactive.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        36,
+        155,
+        2138,
+        566
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: a wide BLUE inactive tab, width to height ratio 4:1, medium slate-blue fill #345575, lighter blue upper edge, navy stepped pixel outline, straight bottom edge. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    },
+    {
+      "id": "inventory-slot",
+      "file": "01_panels/left_panel/inventory-slot.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        0,
+        49,
+        1131,
+        1095
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: one SQUARE empty inventory slot, deep navy fill #101D30, blue-gray double pixel border #789CB9, dark outer outline, clipped square corners, no decoration. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    },
+    {
+      "id": "recruit-row",
+      "file": "01_panels/right_panel/recruit-row.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        23,
+        69,
+        2152,
+        690
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: one wide shallow empty recruitment row background, width to height ratio 4:1, uniform navy fill #17263F with thin muted blue-gray pixel border, subtle bottom divider. Absolutely no portrait slot or internal divisions or buttons. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    },
+    {
+      "id": "portrait-frame",
+      "file": "01_panels/shared/portrait-frame.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        0,
+        0,
+        1251,
+        1254
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: one SQUARE empty portrait frame, dark navy fill #101D30, bright blue-gray double border #789CB9 with tiny stepped corner highlights, no image in the center. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    },
+    {
+      "id": "dialogue-frame",
+      "file": "01_panels/dialogue/dialogue-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "visible_bounds": [
+        0,
+        52,
+        2172,
+        682
+      ],
+      "status": "design-draft-not-runtime-ready",
+      "nine_slice": null,
+      "source": "OpenAI image generation; user-supplied screenshot used as style reference",
+      "license": "No third-party asset license verified; no exclusive ownership claim",
+      "prompt": "Use case: ui-mockup. Generate ONE isolated original reusable pixel-art game UI asset for PokeChess: one wide horizontal empty dialogue box, width to height ratio 8:1, uniform navy fill #17263F, blue-gray double border #789CB9, tiny stepped corners. No portrait region or subdivisions. The supplied screenshot is a style reference only, match its classic handheld RPG UI styling. Absolutely NO text, letters, numerals, icons, symbols, Pokemon, people or objects. Just the empty frame. Flat front view, crisp chunky pixel steps, solid limited colors, NO smooth gradient, NO grain, NO distressed texture, NO shadows outside. Transparent background outside frame, opaque colored inside. Minimal transparent margins, no other elements. Not a full interface, not an asset sheet. Designed to be reusable with dynamic text drawn later."
+    }
+  ]
+}

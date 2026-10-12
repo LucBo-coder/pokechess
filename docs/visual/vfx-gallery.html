@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="vi">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <base href="../../"><title>PokéChess+ — Thư viện 92 hoạt ảnh</title>
+ <script src="js/vfx_manifest.js"></script>
+ <style>
+ body{margin:0;background:#111b2d;color:#f5f4ec;font:15px/1.5 'Segoe UI',Arial,sans-serif}header{padding:16px;position:sticky;top:0;background:#111b2d;z-index:1;border-bottom:1px solid #7487a2}h1{margin:0;font-size:22px}input,button{font:inherit;padding:8px;margin:8px 8px 0 0}main{padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}.card{padding:12px;background:#223550;border:1px solid #7487a2}.card[hidden]{display:none}canvas{display:block;margin:8px auto;image-rendering:pixelated;max-width:100%}.name{font-weight:600;overflow-wrap:anywhere}small{color:#cad4e2}p{margin:6px 0}
+ </style>
+</head>
+<body>
+ <header><h1>PokéChess+ — 92 hoạt ảnh đã duyệt</h1><p>Thư viện kiểm tra hình ảnh. Các hoạt ảnh minh họa không tự thêm kỹ năng hoặc trạng thái vào game.</p><input id="search" placeholder="Tìm tên, hệ hoặc nhóm" aria-label="Tìm hoạt ảnh"><button id="pause">Tạm dừng</button></header>
+ <main id="gallery"></main>
+ <script>
+ const state=[];let paused=false,last=performance.now();
+ for(const asset of CombatVfxManifest.assets){
+  const card=document.createElement('section');card.className='card';card.dataset.id=asset.assetId+' '+asset.source;
+  const name=document.createElement('div');name.className='name';name.textContent=asset.assetId;
+  const cv=document.createElement('canvas');cv.width=asset.frameSize[0];cv.height=asset.frameSize[1];
+  const label=document.createElement('small');label.textContent=`${asset.frameCount} khung · ${asset.fps} khung/giây · ${asset.loop?'Lặp':'Một lần'}`;
+  card.append(name,cv,label);document.getElementById('gallery').append(card);
+  const image=new Image();image.src=asset.path;state.push({asset,cv,image,time:0});
+ }
+ document.getElementById('pause').onclick=event=>{paused=!paused;event.target.textContent=paused?'Tiếp tục':'Tạm dừng';};
+ document.getElementById('search').oninput=event=>{for(const card of document.querySelectorAll('.card'))card.hidden=!card.dataset.id.includes(event.target.value.toLowerCase());};
+ function draw(now){const dt=(now-last)/1000;last=now;
+  for(const s of state){if(!paused)s.time+=dt;if(s.cv.parentElement.hidden||!s.image.complete||!s.image.naturalWidth)continue;
+   const {asset:a,cv}=s,[w,h]=a.frameSize,ctx=cv.getContext('2d');
+   for(let y=0;y<h;y+=8)for(let x=0;x<w;x+=8){ctx.fillStyle=(x/8+y/8)%2?'#17263c':'#30415b';ctx.fillRect(x,y,8,8);}
+   const length=a.frameCount/a.fps,elapsed=s.time%(length+(a.loop?0:.8));
+   const frame=Math.min(a.frameCount-1,Math.floor(elapsed*a.fps));ctx.drawImage(s.image,frame*w,0,w,h,0,0,w,h);
+  }requestAnimationFrame(draw);
+ }requestAnimationFrame(draw);
+ </script>
+</body>
+</html>

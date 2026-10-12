@@ -895,10 +895,11 @@ const MetaProgression = {
 
     panel.innerHTML = `
       <div class="tooltip-header">
-        <div class="tooltip-title">${node.label}</div>
+        <div class="tooltip-title">${I18n.tree(node,'label')}</div>
         ${typeBadge}
       </div>
-      <div class="tooltip-desc">${node.desc}</div>
+      <div class="tooltip-desc">${window.AstralModifiers?.description(node)??I18n.tree(node,'desc')}</div>
+      <div class="tooltip-desc">${window.AstralModifiers?`${t('astral.scope')}: ${AstralModifiers.nodes.get(node.id)?.scope??''} · ${t('astral.cost')}: ${AstralModifiers.nodes.get(node.id)?.cost??1} · ${t('astral.requires')}: ${(AstralModifiers.nodes.get(node.id)?.prerequisites??[]).map(id=>I18n.tree(this.nodes[id],'label')).join(' / ')}`:''}</div>
       <div class="tooltip-status">${statusText}</div>
     `;
   },

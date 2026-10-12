@@ -1,0 +1,92 @@
+{
+  "GameLogo": {
+    "asset_id": "hud-logo-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "StageIndicator": {
+    "asset_id": "hud-stage-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "CurrencyIndicator": {
+    "asset_id": "hud-currency-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "TeamCapacity": {
+    "asset_id": "hud-team-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "MenuButton": {
+    "asset_id": "hud-menu-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "JourneyButton": {
+    "asset_id": "hud-journey-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "LanguageSelector": {
+    "asset_id": "hud-language-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "CurrencyValue": {
+    "asset_id": "hud-value-inset",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "TeamValue": {
+    "asset_id": "hud-value-inset",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  },
+  "LanguageDropdown": {
+    "asset_id": "hud-dropdown-frame",
+    "dynamic_layers": [
+      "localized_text",
+      "icon",
+      "value"
+    ],
+    "note": "Only required dynamic layers are rendered; no labels or icons baked into PNG."
+  }
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "size": 3,
+    "bounded": true,
+    "noGhost": true,
+    "owned": true,
+    "max": 4,
+    "elapsed": 147.5,
+    "log": true
+  },
+  {
+    "size": 6,
+    "bounded": true,
+    "noGhost": true,
+    "owned": true,
+    "max": 16,
+    "elapsed": 415.80000000074506,
+    "log": true
+  },
+  {
+    "size": 12,
+    "bounded": true,
+    "noGhost": true,
+    "owned": true,
+    "max": 24,
+    "elapsed": 803.5,
+    "log": true
+  }
+]

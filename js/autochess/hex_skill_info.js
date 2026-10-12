@@ -75,3 +75,22 @@ window.HexSkillInfo = {
         return `${description} ${window.t ? t('skill.balance',{percent}) : `Sau cân bằng kỹ năng: ${percent}% ATK trước tương khắc hệ và Sudden Death.`}`;
     }
 };
+
+// Metadata mirrors the existing auto-battler rules. Null range means no cast-distance gate.
+for (const role of ['tank','fighter','assassin','mage','marksman']) {
+    Object.assign(HexSkillInfo[role], {
+        id:`role_${role}`, nameKey:`skill.${role}.name`, descriptionKey:`skill.${role}.description`,
+        category:'active', targetMode:role === 'tank' ? 'self' : role === 'mage' ? 'enemy-area' : 'enemy',
+        range:null, energyCost:'maxMana', cooldown:3, castTime:role==='tank'?0:6/30,
+        effects:role === 'tank' ? [{kind:'shield',maxHpRatio:.3}] : [{kind:'damage',multiplier:HexSkillInfo[role].damageMultiplier,...(role === 'mage' ? {radius:1,maxTargets:3} : {})}],
+        vfxId:role === 'tank' ? 'status_shield_01' : role === 'mage' ? 'aoe_{element}_01' : 'cast_{element}_01',
+        sfxId:role === 'tank' ? 'reflect' : role === 'mage' ? 'magic' : role === 'marksman' ? 'arrow' : 'slash'
+    });
+}
+HexSkillInfo.describe = function(role,unit = {},combat = null) {
+    const skill = this[role] ?? this.fighter;
+    return {...skill, energyCost:unit?.maxMana ?? 100,
+        cooldown:combat ? combat.skillCooldownTicks/combat.tickRate : (window.HexBalance?.SKILL_COOLDOWN_SECONDS ?? skill.cooldown),
+        castTime:role==='tank' || (combat && !combat.deferDamage) ? 0 : combat ? combat.getHitDelay(unit,'skill')/combat.tickRate : skill.castTime};
+};
+HexSkillInfo.basicAttack = unit => ({id:'basic_attack',nameKey:'skill.basic',category:'basic',element:'active',targetMode:'enemy',range:unit?.attackRange??1,energyCost:0,energyGain:window.HexBalance?.MANA_PER_ATTACK??15,effects:[{kind:'damage',multiplier:1}],vfxId:'hit_light_01',sfxId:'hit'});

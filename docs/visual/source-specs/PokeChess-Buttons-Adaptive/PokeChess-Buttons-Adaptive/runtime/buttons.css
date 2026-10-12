@@ -1,0 +1,13 @@
+button[data-pixel-button]{position:relative;isolation:isolate;box-sizing:border-box;min-height:44px;min-width:44px;max-width:100%;border:0;padding:12px 18px;background:#245fab;color:#fff;font:700 16px/1.4 system-ui,sans-serif;cursor:pointer;vertical-align:middle;touch-action:manipulation;}
+button[data-pixel-button="danger"]{background:#af2639;}
+button[data-skin-ready="true"]{background:transparent;}
+.button-skin{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;image-rendering:pixelated;}
+.button-content{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;white-space:normal;overflow-wrap:anywhere;min-width:0;pointer-events:none;}
+.button-content img{width:24px;height:24px;object-fit:contain;image-rendering:pixelated;flex:none;}
+@media(hover:hover){button[data-pixel-button]:not(:disabled):hover .button-skin{filter:brightness(1.12);}}
+button[data-pixel-button]:not(:disabled):active .button-skin{filter:brightness(.85);}
+button[data-pixel-button]:not(:disabled):active .button-content{transform:translateY(1px);}
+button[data-pixel-button]:focus-visible{outline:3px solid #ffe38a;outline-offset:3px;}
+button[data-pixel-button]:disabled{cursor:not-allowed;color:#e0e3e8;}
+button[data-pixel-button]:disabled .button-skin{filter:grayscale(1) brightness(.65);}
+button[data-pixel-button].full{width:100%;}

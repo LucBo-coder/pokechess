@@ -11,40 +11,7 @@
 Object.assign(RoguelikeUI.prototype, {
 
   showToast(msg, type = 'warning') {
-    const toast = document.getElementById('gameToast');
-    const icon = document.getElementById('toastIcon');
-    const message = document.getElementById('toastMessage');
-    if (!toast || !message) return;
-  
-    if (this.toastTimeout) {
-      clearTimeout(this.toastTimeout);
-      this.toastTimeout = null;
-    }
-  
-    toast.classList.remove('hidden', 'toast-hide', 'toast-error', 'toast-info');
-    if (type === 'error') {
-      toast.classList.add('toast-error');
-      if (icon) icon.textContent = '❌';
-    } else if (type === 'info') {
-      toast.classList.add('toast-info');
-      if (icon) icon.textContent = 'ℹ️';
-    } else {
-      if (icon) icon.textContent = '⚠️';
-    }
-  
-    message.textContent = msg;
-  
-    if (typeof soundManager !== 'undefined') {
-      soundManager.playSfx('click');
-    }
-  
-    this.toastTimeout = setTimeout(() => {
-      toast.classList.add('toast-hide');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('toast-hide');
-      }, 180);
-    }, 2400);
+    window.NotificationCenter?.toast(msg, type);
   },
 
   showConfirm(msg, onConfirm, onCancel) {
@@ -57,16 +24,10 @@ Object.assign(RoguelikeUI.prototype, {
     this.pendingCancelCallback = onCancel;
   },
 
-  addLog(msg) {
-    const list = document.getElementById('moveList');
-    if (!list) return;
-    const entry = document.createElement('div');
-    entry.className = 'move-entry';
-    entry.textContent = msg;
-    if (list.prepend) list.prepend(entry);
-    else list.appendChild(entry);
+  addLog(msg, category) {
+    window.NotificationCenter?.record(msg, category);
   },
-  
+
   // ---- Bind Buttons & Controls ----
 
   bindEvents() {
@@ -97,7 +58,7 @@ Object.assign(RoguelikeUI.prototype, {
     const btnNewRun = document.getElementById('btnNewRun');
     if (btnNewRun) {
       btnNewRun.addEventListener('click', () => {
-        this.showConfirm('Start a new Roguelike run from Stage 1?', () => {
+        this.showConfirm(t('visual.confirmNewRun'), () => {
           this.resetRun();
         });
       });
@@ -1128,6 +1089,11 @@ Object.assign(RoguelikeUI.prototype, {
     const update = () => {
       const app = document.getElementById('app');
       if (!app) return;
+      if (window.BattleVisual) {
+        app.style.transform = 'none';
+        window.BattleVisual.fitBoard();
+        return;
+      }
       const viewport = document.getElementById('gameViewport') || document.documentElement;
   
       const style = window.getComputedStyle(viewport);

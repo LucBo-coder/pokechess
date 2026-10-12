@@ -13,13 +13,16 @@ class HexRenderer {
         this.effectivenessFeedbackTicks = new Map();
         this.selectedUnitId = null;
         this.destroyed = false;
+        this.retiring = new Set();
+        this.textManager = window.FloatingCombatTextManager ? new FloatingCombatTextManager(this) : null;
+        this.sheetVfx = window.HexVfxPlayer ? new HexVfxPlayer(this) : null;
         this.hoveredUnitId = null;
         this.tooltipEvent = null;
         this.reducedEffects = localStorage.getItem('pokechess_reduced_fx') === '1';
         let toggle = document.getElementById('hex-fx-toggle');
         if (!toggle) {
             toggle = document.createElement('button'); toggle.id = 'hex-fx-toggle'; toggle.type = 'button';
-            document.querySelector('.board-top-controls')?.appendChild(toggle);
+            document.querySelector('.phase-buttons')?.appendChild(toggle);
         }
         toggle.textContent = t(this.reducedEffects ? 'vfx.low' : 'vfx.full');
         toggle.onclick = () => {
@@ -28,6 +31,8 @@ class HexRenderer {
             toggle.textContent = t(this.reducedEffects ? 'vfx.low' : 'vfx.full');
         };
         this.fxToggle = toggle;
+        this.onPresentationChange=()=>{if(this.destroyed)return;this.updateHP();for(const row of this.textManager?.labels.values()??[]){if(row.numeric&&!CombatPresentation.enabled('damage')||row.kind==='hex-float-skill-name'&&!CombatPresentation.enabled('skills')||row.kind==='hex-float-status'&&!CombatPresentation.enabled('status'))this.textManager.remove(row);}if(!CombatPresentation.enabled('effects'))this.sheetVfx?.destroy();};
+        window.CombatPresentation?.listeners.add(this.onPresentationChange);
 
         this.originalOnEvent = combat.onEvent;
         this.originalOnTick = combat.onTick;
@@ -53,7 +58,8 @@ class HexRenderer {
 
             this.updateHP();
             this.updateProjectiles();
-            if (this.selectedUnitId) window.HexPreparationInfo?.showCombatUnit(this.selectedUnitId);
+            this.sheetVfx?.update();
+            if (this.selectedUnitId && window.HexPreparationInfo?.panel?.classList.contains('visible')) window.HexPreparationInfo.showCombatUnit(this.selectedUnitId);
             if (this.hoveredUnitId && !this.tooltip.hidden) {
                 this.showTooltip(this.hoveredUnitId, this.tooltipEvent);
             }
@@ -79,7 +85,8 @@ class HexRenderer {
 
     allowEffect() {
         return !this.destroyed && !this.reducedEffects &&
-            (this.boardElement?.querySelectorAll('.elemental-projectile,.elemental-impact,.pixel-impact,.hex-skill-burst').length ?? 0) < 80;
+            window.CombatPresentation?.enabled('effects')!==false &&
+            !document.body.classList.contains('reduced-motion') && (this.boardElement?.querySelectorAll('.elemental-projectile,.elemental-impact,.pixel-impact,.hex-skill-burst,.hex-sheet-vfx').length ?? 0) < 80;
     }
 
     getCellPosition(square) {
@@ -173,7 +180,7 @@ class HexRenderer {
     }
 
     createSprite(unit) {
-        if (!this.boardElement) return;
+        if (!this.boardElement || this.destroyed || !unit || unit.hp <= 0 || this.getUnit(unit.id) !== unit) return;
 
         const position = this.getCellPosition(unit.square);
         if (!position) return;
@@ -205,6 +212,7 @@ class HexRenderer {
         }
         sprite.classList.add('hex-combat-unit');
         sprite.dataset.unitId = unit.id;
+        sprite.dataset.lifecycle = 'ALIVE';
         if(unit.eliteType)sprite.dataset.elite=unit.eliteType;
         if(unit.traits?.length){
             const badge=document.createElement('div');badge.className='hex-trait-indicator';
@@ -214,7 +222,7 @@ class HexRenderer {
         }
         sprite.setAttribute('role', 'button');
         sprite.tabIndex = 0;
-        sprite.setAttribute('aria-label', `Inspect ${this.getPokemonName(unit)}`);
+        sprite.setAttribute('aria-label', `${t('pokemon.info')} ${this.getPokemonName(unit)}`);
 
         const role = this.getRole(unit);
         sprite.dataset.role = role;
@@ -373,6 +381,9 @@ class HexRenderer {
 
     handleEvent(event) {
         if (this.destroyed || !event) return;
+        window.CombatPresentation?.record(this.combat,event);
+        const sheetPlayed = event.type !== 'damage' ? this.sheetVfx?.event(event) : false;
+        if (['battle-end','boss-phase-change'].includes(event.type)) window.NotificationCenter?.record(event.type === 'battle-end' ? t(event.winner === 'w' ? 'combat.victory' : event.winner === 'b' ? 'combat.defeat' : 'combat.draw') : t('combat.phase',{phase:event.phase}),event.type === 'battle-end' ? 'combat' : 'boss');
 
         switch (event.type) {
             case 'move':
@@ -406,13 +417,13 @@ class HexRenderer {
 
             case 'status': {
                 const sprite=this.sprites.get(event.unitId);
-                if(sprite)this.spawnFloatingText(sprite.element,window.HexTraits?.CONFIG[event.status]?.name??event.status,'hex-float-skill-name');
+                if(sprite && ['dodge','survive','laststand'].includes(event.status))this.spawnFloatingText(sprite.element,t(`status.${event.status}`,{defaultValue:t(`trait.${event.status}`,{defaultValue:event.status})}),'hex-float-status');
                 this.updateHP();
                 break;
             }
 
             case 'skill-cast':
-                this.showSkill(event);
+                this.showSkill(event, sheetPlayed);
                 this.updateHP();
                 break;
 
@@ -427,8 +438,8 @@ class HexRenderer {
                 const sprite = this.sprites.get(event.unitId);
                 if (sprite) {
                     sprite.element.dataset.bossPhase = String(event.phase);
-                    this.spawnFloatingText(sprite.element, `PHASE ${event.phase}`, 'hex-float-skill-name');
-                    this.createBurst(sprite.element, 'fighter');
+                    this.spawnFloatingText(sprite.element, t('combat.phase',{phase:event.phase}), 'hex-float-skill-name');
+                    if(!sheetPlayed)this.createBurst(sprite.element, 'fighter');
                 }
                 this.updateHP();
                 break;
@@ -639,11 +650,10 @@ class HexRenderer {
         if (amount <= 0 && absorbed <= 0) return;
         if (event.critical) this.spawnFloatingText(defender.element, t('combat.critPopup'), 'hex-float-effective');
 
-        this.createPixelImpact(
-            defender.element,
-            event.source === 'skill' ? 'skill' : 'attack'
-        );
-        if (event.element) this.createElementalImpact(defender.element, event.element);
+        if (!this.sheetVfx?.event(event)) {
+            this.createPixelImpact(defender.element,event.source === 'skill' ? 'skill' : 'attack');
+            if(event.element)this.createElementalImpact(defender.element,event.element);
+        }
 
         if (amount > 0) {
             this.spawnFloatingText(
@@ -682,7 +692,7 @@ class HexRenderer {
         this.spawnFloatingText(parent, text, `hex-float-effectiveness hex-float-${kind}`);
     }
 
-    showSkill(event) {
+    showSkill(event, sheetPlayed = false) {
         const caster = this.sprites.get(event.unitId);
         const target = this.sprites.get(event.targetId);
 
@@ -698,13 +708,14 @@ class HexRenderer {
                 'hex-casting'
             );
 
+            caster.element.querySelectorAll('.hex-float-skill-name').forEach(label => label.remove());
             this.spawnFloatingText(
                 caster.element,
                 skillName,
                 'hex-float-skill-name'
             );
 
-            this.createBurst(
+            if (!sheetPlayed) this.createBurst(
                 caster.element,
                 role
             );
@@ -717,7 +728,7 @@ class HexRenderer {
                     'hex-shield-active'
                 );
             }
-        } else if (target) {
+        } else if (target && !sheetPlayed) {
             const element = event.element === null ? 'normal' : event.element ?? this.getVfxElement(event.unitId);
 
             if (
@@ -735,6 +746,7 @@ class HexRenderer {
 
     spawnFloatingText(parent, value, className) {
         if (!parent || this.destroyed) return;
+        if(this.textManager){this.textManager.push(parent,value,className);return;}
 
         const isDamage =
             className === 'hex-float-damage' ||
@@ -832,9 +844,10 @@ class HexRenderer {
         for (const unit of this.combat.units.values()) {
             const sprite = this.sprites.get(unit.id);
             if (!sprite) continue;
+            window.CombatPresentation?.indicators(this,unit,sprite);
             sprite.element.classList.toggle('hex-berserker-active',!!unit.statuses?.berserker);
 
-            const hpPercent = unit.maxHp > 0
+            const hpPercent = Number.isFinite(unit.hp) && Number.isFinite(unit.maxHp) && unit.maxHp > 0
                 ? Math.max(
                     0,
                     Math.min(
@@ -867,8 +880,7 @@ class HexRenderer {
                 )
                 : 0;
 
-            sprite.hpFill.style.width =
-                `${hpPercent}%`;
+            sprite.hpFill.style.clipPath = `inset(0 ${100 - hpPercent}% 0 0)`;
 
             sprite.manaFill.style.width =
                 `${manaPercent}%`;
@@ -1087,6 +1099,8 @@ class HexRenderer {
     }
 
     removeSprite(unitId) {
+        this.sheetVfx?.removeUnit(unitId);
+        this.textManager?.removeUnit(unitId);
         for(const projectile of this.boardElement?.querySelectorAll('.elemental-projectile')??[])
             if(projectile.dataset.attackerId===unitId||projectile.dataset.defenderId===unitId)projectile.remove();
         const sprite = this.sprites.get(unitId);
@@ -1097,12 +1111,12 @@ class HexRenderer {
         }
 
         sprite.element.classList.add('hex-dead');
-
-        sprite.element.addEventListener(
-            'animationend',
-            () => sprite.element.remove(),
-            { once: true }
-        );
+        sprite.element.dataset.lifecycle='FAINTING';
+        sprite.element.querySelectorAll('.hex-combat-hp,.hex-combat-mana,.hex-combat-shield,.hex-status-icons,.hex-floating-text').forEach(el=>el.remove());
+        const retiring={element:sprite.element,timer:null,done:false};this.retiring.add(retiring);
+        const cleanup=()=>{if(retiring.done)return;retiring.done=true;clearTimeout(retiring.timer);sprite.element.dataset.lifecycle='REMOVED';sprite.element.remove();this.retiring.delete(retiring);};
+        sprite.element.addEventListener('animationend',event=>{if(event.target===sprite.element && event.animationName==='hex-death')cleanup();});
+        retiring.timer=setTimeout(cleanup,450);
 
         this.sprites.delete(unitId);
         this.effectivenessFeedbackTicks.delete(unitId);
@@ -1111,6 +1125,10 @@ class HexRenderer {
     destroy() {
         if (this.destroyed) return;
         this.destroyed = true;
+        window.CombatPresentation?.listeners.delete(this.onPresentationChange);
+        this.textManager?.destroy();
+        for(const entry of this.retiring){clearTimeout(entry.timer);entry.element.remove();}this.retiring.clear();
+        this.sheetVfx?.destroy();
         if (this.fxToggle) this.fxToggle.onclick = null;
 
         this.combat.onEvent = this.originalOnEvent;

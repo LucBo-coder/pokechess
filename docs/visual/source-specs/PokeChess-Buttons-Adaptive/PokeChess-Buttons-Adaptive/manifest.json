@@ -1,0 +1,38 @@
+{
+  "assets": [
+    {
+      "id": "button-primary",
+      "file": "assets/button-primary.png",
+      "size": [
+        2172,
+        724
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Create ONE blank reusable pixel-art game button for the approved PokeChess UI reference. blue face #347DE0, darker bottom edge #1E4C91, pale blue top edge, navy outer outline #0B1426. Front view horizontal rectangle 3:1 width to height, very small stepped corners, uniform thin border. Completely empty flat opaque center. No icons, text, symbols, letters or digits. True transparent outside with minimal padding. Classic 16-bit handheld pixel art, hard squared pixel edges, simple 5-color palette. No gradients, grain, glow or external shadow. This is a NORMAL state master design for a 9-slice scalable button, so straight edges, identical symmetric corner geometry, no decorations crossing the center. Single asset only, not a spritesheet or UI mockup. Reference only for style.",
+      "source": "OpenAI imagegen",
+      "status": "generated artwork with runtime nine-slice adapter",
+      "license": "No exclusive ownership or third-party license certification claimed"
+    },
+    {
+      "id": "button-danger",
+      "file": "assets/button-danger.png",
+      "size": [
+        2172,
+        724
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "prompt": "Create ONE blank reusable pixel-art game button for the approved PokeChess UI reference. red face #CB3044, darker bottom edge #7D2031, pale coral top edge, navy outer outline #0B1426. Front view horizontal rectangle 3:1 width to height, very small stepped corners, uniform thin border. Completely empty flat opaque center. No icons, text, symbols, letters or digits. True transparent outside with minimal padding. Classic 16-bit handheld pixel art, hard squared pixel edges, simple 5-color palette. No gradients, grain, glow or external shadow. This is a NORMAL state master design for a 9-slice scalable button, so straight edges, identical symmetric corner geometry, no decorations crossing the center. Single asset only, not a spritesheet or UI mockup. Reference only for style.",
+      "source": "OpenAI imagegen",
+      "status": "generated artwork with runtime nine-slice adapter",
+      "license": "No exclusive ownership or third-party license certification claimed"
+    }
+  ],
+  "runtime": "runtime/buttons.js",
+  "notes": "Source PNGs unchanged; runtime crops and draws 9 slices. Only normal images; interaction states are CSS."
+}

@@ -33,7 +33,7 @@ function loadGame() {
         .matchAll(/<script[^>]*src="([^"?]+)/g)].map(match => match[1])
         .filter(file => file.startsWith('js/talismans/'));
     const scripts = [
-        'locales/en-US.js', 'locales/vi-VN.js', 'js/i18n.js',
+        'locales/en-US.js', 'locales/vi-VN.js', 'locales/vi-items.js','locales/vi-text.js','locales/vi-systems.js','locales/vi-tree.js','locales/overhaul.js','js/i18n.js',
         'js/config.js', 'js/pieces_all.js', ...pieceScripts,
         'js/talisman_core.js', ...talismanScripts,
         'js/type_system.js', 'js/synergy_system.js', 'js/engine.js',
@@ -47,7 +47,8 @@ function loadGame() {
         'js/autochess/hex_unit_config.js', 'js/autochess/hex_bridge.js',
         'js/autochess/hex_skill_info.js', 'js/autochess/hex_pokemon_info.js',
         'js/autochess/hex_preparation_info.js', 'js/save_system.js',
-        'js/roguelike_expansion.js', 'js/autochess/hex_traits.js', 'js/autochess/hex_effects.js', 'js/mastery.js'
+        'js/roguelike_expansion.js', 'js/autochess/hex_traits.js', 'js/autochess/hex_effects.js', 'js/mastery.js',
+        'js/equipment.js','js/astral_modifiers.js','js/combat_equipment.js'
     ];
     for (const file of scripts) vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context, { filename: file });
     return { context, timers, run: code => vm.runInContext(code, context) };

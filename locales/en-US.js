@@ -121,3 +121,56 @@ Object.assign(PokeChessLocales['en-US'], {
     'trait.laststand.description':'Survive once per battle with 20% HP.',
     'rarity.common':'Common','rarity.rare':'Rare','rarity.epic':'Epic','rarity.legend':'Legendary','rarity.legendary':'Legendary'
 });
+
+Object.assign(window.PokeChessLocales["en-US"], {"menu.settings": "Settings", "shop.backRecruit": "← Recruit"});
+Object.assign(window.PokeChessLocales['en-US'], {'visual.bagSynergy':'BAG & SYNERGY','visual.synergy':'SYN','visual.equipped':'Equipped'});
+Object.assign(window.PokeChessLocales['en-US'], {'visual.autoFormation':'AUTO FORM','visual.confirmNewRun':'Start a new journey from Stage 1? Current run progress will be lost.'});
+
+Object.assign(PokeChessLocales["en-US"], {
+  "layout.collapse": "Collapse / Expand",
+  "layout.utility": "Utilities",
+  "layout.motion": "Reduce motion",
+  "info.overview": "Overview",
+  "info.skills": "Skills",
+  "info.equipment": "Equipment",
+  "info.passive": "Passives / Status",
+  "skill.basic": "Basic attack",
+  "skill.active": "Active skill",
+  "skill.cooldown": "Cooldown",
+  "skill.windup": "Cast time",
+  "skill.unlimited": "No cast-distance limit",
+  "log.title": "Event log",
+  "log.system": "System",
+  "log.recruit": "Recruitment",
+  "log.equipment": "Equipment",
+  "log.evolution": "Evolution",
+  "log.combat": "Combat",
+  "log.boss": "Boss",
+  "bench.inspect": "Info",
+  "bench.deploy": "Deploy",
+  "bench.recall": "Recall",
+  "bench.ready": "Ready to deploy",
+  "bench.deployed": "Deployed",
+  "bench.full": "Deployment full — recruitment to reserve remains available",
+  "bench.locked": "Actions locked during battle",
+  "shop.noGold": "Not enough gold: need {gold} gold.",
+  "shop.fullTeam": "Deployment full ({count}/{count}). Recall a unit or increase capacity.",
+  "equipment.full": "Talisman capacity reached ({count}/{max}). Select another Pokémon or increase equipment capacity.",
+  "equipment.apply": "Applying {name}. Select a deployed or reserve Pokémon; Cancel to exit.",
+  "save.importOk": "Saves imported. A backup is available for rollback.",
+  "save.invalid": "Invalid save file or missing roster data.",
+  "save.backup": "Back up before import",
+  "save.rollback": "Restore backup",
+  "save.backupOk": "Saves, mastery and settings backed up.",
+  "save.rollbackOk": "Backup restored. Load a profile to continue.",
+  "save.noBackup": "No backup available.",
+  "audio.mute": "Toggle audio (M)",
+  "audio.volume": "Volume",
+  "vfx.ready": "Skill animations",
+  "status.freeze": "Freeze",
+  "status.paralysis": "Paralysis",
+  "status.sleep": "Sleep",
+  "status.heal": "Heal",
+  "status.atkup": "Attack up",
+  "status.defup": "Defense up"
+});

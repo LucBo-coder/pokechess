@@ -1,0 +1,1598 @@
+[
+  {
+    "assetId": "cast_fire_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_water_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_electric_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_grass_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_ice_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_normal_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_fighting_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_poison_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_ground_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_flying_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_psychic_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_bug_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_rock_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_ghost_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_dragon_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_dark_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_steel_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "cast_fairy_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_fire_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_water_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_electric_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_grass_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_ice_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_normal_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_fighting_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_poison_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_ground_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_flying_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_psychic_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_bug_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_rock_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_ghost_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_dragon_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_dark_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_steel_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "proj_fairy_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_fire_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_water_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_electric_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_grass_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_ice_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_ground_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_psychic_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "aoe_dragon_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        false
+      ]
+    ]
+  },
+  {
+    "assetId": "thunderbolt_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "flamethrower_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "water_gun_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "vine_whip_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "shadow_ball_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "ice_beam_01",
+    "checks": [
+      [
+        "8 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "psychic_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "earthquake_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "hyper_beam_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:false)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "grass_blade_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_burn_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_poison_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_freeze_01",
+    "checks": [
+      [
+        "6 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_paralysis_01",
+    "checks": [
+      [
+        "6 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_sleep_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_shield_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_heal_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_atkup_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_defup_01",
+    "checks": [
+      [
+        "6 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "status_stun_01",
+    "checks": [
+      [
+        "6 unique frames",
+        false
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "boss_aura_01",
+    "checks": [
+      [
+        "10 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "boss_charge_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "boss_phase_01",
+    "checks": [
+      [
+        "10 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "boss_warn_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "loop exit OK (loop:true)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "boss_ultimate_01",
+    "checks": [
+      [
+        "10 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "boss_defeat_01",
+    "checks": [
+      [
+        "10 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "normal_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "fighting_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "poison_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "ground_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "flying_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "psychic_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "bug_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "rock_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "ghost_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "dragon_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "dark_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "steel_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "fairy_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "ice_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "hit_light_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ],
+      [
+        "frame geometry 64×64",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "hit_heavy_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "final frame consistent",
+        true
+      ],
+      [
+        "frame geometry 96×96",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "slash_claw_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "final frame consistent",
+        true
+      ],
+      [
+        "frame geometry 96×96",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "crit_hit_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ],
+      [
+        "frame geometry 128×128",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "fire_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ],
+      [
+        "frame geometry 96×96",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "electric_impact_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ],
+      [
+        "frame geometry 96×96",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "water_splash_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        true
+      ],
+      [
+        "final frame consistent",
+        true
+      ],
+      [
+        "frame geometry 96×96",
+        true
+      ]
+    ]
+  },
+  {
+    "assetId": "grass_vine_01",
+    "checks": [
+      [
+        "8 unique frames",
+        true
+      ],
+      [
+        "no boundary clipping",
+        false
+      ],
+      [
+        "clean final frame (non-loop exit)",
+        true
+      ],
+      [
+        "frame geometry 96×96",
+        true
+      ]
+    ]
+  }
+]

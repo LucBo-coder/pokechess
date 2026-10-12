@@ -1,0 +1,76 @@
+{
+  "assets": [
+    {
+      "id": "hp-bar-frame",
+      "file": "combat/hp_bars/hp-bar-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "center_pixel_alpha": 0,
+      "opaque_bounds": [
+        83,
+        280,
+        2090,
+        436
+      ],
+      "status": "design-needs-runtime-alignment",
+      "nine_slice": null,
+      "source": "OpenAI imagegen",
+      "licensing": "No third-party license or exclusivity certification",
+      "prompt": "Create one isolated game visual asset for the approved PokeChess pixel-art style. ONE tiny horizontal health bar EMPTY FRAME, 8:1 silhouette. Dark navy outline, thin blue gray upper edge, square stepped 1-pixel corners. The interior is completely transparent, as is outside. Only a hollow rectangular border. No filled center. Flat 16-bit pixel art. Reference image is only style guidance. No text, letters, digits, icons or characters. No full interface or sheet. Minimal transparent outer padding; fully visible asset. Flat limited colors, crisp coarse logical pixels, no antialiasing, realistic textures, gradients or lighting. TRUE alpha transparency as specified, do not paint black or checkerboard into transparent areas. ID hp-bar-frame must never be printed."
+    },
+    {
+      "id": "hp-bar-fill",
+      "file": "combat/hp_bars/hp-bar-fill.png",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "center_pixel_alpha": 253,
+      "opaque_bounds": [
+        204,
+        391,
+        1570,
+        499
+      ],
+      "status": "design-needs-runtime-alignment",
+      "nine_slice": null,
+      "source": "OpenAI imagegen",
+      "licensing": "No third-party license or exclusivity certification",
+      "prompt": "Create one isolated game visual asset for the approved PokeChess pixel-art style. ONE horizontal GREEN health bar FILL STRIP only, 8:1 silhouette. Simple pure rectangular green shape with flat light green one-pixel top stripe, flat medium green main face, dark green one-pixel bottom stripe. Square ends, no frame or outline. Opaque strip, transparent outside. No numbers or text. Reference image is only style guidance. No text, letters, digits, icons or characters. No full interface or sheet. Minimal transparent outer padding; fully visible asset. Flat limited colors, crisp coarse logical pixels, no antialiasing, realistic textures, gradients or lighting. TRUE alpha transparency as specified, do not paint black or checkerboard into transparent areas. ID hp-bar-fill must never be printed."
+    },
+    {
+      "id": "unit-selection-ring",
+      "file": "combat/selection/unit-selection-ring.png",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "center_pixel_alpha": 0,
+      "opaque_bounds": [
+        360,
+        236,
+        1416,
+        649
+      ],
+      "status": "design-needs-runtime-alignment",
+      "nine_slice": null,
+      "source": "OpenAI imagegen",
+      "licensing": "No third-party license or exclusivity certification",
+      "prompt": "Create one isolated game visual asset for the approved PokeChess pixel-art style. ONE hollow gold elliptical ground selection ring viewed from a top-down three-quarter 2D RPG perspective, ellipse width to height 2:1. Thin crisp stepped pixel outline, two flat gold shades, no glow or shadow. Completely transparent center and outside. No hexagon, no Pokemon, no ground, no decorations. Reference image is only style guidance. No text, letters, digits, icons or characters. No full interface or sheet. Minimal transparent outer padding; fully visible asset. Flat limited colors, crisp coarse logical pixels, no antialiasing, realistic textures, gradients or lighting. TRUE alpha transparency as specified, do not paint black or checkerboard into transparent areas. ID unit-selection-ring must never be printed."
+    }
+  ]
+}

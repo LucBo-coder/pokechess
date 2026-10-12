@@ -351,14 +351,15 @@ class RoguelikeUI {
     return document.querySelector(`.square[data-sq="${idx}"]`);
   }
 
-  // Calculate unscaled pixel delta between any two elements inside #app (bench slot <-> board square, etc.)
+  // Animation offsets are local to the destination (usually the scaled board).
 
 
   getAppRelativeDelta(fromEl, toEl) {
     const app = document.getElementById('app');
     if (!app || !fromEl || !toEl) return { dx: 0, dy: 0 };
-    const appRect = app.getBoundingClientRect();
-    const scale = appRect.height / 320 || 1;
+    const coordinateRoot = toEl.closest('.board') || app;
+    const rootRect = coordinateRoot.getBoundingClientRect();
+    const scale = rootRect.width / coordinateRoot.offsetWidth || 1;
     const fromRect = fromEl.getBoundingClientRect();
     const toRect = toEl.getBoundingClientRect();
     return {

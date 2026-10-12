@@ -126,7 +126,7 @@ window.HexEffects = {
     },
     dot(combat, owner, target, id, damage, seconds) {
         if(this.has(target,'hasLumBerry') || (this.matches(target,'fairy')&&this.node(target,'fairy_keystone')))return;
-        target.statuses[id] = { name:id, ownerId:owner.id, owner:{id:owner.id,color:owner.color,element:owner.element,element2:owner.element2,square:owner.square,hp:0}, damage, expiresAt:combat.tickCount+seconds*combat.tickRate, nextTick:combat.tickCount+combat.tickRate };
+        target.statuses[id] = { name:id, ownerId:owner.id, owner:{id:owner.id,color:owner.color,element:owner.element,element2:owner.element2,square:owner.square,hp:0,effects:{elements:{...owner.effects?.elements},astral:[...(owner.effects?.astral??[])]}}, damage, expiresAt:combat.tickCount+seconds*combat.tickRate, nextTick:combat.tickCount+combat.tickRate };
         combat.emit({type:'status',unitId:target.id,status:id,duration:seconds});
     },
     update(combat, unit) {

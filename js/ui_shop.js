@@ -697,7 +697,7 @@ Object.assign(RoguelikeUI.prototype, {
   
     if (this.phase === 'battle') {
       btnSell.disabled = true;
-      btnSell.innerHTML = 'SELL';
+      btnSell.textContent = t('shop.sell');
       btnSell.title = 'Cannot sell pieces during battle';
       return;
     }
@@ -707,11 +707,11 @@ Object.assign(RoguelikeUI.prototype, {
       const sellPrice = this.getPieceSellPrice(selectedPiece.type);
       const pieceName = PIECE_NAMES[selectedPiece.type] || 'Piece';
       btnSell.disabled = false;
-      btnSell.innerHTML = `SELL +${sellPrice}<img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />`;
+      btnSell.innerHTML = `${t('shop.sell')} +${sellPrice}<img src="assets/ui/coin.png?v=${ASSET_VERSION}" class="btn-ui-icon" alt="G" />`;
       btnSell.title = `Sell selected ${pieceName} for ${sellPrice} Gold`;
     } else {
       btnSell.disabled = true;
-      btnSell.innerHTML = 'SELL';
+      btnSell.textContent = t('shop.sell');
       btnSell.title = 'Select a piece from your bench or board to sell';
     }
   },
@@ -842,7 +842,7 @@ Object.assign(RoguelikeUI.prototype, {
       card.className = `reward-card ${!canAfford ? 'cant-afford' : ''}`;
   
       const rarityKey = (info.rarity === 'legendary' || info.rarity === 'legend') ? 'legend' : (info.rarity || 'common');
-      const rarityLabel = rarityKey.toUpperCase();
+      const rarityLabel = t(`rarity.${rarityKey}`,{defaultValue:rarityKey});
       const typeStr = info.element2 ? `${info.element.toUpperCase()}/${info.element2.toUpperCase()}` : (info.element || 'NORMAL').toUpperCase();
       card.title = `${info.name} [${typeStr}] (${rarityLabel})\nHP: ${st.maxHp} | ATK: ${st.damage}\nAttack element depends on Hex position\nCost: ${isFree ? 'FREE' : price + 'g'}`;
   
@@ -880,6 +880,8 @@ Object.assign(RoguelikeUI.prototype, {
       };
   
       const pickBtn = card.querySelector('.btn-pick-card');
+      pickBtn.setAttribute('aria-label',t('shop.buyLabel',{name:info.name,price}));
+      if(!canAfford) { pickBtn.title=t('shop.noGold',{gold:price}); const reason=document.createElement('small');reason.className='purchase-state';reason.textContent=t('shop.noGold',{gold:price});card.append(reason); }
       if (pickBtn) {
         pickBtn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -896,7 +898,7 @@ Object.assign(RoguelikeUI.prototype, {
 
   pickRewardPiece(type, price = 0) {
     if (this.gold < price) {
-      alert(`You need at least ${price} Gold to recruit this piece!`);
+      this.showToast(t('shop.noGold',{gold:price}), 'warning');
       return;
     }
   
@@ -966,13 +968,14 @@ Object.assign(RoguelikeUI.prototype, {
   
     const invSlots = document.getElementById('inventorySlots');
     const recruitGrid = document.getElementById('rewardCardsGrid');
-    if (invSlots) invSlots.classList.toggle('hidden', tab !== 'bench');
-    if (recruitGrid) recruitGrid.classList.toggle('hidden', tab !== 'recruit');
+    if (invSlots) invSlots.classList.remove('hidden');
+    if (recruitGrid) recruitGrid.classList.remove('hidden');
   
     const btnSell = document.getElementById('btnSell');
     const btnReroll = document.getElementById('btnReroll');
-    if (btnSell) btnSell.classList.toggle('hidden', tab !== 'bench');
-    if (btnReroll) btnReroll.classList.toggle('hidden', tab !== 'recruit');
+    if (btnSell) btnSell.classList.remove('hidden');
+    if (btnReroll) btnReroll.classList.remove('hidden');
+    if (tab === 'recruit') window.HexPreparationInfo?.hide();
   
     const subtitle = document.getElementById('marketSubtitle');
     if (tab === 'bench') {
@@ -991,7 +994,7 @@ Object.assign(RoguelikeUI.prototype, {
   deployBenchPiece(item) {
     if (this.phase === 'battle') return;
     if (this.placedPieces.length >= this.maxSlots) {
-      alert(`Board is full (${this.maxSlots}/${this.maxSlots} units). Recall a unit first or upgrade slot capacity!`);
+      this.showToast(t('shop.fullTeam',{count:this.maxSlots}), 'warning');
       return;
     }
     // Use all 28 player Hex cells, including squads larger than eight units.
@@ -1020,6 +1023,8 @@ Object.assign(RoguelikeUI.prototype, {
     container.innerHTML = '';
     if (totalCountEl) totalCountEl.textContent = this.inventory.length;
   
+    const capacity = document.getElementById('recruitCapacity');
+    if (capacity) capacity.textContent = this.phase === 'battle' ? t('bench.locked') : this.placedPieces.length >= this.maxSlots ? t('bench.full') : t('shop.squadBench',{deployed:this.placedPieces.length,slots:this.maxSlots,count:this.inventory.length});
     const subtitle = document.getElementById('marketSubtitle');
     if (subtitle && this.pokemonTab === 'bench') {
       subtitle.textContent = t('shop.squadBench',{deployed:this.placedPieces.length,slots:this.maxSlots,count:this.inventory.length});
@@ -1051,6 +1056,13 @@ Object.assign(RoguelikeUI.prototype, {
       const slot = document.createElement('div');
       slot.className = `reward-card bench-card inv-slot ${isDeployed ? 'deployed' : ''} ${isSelected ? 'selected' : ''} ${isEligible ? 'talisman-target-eligible' : ''} ${isTargetIneligible ? 'talisman-target-ineligible' : ''}`;
       slot.dataset.invId = item.id;
+      slot.tabIndex = 0;
+      slot.setAttribute('role', 'group');
+      slot.setAttribute('aria-label', info.name);
+      slot.addEventListener('keydown', event => {
+        if (event.target !== slot) return;
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); slot.click(); }
+      });
   
       const pDef = PIECES[item.type];
       const battlesFought = item.battlesFought || 0;
@@ -1087,7 +1099,7 @@ Object.assign(RoguelikeUI.prototype, {
       const displayName = isMega ? `MEGA ${info.name.toUpperCase()}` : info.name.toUpperCase();
   
       const rarityKey = (info.rarity === 'legendary' || info.rarity === 'legend') ? 'legend' : (info.rarity || 'common');
-      const rarityLabel = rarityKey.toUpperCase();
+      const rarityLabel = t(`rarity.${rarityKey}`,{defaultValue:rarityKey});
       const { element: effT1, element2: effT2 } = (typeof TypeSystem !== 'undefined')
         ? TypeSystem.getEffectivePieceElements(item)
         : { element: info.element || 'normal', element2: info.element2 };
@@ -1101,7 +1113,7 @@ Object.assign(RoguelikeUI.prototype, {
   
       let sealHtml = '';
       if (item.talismans && item.talismans.length > 0) {
-        sealHtml = `<img src="assets/ui/talismans/talisman_seal.svg?v=${ASSET_VERSION}" class="ui-talisman-mark" alt="Talisman" />`;
+        sealHtml = `<span class="equipment-badge" title="${t('visual.equipped')}">◆${item.talismans.length}</span>`;
       }
   
       slot.innerHTML = `
@@ -1127,9 +1139,27 @@ Object.assign(RoguelikeUI.prototype, {
       slot.addEventListener('mouseenter', () => this.previewPieceMoves(item.type));
       slot.addEventListener('mouseleave', () => this.clearPreview());
   
+      const state = document.createElement('span'); state.className = 'bench-state';
+      state.textContent = t(this.phase === 'battle' ? 'bench.locked' : isDeployed ? 'bench.deployed' : this.placedPieces.length >= this.maxSlots ? 'bench.full' : 'bench.ready');
+      if(this.phase==='battle'){state.title=state.textContent;state.textContent='🔒';}
+      if(isSelected)state.textContent = '✓ '+t('bench.selected')+' · '+state.textContent;
+      slot.append(state);
+      const actions = document.createElement('div'); actions.className = 'bench-card-actions';
+      const deploy = document.createElement('button'); deploy.type = 'button'; deploy.textContent = t(isDeployed ? 'bench.recall' : 'bench.deploy');
+      deploy.disabled = this.phase === 'battle' || (!isDeployed && this.placedPieces.length >= this.maxSlots && !this.activeApplyingTalisman);
+      deploy.onclick = event => { event.stopPropagation();
+        if (this.activeApplyingTalisman) { this.applyTalismanToPiece(item); return; }
+        if (isDeployed) this.recallPieceFromBoard(item.id); else this.deployBenchPiece(item);
+      };
+      actions.append(deploy); slot.append(actions);
       slot.addEventListener('click', () => {
         this.clearPreview();
-        this.onInventorySlotClick(item);
+        if(this.activeApplyingTalisman){this.applyTalismanToPiece(item);return;}
+        if(this.phase!=='battle'){
+          this.selectedInvId=item.id;this.selectedBoardSq=-1;
+          this.renderInventory();this.renderBoard();this.updateSellButton();
+        }
+        window.HexPreparationInfo?.showInventory(item);
       });
       container.appendChild(slot);
     }
@@ -1194,7 +1224,9 @@ Object.assign(RoguelikeUI.prototype, {
   
       setTimeout(() => {
         this.game.board[placed.sq] = null;
-        this.placedPieces.splice(idx, 1);
+        // Other recall animations may have completed since this one started.
+        const currentIndex = this.placedPieces.findIndex(piece => piece.invId === invId);
+        if (currentIndex !== -1) this.placedPieces.splice(currentIndex, 1);
         this.saveSetupFormation();
         this.selectedInvId = null;
         this.selectedBoardSq = -1;

@@ -354,7 +354,7 @@ class HexCombat extends HexSimulation {
                         unit,
                         enemy,
                         unit.attackDamage * (skill?.damageMultiplier ?? 1.4),
-                        'skill', damageOptions
+                        'skill', {...damageOptions,area:true}
                     );
                 }
 
@@ -547,6 +547,8 @@ class HexCombat extends HexSimulation {
         const matchup = typeof TypeSystem !== 'undefined'
             ? TypeSystem.getHexAttack(attacker, defender, options)
             : { element: attacker.element ?? 'normal', multiplier: 1 };
+        if(window.EquipmentCombat?.has(attacker,'ring_target')&&matchup.multiplier===0&&['attack','skill'].includes(source))matchup.multiplier=1;
+        if(window.EquipmentCombat?.has(defender,'safety_goggles')&&options.area)return 0;
 
         let damage = Math.max(
             0,
@@ -559,7 +561,7 @@ class HexCombat extends HexSimulation {
         );
         if (!isTrueDamage && window.HexEffects) {
             damage = Math.max(0, Math.round(HexEffects.outgoing(this, attacker, defender, damage, source, matchup)));
-            damage = HexEffects.incoming(this, defender, damage, source);
+            damage = HexEffects.incoming(this, defender, damage, source, attacker, matchup);
         }
         const elementalReduction=defender.eliteType==='elemental' && matchup.element===defender.element?0.25:0;
         const ignoreReduction=source==='attack'&&window.HexEffects?.has(attacker,'hasProtectivePads');
@@ -629,7 +631,7 @@ class HexCombat extends HexSimulation {
 
         if(hpDamage>0 && attacker.hp>0 && attacker.lifesteal>0)this.healUnit(attacker,hpDamage*attacker.lifesteal);
         window.HexTraits?.afterDamage(this,attacker,defender,hpDamage);
-        window.HexEffects?.afterDamage(this,attacker,defender,hpDamage,source,matchup,options);
+        window.HexEffects?.afterDamage(this,attacker,defender,hpDamage,source,matchup,{...options,shieldAbsorbed:absorbed,shieldBefore:currentShield});
         // Xu ly Pokemon chet.
         if (defender.hp <= 0) {
             this.killUnit(defender);
@@ -713,6 +715,10 @@ class HexCombat extends HexSimulation {
     // =========================================
 
     killUnit(unit) {
+        if (!unit || this.units.get(unit.id) !== unit || unit.lifecycle === 'REMOVED') return false;
+        unit.hp = 0;
+        unit.lifecycle = 'REMOVED';
+        this.pendingHits = this.pendingHits.filter(hit => hit.attackerId !== unit.id && hit.defenderId !== unit.id);
         const row=this.statistics.get(unit.id);if(row)row.hp=0;
         const square = unit.square;
 
@@ -731,6 +737,7 @@ class HexCombat extends HexSimulation {
             square,
             team: unit.color
         });
+        return true;
     }
 
     // =========================================
@@ -852,6 +859,7 @@ class HexCombat extends HexSimulation {
             window.HexEffects?.update(this,unit);
             if (unit.hp <= 0 || !this.units.has(id)) continue;
             window.HexTraits?.update(this,unit);
+            if((unit.statuses.frozen?.expiresAt??0)>this.tickCount || (unit.statuses.paralyzed?.expiresAt??0)>this.tickCount)continue;
 
             // Tu dong dung skill khi du Mana.
             // Neu skill dang cooldown,

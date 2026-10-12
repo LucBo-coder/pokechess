@@ -1,0 +1,348 @@
+/* Source-derived skins. Slice caps are measured on normalized assets, not alpha bounds. */
+#app { width:100% !important; min-width:0 !important; max-width:none !important; height:100% !important; min-height:0 !important; max-height:none !important; transform:none !important; font-size:12px; }
+#gameViewport { box-sizing:border-box; }
+body.hex-mode .rotate-overlay { display:none !important; }
+.game-header { height:auto; min-height:48px; max-height:none; flex-wrap:wrap; padding:6px 10px; gap:8px; }
+.logo { padding:8px; border:6px solid transparent; border-image:url('../assets/visual/ui/hud-logo-frame.png') 6 fill / 6px; }
+.rogue-stats { gap:8px; }
+.stat-pill { height:auto; min-height:32px; padding:4px 8px; border:6px solid transparent; border-image:url('../assets/visual/ui/hud-compact-frame.png') 6 fill / 6px; }
+.stat-label,.stat-val { font-size:12px; }
+.stage-pill { border-image-source:url('../assets/visual/ui/hud-stage-frame.png'); }
+.gold-pill { border-image-source:url('../assets/visual/ui/hud-currency-frame.png'); }
+.slot-pill { border-image-source:url('../assets/visual/ui/hud-team-frame.png'); }
+.game-layout { display:grid; grid-template-columns:clamp(200px,22vw,300px) minmax(0,1fr) clamp(210px,23vw,320px); grid-template-rows:minmax(0,1fr); flex:1; height:auto; min-height:0; max-height:none; padding:8px; gap:10px; }
+.side-panel,.left-panel,.right-panel { width:100%; min-width:0; max-width:none; height:100%; min-height:0; }
+.game-layout .card-box,.battle-settings-body,.hex-pokemon-inspector { border:6px solid transparent; border-image:url('../assets/visual/ui/panel-main.png') 6 fill / 6px; background:none; padding:8px; box-sizing:border-box; }
+.talisman-panel,.pokemon-panel { width:100%; min-height:0; height:100%; max-height:100%; padding:8px; align-items:stretch; }
+.panel-title,.hex-inspector-header { min-height:32px; padding:6px 10px; margin:0 0 6px; font-size:13px; color:#fff; border:6px solid transparent; border-image:url('../assets/visual/ui/header-red.png') 6 fill / 6px; }
+.talisman-tabs,.pokemon-tabs { width:100%; height:auto; min-height:36px; gap:4px; }
+.talisman-tab,.pokemon-tab { height:auto; min-height:36px; padding:6px; font-size:11px; white-space:normal; border:8px solid transparent; border-image:url('../assets/visual/ui/tab-inactive.png') 8 fill / 8px; background:none; color:#fff; }
+.talisman-tab.active,.pokemon-tab.active { border-image-source:url('../assets/visual/ui/tab-active.png'); color:#17263f; }
+#tabPokemonRecruit { width:100%; }
+.talisman-content,.pokemon-content { width:100%; flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; touch-action:pan-y; }
+.talisman-footer,.pokemon-footer { flex-shrink:0; height:auto; min-height:42px; margin-top:6px; }
+.pokemon-subtitle { height:auto; min-height:24px; font-size:12px; white-space:normal; }
+.game-header .btn, .game-layout .btn, #hex-fx-toggle { height:auto !important; min-height:34px; line-height:1.25 !important; font-size:12px !important; padding:8px 12px !important; max-width:100%; white-space:normal; overflow-wrap:anywhere; border:9px solid transparent !important; border-image:url('../assets/visual/ui/button-primary.png') 9 fill / 9px !important; background:none !important; box-shadow:none !important; }
+.btn-sell,.btn-sell-talisman,.btn-cta-battle { border-image-source:url('../assets/visual/ui/button-danger.png') !important; }
+.game-layout .btn:hover:not(:disabled),.game-header .btn:hover:not(:disabled),.talisman-tab:hover,.pokemon-tab:hover { filter:brightness(1.15); }
+.game-layout .btn:active:not(:disabled),.game-header .btn:active:not(:disabled) { filter:brightness(.85); transform:translateY(1px); }
+.game-layout .btn:disabled,.game-header .btn:disabled { filter:grayscale(.8) brightness(.6); cursor:not-allowed; }
+button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline:2px solid #ffe188; outline-offset:2px; }
+.header-controls { gap:6px; }
+.battle-settings { position:relative; font-size:12px; }
+.battle-settings summary { cursor:pointer; min-height:34px; padding:8px; box-sizing:border-box; }
+.battle-settings-body { position:absolute; right:0; top:100%; z-index:500; min-width:230px; display:flex; flex-direction:column; gap:12px; }
+.music-widget { height:auto; flex-wrap:wrap; }
+.language-select { height:36px; font-size:14px; }
+body.hex-mode .arena-center { min-height:0; width:100%; }
+body.hex-mode .arena-center .board-view { display:flex; flex-direction:column; width:100%; height:100%; min-height:0; overflow:hidden !important; padding:0; gap:6px; }
+body.hex-mode .board-top-controls { background:none; width:100%; height:auto; min-height:38px; max-height:none; margin:0; padding:0; flex-wrap:wrap; gap:6px; }
+.enemy-text { font-size:12px; line-height:1.3; white-space:normal; }
+.phase-buttons { flex-wrap:wrap; }
+body.hex-mode .board-wrapper { flex:1 1 0 !important; min-height:0; width:100%; position:relative; overflow:hidden; background:url('../assets/visual/maps/forest-background.png') center no-repeat #253d2e; }
+body.hex-mode .board-frame { position:absolute; margin:0; padding:0; width:270px; height:263px; background:none; transform-origin:center; }
+body.hex-mode .board-container { width:270px; height:263px; background:none; border:none; box-shadow:none; }
+body.hex-mode .board { background:none; }
+body.hex-mode .board .square::before { background:rgba(30,65,40,.30); background-image:none; }
+body.hex-mode .board .square.hex-player::before { background:rgba(115,185,120,.25); }
+body.hex-mode .board .square.selected::before,body.hex-mode .board .square.deploy-zone::before { background:rgba(240,203,78,.45); }
+body.hex-mode .board .square::after { opacity:1; background:rgba(165,219,138,.13); }
+body.hex-mode .board .square.selected:has(.piece)::after { inset:auto; left:0; bottom:4px; width:36px; height:14px; clip-path:none; background:url('../assets/visual/combat/unit-selection-ring.png') center/contain no-repeat; z-index:1; }
+.bench-dock { width:100%; flex:0 0 auto; padding:6px; max-height:none; min-height:80px; }
+.bench-header { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.bench-header .pokemon-tab { min-height:28px; }
+#inventorySlots { display:flex !important; flex-flow:row nowrap; gap:6px; overflow-x:auto; overflow-y:hidden; height:72px; width:100%; touch-action:pan-x; }
+#inventorySlots .bench-card { flex:0 0 170px; width:170px; min-width:170px; height:68px; }
+.battle-actions { width:100%; display:flex; justify-content:flex-end; flex-shrink:0; }
+.battle-actions .btn { min-width:150px; }
+.reward-card { width:100%; min-width:0; height:auto; min-height:78px; padding:8px; box-sizing:border-box; border:6px solid transparent; border-image:url('../assets/visual/ui/recruit-row.png') 6 fill / 6px; background:none; }
+.reward-card-info { min-width:0; flex:1; }
+.card-name { font-size:12px; line-height:1.3; white-space:normal; }
+.card-rarity-row,.card-stats { flex-wrap:wrap; height:auto; gap:3px; }
+.card-stats,.stat-badge { font-size:11px; }
+.reward-card-img-wrap { min-width:40px; }
+.reward-card-img { width:36px; height:36px; }
+.talisman-card { width:100%; height:auto; min-height:80px; padding:8px; box-sizing:border-box; }
+.talisman-name { font-size:12px; white-space:normal; }
+.talisman-desc,.talisman-target-desc,.synergy-description { font-size:11px; line-height:1.4; white-space:normal; }
+.talisman-icon { width:40px; height:40px; box-sizing:border-box; padding:5px; background:url('../assets/visual/ui/inventory-slot.png') center/100% 100% no-repeat; }
+.talisman-equipped-card .talisman-icon { background-image:url('../assets/visual/ui/slot-equipped.png'),url('../assets/visual/ui/inventory-slot.png'); }
+.bag-selected .talisman-icon { background-image:url('../assets/visual/ui/slot-selected.png'),url('../assets/visual/ui/inventory-slot.png'); }
+.talisman-card[aria-disabled="true"] .talisman-icon { background-image:url('../assets/visual/ui/slot-disabled.png'),url('../assets/visual/ui/inventory-slot.png'); }
+.synergy-row { font-size:12px; line-height:1.4; }
+#pokemonPanel { position:relative; }
+#pokemonPanel #hex-pokemon-inspector { display:none; position:absolute !important; inset:0 !important; width:100% !important; max-width:none !important; height:100%; max-height:100% !important; margin:0 !important; transform:none !important; z-index:20; overflow:hidden; }
+#pokemonPanel #hex-pokemon-inspector.visible { display:flex !important; flex-direction:column; }
+#pokemonPanel .hex-inspector-header { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+#pokemonPanel .hex-inspector-close { font-size:12px; color:white; min-height:32px; cursor:pointer; }
+#pokemonPanel .hex-inspector-body { flex:1; min-height:0; overflow:auto; padding:6px; font-size:12px; line-height:1.4; }
+#pokemonPanel .hex-inspector-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+#pokemonPanel .hex-inspector-stat small,#pokemonPanel .hex-inspector-stat strong { font-size:12px; }
+#pokemonPanel .hex-inspector-name { font-size:16px; }
+#pokemonPanel .hex-inspector-section { font-size:12px; }
+#pokemonPanel .unit-healthbar { position:relative; left:auto; right:auto; bottom:auto; width:100%; height:8px !important; margin:8px 0; }
+.hex-combat-hp { height:5px !important; background:#182332; border:none; overflow:visible; }
+.hex-combat-hp::after { content:''; position:absolute; inset:-1px -2px; border:0 solid transparent; border-image:url('../assets/visual/combat/hp-bar-frame.png') 0 4 0 4 fill / 0 2px 0 2px; pointer-events:none; }
+.hex-combat-hp-fill { width:100%; background:url('../assets/visual/combat/hp-bar-fill.png') left center/100% 100% no-repeat !important; transition:clip-path .15s linear; }
+.hex-unit-selected::before { content:''; position:absolute; left:0; bottom:4px; width:36px; height:14px; background:url('../assets/visual/combat/unit-selection-ring.png') center/contain no-repeat; pointer-events:none; z-index:-1; }
+.battle-drawer-nav { display:none; }
+.bench-header .pokemon-tab { flex:none; white-space:nowrap; }
+.bench-header .btn-sell { flex:none; width:auto; }
+#inventorySlots .reward-card.bench-card { width:210px !important; min-width:210px !important; max-width:none !important; height:68px !important; min-height:68px !important; max-height:none !important; background:none !important; border:6px solid transparent !important; border-image:url('../assets/visual/ui/recruit-row.png') 6 fill / 6px !important; padding:6px; opacity:1; }
+#inventorySlots .bench-card.selected { border-image-source:url('../assets/visual/ui/tab-active.png') !important; filter:none; }
+#inventorySlots .bench-card .reward-card-img-wrap { position:relative !important; width:40px !important; height:40px !important; flex:none; }
+#inventorySlots .bench-card .reward-card-img { position:static !important; width:36px !important; height:36px !important; }
+#inventorySlots .bench-card .reward-card-info { position:static !important; width:auto !important; min-width:0; padding-left:4px; overflow:visible !important; }
+.card-rarity,.stat-evo { font-size:10px; }
+.talisman-card[data-slot-state="locked"] .talisman-icon { background-image:url('../assets/visual/ui/slot-locked.png'),url('../assets/visual/ui/inventory-slot.png'); }
+.talisman-card[data-slot-state="disabled"] .talisman-icon { background-image:url('../assets/visual/ui/slot-disabled.png'),url('../assets/visual/ui/inventory-slot.png'); }
+.equipment-badge { position:absolute; bottom:0; right:0; font-size:11px; color:#8fffa7; pointer-events:none; }
+.board .unit-healthbar { position:absolute; bottom:5px; left:4px; right:4px; z-index:4; pointer-events:none; }
+.synergy-card .talisman-name,.synergy-tier-text,.synergy-header-title { font-size:12px; }
+.synergy-tier-line { height:auto; line-height:1.4; }
+.talisman-empty-msg { font-size:12px !important; line-height:1.5; }
+#rewardCardsGrid .reward-card { width:100% !important; min-width:0 !important; max-width:none !important; height:auto !important; min-height:104px !important; max-height:none !important; padding:8px; display:grid; grid-template-columns:42px minmax(0,1fr); gap:6px; overflow:visible; }
+#rewardCardsGrid .reward-card-img-wrap { position:static; height:42px !important; }
+#rewardCardsGrid .reward-card-img { position:static; }
+#rewardCardsGrid .reward-card-info { position:static; width:auto; min-width:0; }
+#rewardCardsGrid .btn-pick-card { position:static; transform:none; grid-column:1 / -1; width:100%; }
+.btn-pick-card,.btn-buy-talisman,.btn-use-talisman { min-height:32px; height:auto; padding:6px 10px; font-size:12px; line-height:1.3; white-space:normal; color:white; border:9px solid transparent; border-image:url('../assets/visual/ui/button-primary.png') 9 fill / 9px; background:none; cursor:pointer; }
+.btn-pick-card:disabled,.btn-buy-talisman:disabled { filter:grayscale(1) brightness(.6); cursor:not-allowed; }
+.btn-pick-card:hover:not(:disabled),.btn-buy-talisman:hover:not(:disabled),.btn-use-talisman:hover { filter:brightness(1.15); }
+.turn-order-container { display:none; }
+@media(max-width:1050px) {
+ .game-layout { grid-template-columns:minmax(0,1fr); }
+ .game-layout .side-panel, #pokemonPanel { display:none; position:absolute; top:60px; bottom:8px; height:auto; width:min(320px,85vw); z-index:300; }
+ .game-layout .left-panel { left:8px; }.game-layout .right-panel { right:8px; }
+ #app[data-drawer="left"] .left-panel,#app[data-drawer="right"] .right-panel { display:flex; }
+ .battle-drawer-nav { display:flex; gap:6px; }
+ .logo { display:none; }
+ .bench-dock { max-height:none; }
+}
+@media(max-height:500px) {
+ .game-header { min-height:40px; padding:2px 6px; gap:4px; }
+ .stat-pill { min-height:28px; padding:2px 4px; }
+ .game-layout { padding:4px; gap:4px; }
+ body.hex-mode .board-top-controls { min-height:30px; }
+ .game-header .btn,.game-layout .btn,#hex-fx-toggle { min-height:32px; padding:5px 8px !important; border-width:4px !important; border-image-width:4px !important; }
+ .bench-dock { min-height:64px; max-height:none; padding:3px; }
+ #inventorySlots { height:48px; } #inventorySlots .reward-card.bench-card { height:46px !important; min-height:46px !important; }
+ #inventorySlots .bench-card .card-rarity-row { display:none; }
+ .bench-header .pokemon-tab { min-height:28px; padding:3px; border-width:4px; border-image-width:4px; }
+ .battle-actions { position:absolute; bottom:8px; right:12px; width:auto; }
+ .bench-dock { padding-right:155px; }
+ .game-layout .side-panel { top:46px; }
+}
+
+/* UI overhaul: shared readable typography and ordered presentation layers. */
+:root { --ui-font:'Segoe UI',Arial,sans-serif; --ui-text:#f5f4ec; --ui-muted:#c9d1df; --ui-gold:#ffe188; --ui-space:8px; --ui-radius:4px; --layer-panel:300; --layer-info:350; --layer-popover:500; --layer-modal:2000; --layer-toast:2500; }
+body,#app,button,input,select,textarea { font-family:var(--ui-font) !important; }
+#app { color:var(--ui-text); font-size:14px; }
+.game-layout { grid-template-columns:clamp(200px,19vw,270px) minmax(0,1fr) clamp(230px,22vw,310px); }
+.game-layout.utility-collapsed { grid-template-columns:minmax(0,1fr) clamp(230px,22vw,310px); }
+.game-layout.utility-collapsed .left-panel { display:none; }
+.utility-actions { display:flex; flex-wrap:wrap; gap:var(--ui-space); padding-top:8px; }
+.utility-actions .btn { flex:1 1 100%; }
+.right-panel .bench-dock { height:100%; min-height:0; display:flex; flex-direction:column; padding:8px; }
+#inventorySlots { flex:1; flex-flow:column nowrap !important; height:auto !important; min-height:0; overflow-x:hidden; overflow-y:auto; touch-action:pan-y; }
+#inventorySlots .reward-card.bench-card { width:100% !important; min-width:0 !important; flex:0 0 auto; height:auto !important; min-height:110px !important; max-height:none !important; display:flex; flex-wrap:wrap; }
+#inventorySlots .bench-card .reward-card-info { flex:1; }
+.bench-card-actions { display:flex; width:100%; gap:4px; margin-top:6px; }
+.bench-card-actions button { flex:1; min-height:36px; font:inherit; color:var(--ui-text); background:#253d54; border:1px solid var(--ui-muted); border-radius:var(--ui-radius); cursor:pointer; }
+.bench-card-actions button:disabled { opacity:.6; cursor:not-allowed; }
+.bench-state { display:block; width:100%; font-size:12px; color:var(--ui-gold); margin-top:4px; }
+.board-view .talisman-apply-banner { flex:0 0 auto; min-height:44px; padding:6px; font-size:14px; line-height:1.4; width:100%; box-sizing:border-box; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.board-view .talisman-apply-banner.hidden { display:none; }
+.talisman-apply-msg { font-size:14px !important; }
+#marketView { flex:0 0 auto; height:auto; max-height:230px; min-height:0; padding:6px; gap:4px; }
+#marketView .pokemon-panel-title,#marketView #marketSubtitle { display:none; }
+#marketView .pokemon-tabs { display:flex; justify-content:space-between; min-height:36px; }
+#tabPokemonRecruit { width:auto; flex:1; }
+#marketView .pokemon-content { flex:0 1 auto; max-height:145px; overflow:auto; }
+#marketView .pokemon-footer { min-height:36px; margin:0; justify-content:flex-end; }
+#marketView .pokemon-footer { display:none; }
+#rewardCardsGrid { display:flex !important; flex-flow:row nowrap; gap:8px; overflow-x:auto; }
+#rewardCardsGrid .reward-card { flex:1 0 180px; min-height:128px !important; }
+#marketView.collapsed .pokemon-content,#marketView.collapsed .pokemon-footer,#marketView.collapsed .recruit-capacity { display:none; }
+.recruit-capacity { font-size:12px; line-height:1.35; }
+.battle-actions { position:static !important; width:100%; }
+.game-header .btn,.game-layout .btn { min-height:40px; }
+.modal-overlay { z-index:var(--layer-modal); }
+.battle-settings-body { z-index:var(--layer-popover); }
+#app > #hex-pokemon-inspector { display:none; position:absolute !important; top:calc(var(--content-top,var(--header-height,60px)) + 8px) !important; right:8px !important; bottom:64px !important; left:auto !important; width:min(390px,calc(100% - 16px)) !important; height:auto !important; max-height:none !important; max-width:none !important; margin:0 !important; transform:none !important; z-index:var(--layer-info); overflow:hidden; }
+#app > #hex-pokemon-inspector.visible { display:flex; flex-direction:column; }
+#hex-pokemon-inspector .hex-inspector-header { display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+#hex-pokemon-inspector .hex-inspector-close { font:inherit; min-height:40px; color:white; cursor:pointer; }
+#hex-pokemon-inspector .hex-inspector-body { flex:1; min-height:0; overflow:auto; padding:8px; font-size:14px; line-height:1.55; }
+#hex-pokemon-inspector .hex-inspector-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+#hex-pokemon-inspector .hex-inspector-stat small,#hex-pokemon-inspector .hex-inspector-stat strong { font-size:14px; }
+#hex-pokemon-inspector .hex-inspector-name { font-size:18px; }
+#hex-pokemon-inspector .hex-inspector-section { font-size:14px; }
+#hex-pokemon-inspector .unit-healthbar { position:relative; inset:auto; width:100%; height:8px !important; margin:8px 0; }
+.inspector-tabs { display:flex; flex-wrap:wrap; gap:4px; }
+.inspector-tabs button { flex:1 1 40%; min-height:40px; font:inherit; color:white; background:#253d54; border:1px solid #a5b7c8; cursor:pointer; }
+.inspector-tabs button[aria-pressed=true] { color:#17263f; background:var(--ui-gold); }
+[data-info-section][hidden] { display:none !important; }
+.retro-toast { position:absolute; top:auto; bottom:12px; left:12px; transform:none; width:min(410px,calc(100% - 24px)); box-sizing:border-box; z-index:var(--layer-toast); padding:12px; display:flex; gap:8px; border:2px solid var(--ui-gold); background:#17263f; }
+.retro-toast .toast-message { font-size:14px; line-height:1.5; flex:1; }
+.retro-toast { position:relative; inset:auto; width:100%; max-width:none; flex:0 0 auto; animation:none; transform:none; margin:0; padding:6px 12px; }
+.retro-toast.hidden { display:none !important; }
+.retro-toast .toast-icon { font-size:18px; }
+#marketView .pokemon-tabs #btnReroll { width:auto; flex:0 0 auto; }
+.talisman-desc,.talisman-target-desc,.synergy-tier-text,.synergy-tier-badge { font-size:13px; line-height:1.5; }
+.recruit-locked-msg,.recruit-picked-msg,.hex-class-synergy { font-size:14px !important; line-height:1.5; padding:8px; }
+@media(min-width:1051px) { #app > #hex-pokemon-inspector { width:clamp(230px,22vw,310px) !important; } }
+.toast-close { min-width:40px; min-height:40px; font:inherit; cursor:pointer; color:white; background:#253d54; border:1px solid var(--ui-muted); }
+.toast-success { border-color:#9cf1ac; }.toast-error { border-color:#ffaca3; }.toast-info { border-color:#9cdaff; }
+.event-log { position:absolute; top:calc(var(--content-top,var(--header-height,60px)) + 8px); left:8px; bottom:64px; width:min(450px,calc(100% - 16px)); z-index:var(--layer-info); background:#17263f; border:2px solid var(--ui-gold); padding:12px; display:flex; flex-direction:column; box-sizing:border-box; }
+.event-log[hidden] { display:none; }.event-log-header { display:flex; justify-content:space-between; gap:8px; }
+.event-log-header h2 { margin:0; font-size:18px; }
+#moveList { overflow:auto; flex:1; min-height:0; }
+.move-entry { padding:8px 0; border-bottom:1px solid #52647c; font-size:14px; line-height:1.5; }
+.move-entry small { display:block; color:var(--ui-muted); }
+.hex-sheet-vfx { position:absolute; pointer-events:none; image-rendering:pixelated; z-index:8; background-repeat:no-repeat; }
+.hex-combat-mana { height:4px !important; background:#162b46; }
+.hex-combat-mana-fill { background:#77cfff !important; }
+.motion-setting { display:flex; align-items:center; gap:8px; min-height:44px; }
+.hex-skill-target { outline:2px solid var(--ui-gold); outline-offset:3px; }
+.reduced-motion * { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+@media(prefers-reduced-motion:reduce) { * { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
+@media(max-width:1050px) {
+ #app button,#app select { min-height:44px; }
+ .game-layout,.game-layout.utility-collapsed { grid-template-columns:minmax(0,1fr); }
+ .game-layout .side-panel { top:calc(var(--content-top,var(--header-height,60px)) + 8px); bottom:64px; width:min(330px,90vw); z-index:var(--layer-panel); }
+ #app[data-drawer=right] #pokemonPanel { display:flex; }
+ #app[data-drawer=left] .game-layout.utility-collapsed .left-panel { display:flex; }
+ .utility-toggle { display:none; }
+ #marketView { max-height:220px; }
+ .bench-dock { padding-right:8px; }
+}
+@media(max-height:500px) {
+ #marketView { max-height:145px; }
+ #marketView .recruit-capacity { display:none; }
+ #marketView:not(.collapsed) .pokemon-content { max-height:105px; }
+ #rewardCardsGrid .reward-card { min-height:100px !important; grid-template-columns:32px minmax(0,1fr); }
+ #rewardCardsGrid .card-stats { display:none; }
+ #marketView .pokemon-footer { min-height:32px; }
+ #marketView .btn,#marketView .pokemon-tab { min-height:32px; }
+}
+@media(max-width:500px) {
+ .game-header { gap:4px; padding:4px; }.rogue-stats { width:100%; justify-content:space-between; }
+ .header-controls { flex:1; flex-wrap:wrap; }.stat-pill { min-width:0; }
+ .battle-drawer-nav { margin-left:auto; }
+ #marketView .pokemon-content { max-height:130px; }
+ .game-layout .btn,.game-header .btn { min-height:40px; }
+}
+
+/* Layout revision: a single HUD, battlefield toolbar, and recruitment action rail. */
+body.hex-combat-active .board .square > .unit-healthbar { display:none !important; }
+.hex-combat-role,.hex-trait-indicator { display:none !important; }
+.hex-combat-unit .hex-combat-hp { left:6px; right:6px; height:3px !important; bottom:6px; }
+.hex-combat-unit .hex-combat-hp::after { display:none; }
+.hex-combat-unit .hex-combat-mana { left:6px; right:6px; height:2px !important; bottom:2px; border:0; }
+.hex-combat-unit .hex-combat-shield { left:6px; right:6px; height:2px; bottom:10px; border:0; }
+.hex-combat-unit [hidden] { display:none !important; }
+.hex-status-icons { position:absolute; top:-8px; right:0; display:flex; gap:1px; pointer-events:auto; }
+.combat-status-icon,.hex-status-icons > span { min-width:8px; height:8px; line-height:8px; text-align:center; font:8px monospace; color:#fff1bb; background:#17263f; border:1px solid #c9d1df; }
+.hex-floating-text { top:-12px !important; font:900 10px Consolas,monospace !important; line-height:1; max-width:110px; overflow:hidden; text-overflow:ellipsis; text-shadow:1px 1px #101820,-1px -1px #101820; animation:hex-floating-up .6s ease-out forwards; }
+.hex-floating-text[data-priority="3"],.hex-floating-text[data-priority="4"],.hex-floating-text[data-priority="5"] { top:-27px !important; }
+.hex-float-heal { color:#9cf1ac; }.hex-float-shield { color:#9cdaff; }.hex-float-damage { color:#ffd4ce; }
+#inventorySlots .reward-card.bench-card { grid-template-columns:40px minmax(0,1fr) 70px; min-height:96px !important; }
+#inventorySlots .bench-card .reward-card-info { min-width:0; }
+#inventorySlots .bench-card .card-name { white-space:nowrap !important; word-break:normal !important; overflow-wrap:normal !important; overflow:hidden !important; text-overflow:ellipsis; width:100%; }
+#inventorySlots .bench-card .card-rarity-row { display:flex !important; flex-wrap:wrap; gap:3px; min-width:0; }
+.bench-state { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bench-card-actions { min-width:70px; }.bench-card-actions button { width:70px; flex:none; }
+.inspector-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+.inspector-tabs button { min-width:0; font-size:12px; overflow-wrap:normal; }
+#gameViewport { padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px) !important; }
+.game-header { display:flex; align-items:center; justify-content:flex-start; gap:8px; padding:4px 8px; min-height:48px; flex:0 0 auto; }
+.game-header .logo { flex:0 0 auto; width:auto; padding:2px 6px; margin:0; font-size:16px; }
+.game-header .rogue-stats { flex:0 0 auto; width:auto; margin:0; gap:4px; }
+.game-header .header-controls { display:flex; flex:1 1 auto; justify-content:flex-end; align-items:center; flex-wrap:wrap; width:auto; gap:4px; margin:0; }
+.game-header .utility-actions { display:flex; width:auto; gap:4px; padding:0; }
+.game-header .utility-actions .btn { flex:0 0 auto; }
+.game-header .btn { padding:4px 8px !important; min-height:36px; border-width:4px !important; border-image-width:4px !important; }
+.game-header .stat-pill { min-height:32px; padding:2px 4px; border-width:4px; border-image-width:4px; }
+.settings-gear { width:40px; flex:0 0 40px; color:var(--ui-gold); }
+.settings-gear svg { display:block; width:22px; height:22px; margin:auto; }
+.settings-dialog { display:flex; flex-direction:column; align-items:stretch; text-align:left; width:min(520px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); overflow:auto; box-sizing:border-box; font-size:14px; padding:16px; }
+.settings-dialog .btn { font-size:14px !important; min-height:44px !important; height:auto !important; padding:8px 12px !important; line-height:1.3; }
+.settings-dialog .language-select { min-height:44px; font-size:14px; }
+.settings-dialog .music-widget { min-height:48px; padding:4px 8px; }
+.settings-dialog .music-text { font-size:14px; }.settings-dialog .music-slider { width:160px; min-height:28px; }
+.settings-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.settings-heading h2 { font-size:20px; margin:0; }
+.settings-section { padding:12px 0; border-top:1px solid #52647c; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.settings-section h3 { margin:0; font-size:16px; flex:0 0 100%; }
+.settings-section p { line-height:1.5; margin:0; }.settings-section .music-widget { width:100%; }
+body.hex-mode .board-top-controls { display:flex; flex:0 0 auto; justify-content:space-between; align-items:center; gap:6px; min-height:40px; }
+.phase-buttons { display:flex; gap:4px; align-items:center; }
+#hex-fx-toggle { padding:4px 8px !important; }
+#marketView { max-height:none; padding:6px; overflow:hidden; }
+#marketView .pokemon-tabs { flex:0 0 auto; display:flex; align-items:center; gap:4px; min-height:40px; flex-wrap:nowrap; }
+#marketView .pokemon-tabs > button { flex:0 0 auto !important; width:auto !important; min-width:0; padding:4px 8px !important; min-height:36px; border-width:4px !important; border-image-width:4px !important; white-space:nowrap; }
+#marketView #tabPokemonRecruit { margin-right:auto; font-size:13px; }
+#marketView .battle-actions { flex:0 0 auto; width:auto; margin-left:4px; }
+#marketView .battle-actions .btn { min-width:112px; min-height:40px; margin:0; padding:6px 12px !important; }
+#marketView .pokemon-content { max-height:124px; padding:0; }
+#rewardCardsGrid { align-items:stretch; padding:2px 0; }
+#rewardCardsGrid .reward-card { display:grid; grid-template-columns:40px minmax(0,1fr); align-content:center; align-items:center; flex:1 0 170px; min-width:170px; height:112px !important; min-height:112px !important; padding:6px; gap:4px; }
+#rewardCardsGrid .reward-card-img-wrap { grid-row:1 / 3; }
+#rewardCardsGrid .reward-card-info { min-width:0; }
+#rewardCardsGrid .card-name { font-size:13px; }.card-name { overflow-wrap:anywhere; }
+#rewardCardsGrid .card-stats { display:none; }
+#rewardCardsGrid .btn-pick-card { width:100%; min-width:0; min-height:32px; grid-column:2; margin:0; }
+.purchase-state { grid-column:1/-1; font-size:11px; line-height:1.2; color:#ffb7ae; }
+.reroll-locked .recruit-lock { outline:2px solid var(--ui-gold); outline-offset:-2px; }
+.recruit-capacity { font-size:11px; }
+#inventorySlots .reward-card.bench-card { min-height:84px !important; padding:6px; gap:4px; display:grid; grid-template-columns:36px minmax(0,1fr) auto; align-items:center; }
+#inventorySlots .bench-card .reward-card-img-wrap { min-width:0; grid-row:1/3; }
+#inventorySlots .bench-card .reward-card-info { grid-column:2; grid-row:1; }
+#inventorySlots .bench-card .card-name { font-size:13px !important; }
+#inventorySlots .bench-card .card-rarity-row { font-size:11px; }
+#inventorySlots .bench-card .card-stats,#inventorySlots .bench-card .stat-evo { display:none; }
+.bench-card-actions { width:auto; margin:0; grid-column:3; grid-row:1/3; }
+.bench-card-actions button { max-width:76px; padding:4px; min-height:40px; font-size:12px; }
+.bench-state { width:auto; grid-column:2; grid-row:2; margin:0; font-size:11px; }
+.reward-card.bench-card.deployed { opacity:1; }
+.bench-card.selected { outline:2px solid var(--ui-gold); outline-offset:-2px; }
+.retro-toast { max-height:74px; padding:4px 8px; overflow:hidden; }
+.retro-toast .toast-message { min-width:0; max-height:62px; overflow:auto; overflow-wrap:anywhere; font-size:13px; line-height:1.4; }
+.skill-icon { float:right; width:32px; height:32px; image-rendering:pixelated; }.skill-state { color:var(--ui-gold); padding:8px; background:#253d54; }
+@media(max-width:1050px) {
+ .game-header .logo { display:none; }.game-header .utility-actions .btn:last-child { display:none; }
+ .battle-drawer-nav { margin:0; gap:4px; }.game-header .header-controls { flex:1; }
+ .game-header .utility-actions .btn { min-width:44px; }.game-header .btn { min-height:44px; }
+ .game-layout,.game-layout.utility-collapsed { grid-template-columns:minmax(0,1fr); }
+ #inventorySlots .reward-card.bench-card { min-height:84px !important; }
+}
+@media(max-width:1050px) and (max-height:500px) {
+ .game-header { flex-wrap:nowrap; gap:4px; min-height:44px; padding:0 4px; }
+ .game-header .rogue-stats { flex-shrink:0; }.stat-label { font-size:10px; }.stat-val { font-size:12px; }
+ .game-header .header-controls { flex-wrap:nowrap; }.game-header .utility-actions { display:none; }
+ .game-header .btn { white-space:nowrap; font-size:11px !important; padding:2px 5px !important; }
+ .game-layout { padding:4px; gap:4px; }body.hex-mode .arena-center .board-view { gap:3px; }
+ body.hex-mode .board-top-controls { min-height:44px; flex-wrap:nowrap; }.enemy-text { font-size:11px; }
+ .phase-buttons { flex-wrap:nowrap; }.phase-buttons .btn,#hex-fx-toggle { min-height:44px; padding:2px 5px !important; font-size:11px !important; border-width:4px !important; border-image-width:4px !important; }
+ #marketView { padding:2px 4px; }#marketView .pokemon-tabs { min-height:44px; }
+ #marketView .pokemon-tabs > button { min-height:44px; font-size:11px !important; padding:2px 5px !important; }
+ #marketView .battle-actions .btn { min-height:44px; min-width:108px; }
+ #marketView:not(.collapsed) .pokemon-content { max-height:94px; }
+ #rewardCardsGrid .reward-card { height:88px !important; min-height:88px !important; }
+ #marketView .recruit-capacity { display:none; }.retro-toast { max-height:48px; }.retro-toast .toast-message { max-height:38px; }
+}
+@media(max-width:500px) {
+ .game-header { flex-wrap:wrap; }.game-header .rogue-stats { width:auto; flex:1; }.game-header .header-controls { flex:1 1 100%; justify-content:flex-start; }
+ .battle-drawer-nav { position:absolute; right:4px; top:46px; }.game-header .utility-actions { display:none; }
+ #marketView .pokemon-tabs { flex-wrap:wrap; }#marketView .battle-actions { margin:0; margin-left:auto; }
+ #marketView #tabPokemonRecruit { flex:1 1 auto !important; }#marketView .pokemon-tabs > button { font-size:11px !important; }
+ .phase-buttons { flex-wrap:wrap !important; width:100%; min-width:0; justify-content:flex-start; }
+ body.hex-mode .board-top-controls { flex-wrap:wrap; }
+}
+.equipment-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid #536d5b}
+.equipment-row>img{width:24px;height:24px;image-rendering:pixelated}
+.equipment-row>span:first-child{grid-column:1 / 3}
+.equipment-row>span{min-width:0;overflow-wrap:normal;word-break:normal}
+.equipment-row>small{grid-column:1 / -1;line-height:1.4}
+.equipment-row>button{min-width:64px;white-space:nowrap}

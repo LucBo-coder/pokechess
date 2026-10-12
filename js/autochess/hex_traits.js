@@ -102,13 +102,14 @@ window.HexTraits = {
     renderSynergies(ui,container) {
         const diversity=this.elementDiversity(ui),row=document.createElement('div');
         row.className='hex-class-synergy';
-        row.textContent=`ELEMENT DIVERSITY ${diversity.count}/${diversity.count<6?6:8} · +${diversity.tier*5} squad HP, +${diversity.tier*4} Speed (Stage 3+)`;
+        row.textContent=t('synergy.diversity',{count:diversity.count,next:diversity.count<6?6:8,hp:diversity.tier*5,speed:diversity.tier*4});
         container.appendChild(row);
         for(const [role,{count,tier}] of Object.entries(this.classSynergies(ui))){
             const row=document.createElement('div');row.className='hex-class-synergy';
             const next=this.CLASS_TIERS.find(n=>n>count)??6;
-            const descriptions={tank:`+${tier*8} HP, ${tier*3}% reduction`,fighter:`+${tier*2} ATK`,assassin:`+${tier*10} Speed, ${tier*5}% crit`,mage:`+${tier*5} starting Mana`,marksman:`+${tier*8} Speed`};
-            row.textContent=`${role.toUpperCase()} ${count}/${next} · ${tier?'Tier '+tier+' · '+descriptions[role]:'Inactive'}`;container.appendChild(row);
+            const descriptions={tank:`+${tier*8} HP, ${tier*3}% ${t('synergy.reduction')}`,fighter:`+${tier*2} ${t('pokemon.attack')}`,assassin:`+${tier*10} ${t('pokemon.speed')}, ${tier*5}% ${t('synergy.crit')}`,mage:`+${tier*5} ${t('synergy.startMana')}`,marksman:`+${tier*8} ${t('pokemon.speed')}`};
+            row.textContent=`${t('role.'+role)} ${count}/${next} · ${tier?t('synergy.tier',{tier})+' · '+descriptions[role]:t('synergy.inactive')}`;container.appendChild(row);
         }
     }
 };
+for(const [id,trait] of Object.entries(HexTraits.CONFIG))Object.assign(trait,{id:`trait_${id}`,nameKey:`trait.${id}`,descriptionKey:`trait.${id}.description`,category:'passive'});

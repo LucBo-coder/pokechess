@@ -519,10 +519,10 @@ Object.assign(RoguelikeUI.prototype, {
     if (btnBattle) {
       if (isBattle) {
         btnBattle.disabled = true;
-        btnBattle.innerHTML = this.isAutoBattle ? 'AUTO' : 'BATTLING...';
+        btnBattle.textContent = t('combat.battle');
       } else {
         btnBattle.disabled = !canDeploy;
-        btnBattle.innerHTML = 'BATTLE';
+        btnBattle.textContent = t('combat.battle');
       }
     }
   },

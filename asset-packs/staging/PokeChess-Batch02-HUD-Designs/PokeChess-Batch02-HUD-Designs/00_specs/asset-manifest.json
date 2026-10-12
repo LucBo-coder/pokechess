@@ -1,0 +1,320 @@
+{
+  "batch": 2,
+  "distinct_designs": 7,
+  "png_files": 10,
+  "assets": [
+    {
+      "id": "hud-logo-frame",
+      "file": "02_hud/logo/hud-logo-frame.png",
+      "dimensions": [
+        2079,
+        756
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        19,
+        68,
+        2061,
+        643
+      ],
+      "proposed_display_size": [
+        380,
+        68
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-logo-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: wide horizontal frame, silhouette ratio 5.5:1. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-stage-frame",
+      "file": "02_hud/status/hud-stage-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        13,
+        23,
+        2159,
+        644
+      ],
+      "proposed_display_size": [
+        208,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-stage-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 4:1. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-compact-frame",
+      "file": "02_hud/shared/hud-compact-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        30,
+        69,
+        2141,
+        622
+      ],
+      "proposed_display_size": [
+        156,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-compact-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 3:1. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-journey-frame",
+      "file": "02_hud/actions/hud-journey-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        20,
+        80,
+        2154,
+        686
+      ],
+      "proposed_display_size": [
+        234,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-journey-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 4.5:1. Center uniformly flat solid #263D5B. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-language-frame",
+      "file": "02_hud/language/hud-language-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        22,
+        41,
+        2149,
+        661
+      ],
+      "proposed_display_size": [
+        156,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-language-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 3:1. Center uniformly flat solid #F5C65B. Outer dark outline #0B1426, thin blue-gray border #FFE9A3, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-value-inset",
+      "file": "02_hud/shared/hud-value-inset.png",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        23,
+        100,
+        1643,
+        797
+      ],
+      "proposed_display_size": [
+        56,
+        28
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-value-inset is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: small shallow horizontal rectangular inset, silhouette ratio 2:1. Center uniformly flat solid #0B1426. Outer dark outline #0B1426, thin blue-gray border #263D5B, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-dropdown-frame",
+      "file": "02_hud/language/hud-dropdown-frame.png",
+      "dimensions": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        0,
+        118,
+        1005,
+        1344
+      ],
+      "proposed_display_size": [
+        180,
+        240
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-dropdown-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: vertical rectangular dropdown panel, silhouette ratio 3:4. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition."
+    },
+    {
+      "id": "hud-currency-frame",
+      "file": "02_hud/status/hud-currency-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        30,
+        69,
+        2141,
+        622
+      ],
+      "proposed_display_size": [
+        156,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-compact-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 3:1. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition.",
+      "duplicate_of": "hud-compact-frame"
+    },
+    {
+      "id": "hud-team-frame",
+      "file": "02_hud/status/hud-team-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        30,
+        69,
+        2141,
+        622
+      ],
+      "proposed_display_size": [
+        156,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-compact-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 3:1. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition.",
+      "duplicate_of": "hud-compact-frame"
+    },
+    {
+      "id": "hud-menu-frame",
+      "file": "02_hud/actions/hud-menu-frame.png",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "alpha_bounds": [
+        30,
+        69,
+        2141,
+        622
+      ],
+      "proposed_display_size": [
+        156,
+        52
+      ],
+      "nine_slice": null,
+      "status": "design-draft-not-runtime-ready",
+      "states_exported": [
+        "normal"
+      ],
+      "source": "OpenAI image generation; supplied screenshot is style reference",
+      "license": "No third-party license verified or exclusive ownership claimed",
+      "prompt": "Create a SINGLE empty reusable pixel art HUD frame asset for the top bar of PokeChess. Asset ID hud-compact-frame is metadata only: NEVER print it. Screenshot supplied for ART STYLE ONLY, do not reproduce its text or icons. Shape: horizontal frame, silhouette ratio 3:1. Center uniformly flat solid #17263F. Outer dark outline #0B1426, thin blue-gray border #789CB9, one flat lighter highlight color. Draw as true low-resolution pixel art at a logical 2px outline then upscale with nearest neighbor: square pixel blocks, crisp horizontal/vertical lines, clipped 2-step corners, CONSISTENT THIN BORDER about 1/16 of short side, not thick decorative corners. Only four to six FLAT colors. Absolutely NO texture, grain, gradients, bloom, blur, realistic lighting, 3D, antialiasing or drop shadow. NO text, digits, letters, icons, logo, arrows, coin, bag, emblem or internal separator. Empty uninterrupted center for dynamic content. Frame is the only object and is fully visible with a small transparent margin. TRUE transparent alpha outside silhouette; center opaque. No checkerboard painted in image. Single separate asset, not an atlas or screenshot or composition.",
+      "duplicate_of": "hud-compact-frame"
+    }
+  ]
+}

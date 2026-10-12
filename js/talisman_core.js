@@ -175,7 +175,7 @@ const TalismanSystem = {
     }
 
     // 2. Dev server API: /api/list-talismans
-    if (fileList.length === 0 && typeof fetch !== 'undefined') {
+    if (fileList.length === 0 && window.POKECHESS_EDITOR_API && typeof fetch !== 'undefined') {
       try {
         const res = await fetch(`/api/list-talismans?_t=${Date.now()}`);
         if (res.ok) {
@@ -221,7 +221,7 @@ const TalismanSystem = {
     }
 
     // 2. Dev server API
-    if (!code && typeof fetch !== 'undefined') {
+    if (!code && window.POKECHESS_EDITOR_API && typeof fetch !== 'undefined') {
       try {
         const res = await fetch(`/api/read-talisman?filename=${encodeURIComponent(fileName)}&_t=${Date.now()}`);
         if (res.ok) {

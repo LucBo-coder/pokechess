@@ -1,0 +1,41 @@
+{
+  "assets": [
+    {
+      "id": "forest-background",
+      "file": "maps/forest/backgrounds/forest-background.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "source": "OpenAI imagegen",
+      "prompt": "Create ONE square top-down 2D pixel-art FOREST BATTLEFIELD BACKGROUND for PokeChess. Use supplied approved UI mockup only as art direction; output ONLY the forest ground/environment, no UI. Square composition. Classic GBA/DS 16-bit pixel tiles, bright friendly greens, coordinated small palette, dark pixel outlines, clean stepped pixels, no blur, smooth gradients, photorealism or cinematic light.\nCritical tactical layout: central 76% of width AND central 76% of height must be an uninterrupted flat grass clearing, clear and calm, very sparse tiny grass flecks. Absolutely NO hexagons, grid, tile outlines, circles, selection, paths, rocks, trees, units or props in this central playable area. It will receive a dynamically drawn hex board with arbitrary existing geometry.\nPERIMETER ONLY: dense varied leafy trees across top edge and upper left/right corners; a few rocks, tiny white flowers and shrubs along outer left and right edges. A narrow blue stream runs horizontally along the very bottom 10% of canvas, with short grass riverbank. Small wooden bridge at bottom center connects bottom edge into the clearing but stops within bottom border margin. Keep bridge, water and trees outside central clearing. A few stepped riverbank stones, readable water pixel ripples. No waterfall or buildings required. Crisp orthographic top-down consistent perspective, flat tactical ground, no isometric raised floating island.\nNO Pokemon, creatures, humans, text, signs, symbols, logos, UI frames, health bars or navigation. Full bleed opaque map background. This is a reusable base environment, not a screenshot. Grass texture should not imply collision or gameplay effects.",
+      "status": "visual-background-not-integrated",
+      "license": "No third-party licensing or exclusivity certification"
+    },
+    {
+      "id": "forest-grass-texture",
+      "file": "maps/forest/ground/forest-grass-texture.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "source": "OpenAI imagegen",
+      "prompt": "Create ONE square flat grass ground texture for a classic 16-bit GBA top-down tactical game, matching the central grass in the provided forest map. Uniform medium-bright grass green base with extremely sparse tiny dark green grass flecks and occasional 2-pixel pale green dots. Calm low contrast, limited flat palette, crisp pixel art, NO gradients, blur, realistic noise or lighting. Flat terrain only, no outlines, hexagons, grid, trees, stones, flowers, characters, UI, symbols or text. Opaque full bleed square, approximately uniform edge colors for repeat-friendly use; no border. This will be masked into EXISTING hex geometry by code, do not draw a hexagon. One texture image, not a sheet.",
+      "status": "visual-background-not-integrated",
+      "license": "No third-party licensing or exclusivity certification"
+    }
+  ],
+  "background_playable_rect_candidate_normalized": {
+    "left": 0.18,
+    "top": 0.19,
+    "right": 0.82,
+    "bottom": 0.81
+  },
+  "rect_status": "conservative visual proposal, not validated with actual grid",
+  "hex_geometry": "use existing project geometry; not supplied",
+  "texture_seamless_verified": false
+}

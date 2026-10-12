@@ -38,7 +38,7 @@ async function main() {
     browser = spawn(browserPath, [
         '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
         '--disable-background-networking', '--remote-debugging-port=0',
-        `--user-data-dir=${profile}`, '--window-size=1024,768', 'about:blank'
+        `--user-data-dir=${profile}`, '--window-size=1440,900', 'about:blank'
     ], { windowsHide: true, stdio: 'ignore' });
     let launchError;
     browser.on('error', error => { launchError = error; });
@@ -78,7 +78,7 @@ async function main() {
         const result = await command('Page.captureScreenshot', { format: 'png' });
         const folder = path.join(root, 'artifacts');
         fs.mkdirSync(folder, { recursive: true });
-        fs.writeFileSync(path.join(folder, name + '.png'), Buffer.from(result.data, 'base64'));
+        fs.writeFileSync(path.join(folder, (name.startsWith('visual-') ? name : 'visual-' + name) + '.png'), Buffer.from(result.data, 'base64'));
     };
     const evaluate = async expression => {
         const result = await command('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
@@ -301,12 +301,12 @@ async function main() {
         const info=panel.getBoundingClientRect(), board=document.querySelector('.board-wrapper').getBoundingClientRect();
         const arena=document.querySelector('.arena-center').getBoundingClientRect();
         const recruit=document.querySelector('.right-panel').getBoundingClientRect();
-        return {below:info.top>=board.bottom, contained:info.left>=arena.left && info.right<=arena.right,
-            recruitClear:info.right<=recruit.left, scrollable:view.scrollHeight>view.clientHeight,
+        return {beside:recruit.left>=board.right, contained:info.left>=0 && info.right<=innerWidth,
+            boardClear:info.top<board.bottom, scrollable:view.scrollHeight<=view.clientHeight,
             position:getComputedStyle(panel).position};
     })()`);
-    assert.ok(layout.below && layout.contained && layout.recruitClear && layout.scrollable);
-    assert.equal(layout.position, 'relative');
+    assert.ok(layout.beside && layout.contained && layout.boardClear && layout.scrollable, JSON.stringify(layout));
+    assert.equal(layout.position, 'absolute');
     await evaluate('document.querySelector(".board-view").scrollTop=0;');
     await screenshot('hex-setup');
 
@@ -378,25 +378,328 @@ async function main() {
     })()`);
     assert.ok(cleanup.oneTooltip && cleanup.clean && cleanup.hasBoss && cleanup.validRetry);
 
-    for (const viewport of [{ width: 768, height: 432 }, { width: 844, height: 390 }]) {
+    const actions = await evaluate(`(async () => {
+        const ui=roguelikeUI;ui.resetRun();ui.closeMainMenu();ui.gold=100;ui.updateStats();ui.renderShop();
+        const inventoryNode=document.getElementById('inventorySlots'),initial=ui.inventory.length;
+        const price=ui.getPiecePrice(ui.cardChoices[0]);
+        document.querySelector('#rewardCardsGrid .btn-pick-card').click();
+        const recruited=ui.inventory.length===initial+1 && ui.gold===100-price;
+        document.getElementById('btnRecallAll').click();
+        await new Promise(resolve=>setTimeout(resolve,700));
+        const recalled=ui.placedPieces.length===0;
+        const item=ui.inventory[0];document.querySelector('[data-inv-id="'+item.id+'"]').click();
+        ui.getSquareEl(55).click();await new Promise(resolve=>setTimeout(resolve,700));
+        const deployed=ui.placedPieces.some(p=>p.invId===item.id && p.sq===55);
+        const transfer=new DataTransfer();transfer.setData('text/plain','55');
+        ui.getSquareEl(54).dispatchEvent(new DragEvent('drop',{bubbles:true,dataTransfer:transfer}));
+        await new Promise(resolve=>setTimeout(resolve,700));
+        const dragged=ui.placedPieces.some(p=>p.invId===item.id && p.sq===54);
+        document.getElementById('btnAutoFormation').click();
+        await new Promise(resolve=>setTimeout(resolve,700));
+        const arranged=ui.placedPieces.every(p=>p.sq>=28 && p.sq<56);
+        ui.talismanChoices=[{talismanId:'muscle_band'}];ui.setTalismanTab('shop');
+        document.querySelector('.btn-buy-talisman').click();
+        const bought=ui.talismanInventory.some(t=>t.talismanId==='muscle_band');
+        ui.setTalismanTab('bag');document.querySelector('.btn-use-talisman').click();
+        document.querySelector('[data-inv-id="'+item.id+'"]').click();
+        const equipped=item.talismans.includes('muscle_band');
+        ui.buyTalisman('muscle_band',6);ui.setTalismanTab('bag');
+        const beforeItemSell=ui.talismanInventory.length;document.getElementById('btnSellTalisman').click();
+        const itemSold=ui.talismanInventory.length===beforeItemSell-1;
+        const chosen=ui.placedPieces.find(p=>p.invId===item.id);ui.selectedBoardSq=chosen.sq;
+        ui.updateSellButton();const beforeSell=ui.inventory.length;document.getElementById('btnSell').click();
+        const sold=ui.inventory.length===beforeSell-1;
+        // Old unversioned data must still load, then current-format data must round-trip.
+        ui.applySaveData({stage:2,inventory:ui.inventory,placedPieces:ui.placedPieces,setupFormation:ui.setupFormation});
+        ui.currentSaveSlot=1;SaveSystem.saveToSlot(1,ui);const saved=SaveSystem.getSlot(1);ui.applySaveData(saved);
+        return {recruited,recalled,deployed,dragged,arranged,bought,equipped,sold,itemSold,saved:ui.stage===2,
+            sameNode:inventoryNode===document.getElementById('inventorySlots')};
+    })()`);
+    assert.ok(Object.values(actions).every(Boolean), JSON.stringify(actions));
+
+    const health = await evaluate(`(() => {
+        const ui=roguelikeUI;ui.startBattle();ui.hexCombat.stop();
+        const unit=[...ui.hexCombat.units.values()][0], fill=ui.hexRenderer.sprites.get(unit.id).hpFill;
+        const result=[];for(const ratio of [0,.05,.5,1]) {
+            unit.hp=unit.maxHp*ratio;ui.hexRenderer.updateHP();result.push(fill.style.clipPath);
+        }
+        unit.hp=NaN;ui.hexRenderer.updateHP();result.push(fill.style.clipPath);
+        unit.maxHp=0;ui.hexRenderer.updateHP();result.push(fill.style.clipPath);
+        ui.hexRenderer.selectUnit(unit.id);const before=ui.hexRenderer.selectedUnitId;
+        document.querySelector('.hex-inspector-close').click();ui.hexRenderer.updateHP();
+        return {clips:result,width:fill.style.width,selectionPreserved:before===ui.hexRenderer.selectedUnitId,
+            closed:!HexPreparationInfo.panel.classList.contains('visible')};
+    })()`);
+    assert.deepEqual(health.clips,['inset(0px 100% 0px 0px)','inset(0px 95% 0px 0px)','inset(0px 50% 0px 0px)','inset(0px 0% 0px 0px)','inset(0px 100% 0px 0px)','inset(0px 100% 0px 0px)']);
+    assert.equal(health.width,'');
+    assert.ok(health.selectionPreserved && health.closed);
+    await evaluate('roguelikeUI.resetRun();roguelikeUI.closeMainMenu();');
+    const settingsCheck=await evaluate(`(() => {
+        const ui=roguelikeUI,before=JSON.stringify(ui.inventory);ui.stage=5;
+        const settings=document.getElementById('settingsModal');document.getElementById('btnSettings').click();
+        document.getElementById('languageSelect').value='en-US';document.getElementById('languageSelect').dispatchEvent(new Event('change'));
+        const translated=document.getElementById('btnStartBattle').textContent===t('combat.battle');
+        document.getElementById('btnNewRun').click();
+        const unchanged=ui.stage===5 && JSON.stringify(ui.inventory)===before;
+        const confirmed=!document.getElementById('confirmModal').classList.contains('hidden');
+        document.getElementById('btnCancelConfirm').click();settings.classList.add('hidden');I18n.setLanguage('vi-VN');
+        return {translated,unchanged,confirmed};
+    })()`);
+    assert.ok(Object.values(settingsCheck).every(Boolean));
+    const structure=await evaluate(`(() => {
+        const ui=roguelikeUI,market=document.getElementById('marketView'),bar=market.querySelector('.pokemon-tabs');
+        const roll=document.getElementById('btnReroll'),before=JSON.stringify(ui.cardChoices),gold=ui.gold;
+        market.querySelector('.recruit-lock').click();roll.click();
+        const guarded=JSON.stringify(ui.cardChoices)===before&&ui.gold===gold;market.querySelector('.recruit-lock').click();
+        const gear=document.getElementById('btnSettings');gear.click();
+        const modal=!document.getElementById('settingsModal').classList.contains('hidden')&&document.querySelectorAll('.settings-section').length===5;
+        document.querySelector('.settings-heading button').click();NotificationCenter.dismiss();
+        return {guarded,modal,battleInShop:bar.contains(document.getElementById('btnStartBattle')),
+          singleArrange:document.querySelectorAll('#btnAutoFormation').length===1,
+          singleEffects:document.querySelectorAll('#hex-fx-toggle').length===1&&document.getElementById('phaseButtons').contains(document.getElementById('hex-fx-toggle')),
+          oneBenchAction:[...document.querySelectorAll('.bench-card-actions')].every(row=>row.children.length===1),
+          astralOutsideBag:!document.getElementById('talismanView').querySelector('.utility-actions')};
+    })()`);
+    assert.ok(Object.values(structure).every(Boolean),JSON.stringify(structure));
+    if(process.argv.includes('--screenshots')) {
+        await evaluate("document.getElementById('btnSettings').click();");await sleep(100);
+        await screenshot('settings-modal');
+        await evaluate("document.querySelector('.settings-heading button').click();");
+    }
+    if(process.argv.includes('--screenshots')) {
+        await evaluate("roguelikeUI.stage=1;roguelikeUI.setupNewStage();roguelikeUI.gold=100;roguelikeUI.updateStats();roguelikeUI.renderShop();roguelikeUI.setTalismanTab('shop');HexPreparationInfo.hide();");
+        await sleep(1000);
+        await screenshot('visual-desktop-recruit-shop');
+    }
+
+    const overhaul = await evaluate(`(async () => {
+        const ui=roguelikeUI;ui.resetRun();ui.closeMainMenu();NotificationCenter.dismiss();
+        const map=document.querySelector('.board-wrapper').getBoundingClientRect(),bench=document.querySelector('.bench-dock').getBoundingClientRect(),recruit=document.getElementById('marketView').getBoundingClientRect();
+        const layout=bench.left>=map.right&&recruit.top>=map.bottom&&getComputedStyle(document.getElementById('inventorySlots')).flexDirection==='column';
+        const item=ui.inventory[0],instance=item.instanceId;
+        document.querySelector('[data-inv-id="'+item.id+'"]').click();
+        const info=HexPreparationInfo.panel;info.querySelector('[data-info-tab=skills]').click();
+        const tabs=info.querySelectorAll('[data-info-tab]').length===4&&info.querySelector('[data-info-section=skills]').hidden===false;
+        info.querySelector('[data-info-tab=equipment]').click();const equipmentVisible=!info.querySelector('[data-info-section=equipment]').hidden;
+        info.querySelector('.hex-inspector-close').click();
+        ui.gold=0;const before=ui.inventory.length;ui.pickRewardPiece(ui.cardChoices[0],ui.getPiecePrice(ui.cardChoices[0]));
+        const noGold=ui.inventory.length===before&&document.getElementById('toastMessage').textContent.includes('vàng');
+        ui.gold=100;ui.maxSlots=ui.placedPieces.length;const fullBefore=ui.inventory.length;
+        ui.pickRewardPiece(ui.cardChoices[0],ui.getPiecePrice(ui.cardChoices[0]));const fullRecruit=ui.inventory.length===fullBefore+1;
+        const fullItem=ui.inventory.at(-1);ui.deployBenchPiece(fullItem);const fullDeploy=ui.placedPieces.length===ui.maxSlots;
+        // Full equipment does not consume a charge or trigger deployment/recall.
+        item.talismans=['leftovers','choice_band','focus_sash'];ui.talismanInventory=[{id:500,talismanId:'muscle_band',usesLeft:1,maxUses:1}];
+        ui.startApplyTalisman(ui.talismanInventory[0]);const positions=JSON.stringify(ui.placedPieces);
+        ui.applyTalismanToPiece(item);const fullTalisman=item.talismans.length===3&&ui.talismanInventory[0].usesLeft===1&&JSON.stringify(ui.placedPieces)===positions;
+        const hint=!document.getElementById('talismanApplyBanner').classList.contains('hidden')&&document.getElementById('talismanApplyBanner').closest('.board-view')!==null;
+        document.getElementById('btnCancelApplyTalisman').click();const cancelled=!ui.activeApplyingTalisman;
+        NotificationCenter.recent.clear();const count=NotificationCenter.entries.length;
+        for(let n=0;n<20;n++)ui.showToast('Không đủ vàng để thực hiện thao tác.','warning');
+        const dedupe=NotificationCenter.entries.length===count+1;
+        const toast=document.getElementById('gameToast').getBoundingClientRect(),battle=document.getElementById('btnStartBattle').getBoundingClientRect();
+        const toastClear=toast.left>=0&&toast.right<=innerWidth&&toast.bottom<=document.querySelector('.board-view').getBoundingClientRect().top&&toast.bottom<=battle.top;
+        document.querySelector('.toast-close').click();const dismissed=document.getElementById('gameToast').classList.contains('hidden');
+        for(let n=0;n<300;n++)NotificationCenter.record('Kiểm tra giới hạn '+n,'system',false);
+        NotificationCenter.open();
+        const bounded=NotificationCenter.entries.length===200&&document.querySelectorAll('#moveList .move-entry').length===200;
+        NotificationCenter.close();
+        const files=[...CombatVfx.images.values()];await Promise.all(files.map(image=>image.decode()));
+        const sheets=CombatVfx.assets.size===92&&[...CombatVfx.assets].every(([id,a])=>{const image=CombatVfx.images.get(id);return image.naturalWidth===a.frameSize[0]*a.frameCount&&image.naturalHeight===a.frameSize[1];});
+        ui.startBattle();ui.hexCombat.stop();const player=[...ui.hexCombat.units.values()].find(unit=>unit.color==='w');
+        const target=[...ui.hexCombat.units.values()].find(unit=>unit.color==='b');
+        const vfx=ui.hexRenderer.sheetVfx;vfx.play('cast_fire_01',player.id,{duration:1});
+        const effect=[...vfx.effects][0],first=effect.el.style.backgroundPosition;
+        ui.hexCombat.tickCount+=3;vfx.update();const playback=effect.el.style.backgroundPosition!==first;
+        const paused=effect.el.style.backgroundPosition;vfx.update();const pausedVfx=effect.el.style.backgroundPosition===paused;
+        document.body.classList.add('reduced-motion');const reduced=!vfx.play('cast_water_01',player.id);document.body.classList.remove('reduced-motion');
+        const manager=soundManager;manager.sfxVoices=[];manager.sfxLast=new Map();manager.isMuted=true;manager.playSfx('magic');const mute=manager.sfxVoices.length===0;
+        manager.isMuted=false;manager.volume=0;manager.playSfx('magic');const zeroVolume=manager.sfxVoices.length===0;
+        manager.volume=.2;for(const id of ['magic','slash','arrow','reflect','hit','kill','coin','promote','revive','socket'])manager.playSfx(id);
+        const audioBounded=manager.sfxVoices.length<=8;const voices=manager.sfxVoices.length;manager.playSfx('magic');const audioDedupe=manager.sfxVoices.length===voices;
+        ui.hexRenderer.destroy();const cleaned=vfx.effects.size===0&&document.querySelectorAll('.hex-sheet-vfx').length===0;
+        ui.resetRun();ui.closeMainMenu();
+        const profiles=[];
+        MetaProgression.data.allocatedNodes=[...new Set([...MetaProgression.getAllocatedNodes(),'steel_origin','steel_node_1'])];MetaProgression.save();
+        const astralBefore=JSON.stringify(MetaProgression.data);
+        for(let slot=1;slot<=3;slot++){
+            MasterySystem.ensure(ui);
+            ui.currentSaveSlot=slot;ui.stage=49+slot;ui.gold=100+slot;
+            ui.inventory[0].talismans=['muscle_band'];ui.inventory[0].individualMastery.xp=450;
+            ui.runState.upgrades.hp=2;ui.setupNewStage();MasterySystem.ensure(ui);
+            const identity=ui.inventory[0].instanceId;SaveSystem.saveToSlot(slot,ui);
+            const saved=SaveSystem.getSlot(slot);ui.applySaveData(saved);
+            const one=JSON.stringify({inventory:ui.inventory,placed:ui.placedPieces,run:ui.runState});ui.applySaveData(saved);
+            profiles.push(ui.stage===49+slot&&ui.gold===100+slot&&ui.inventory[0].instanceId===identity&&ui.inventory[0].individualMastery.xp===450&&ui.inventory[0].talismans.includes('muscle_band')&&one===JSON.stringify({inventory:ui.inventory,placed:ui.placedPieces,run:ui.runState})&&JSON.stringify(MetaProgression.data)===astralBefore);
+        }
+        const savedBefore=localStorage.getItem(SaveSystem.PREFIX+'1');SaveSystem.backup();localStorage.setItem(SaveSystem.PREFIX+'1','{}');
+        const rollback=SaveSystem.restoreBackup()&&localStorage.getItem(SaveSystem.PREFIX+'1')===savedBefore;
+        const again=SaveSystem.restoreBackup()&&localStorage.getItem(SaveSystem.PREFIX+'1')===savedBefore;
+        const imported=await new Promise(resolve=>SaveSystem.importFromFile(new File([JSON.stringify({slots:[{slot:1,data:SaveSystem.getSlot(2)}]})],'save.json'),ok=>resolve(ok)));
+        const importBackup=imported&&JSON.parse(localStorage.getItem(SaveSystem.BACKUP_KEY)).values[SaveSystem.PREFIX+'1']===savedBefore;
+        SaveSystem.restoreBackup();
+        ui.resetRun();ui.closeMainMenu();NotificationCenter.dismiss();
+        return {layout,tabs,equipmentVisible,noGold,fullRecruit,fullDeploy,fullTalisman,hint,cancelled,dedupe,toastClear,dismissed,bounded,sheets,playback,pausedVfx,reduced,mute,zeroVolume,audioBounded,audioDedupe,cleaned,profiles:profiles.every(Boolean),rollback,again,importBackup};
+    })()`);
+    assert.ok(Object.values(overhaul).every(Boolean),JSON.stringify(overhaul));
+    console.log('Overhaul checks passed:',Object.keys(overhaul).join(', '));
+    const oldOrigin=await evaluate('performance.timeOrigin');
+    await command('Page.reload');
+    for(let n=0;n<150;n++){if(await evaluate('performance.timeOrigin!=='+oldOrigin+' && !!window.roguelikeUI && !!window.HexPreparationInfo?.initialized'))break;await sleep(100);}
+    const reloadedProfiles=await evaluate(`(() => {
+        const ui=roguelikeUI;
+        const result=[1,2,3].map(slot=>{const data=SaveSystem.getSlot(slot);ui.loadGameSlot(slot);
+            return ui.stage===49+slot&&ui.inventory[0].instanceId===data.inventory[0].instanceId&&ui.inventory[0].individualMastery.xp===450&&ui.inventory[0].talismans.includes('muscle_band')&&MetaProgression.hasNode('steel_node_1');
+        });ui.resetRun();ui.closeMainMenu();NotificationCenter.dismiss();return result;
+    })()`);
+    assert.ok(reloadedProfiles.every(Boolean),'All three high-stage profiles must survive a real page reload');
+    await evaluate("roguelikeUI.renderInventory();document.querySelector('.bench-card').focus();");
+    await command('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    await command('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    assert.ok(await evaluate("HexPreparationInfo.panel.classList.contains('visible')"),'Keyboard activation opens Pokémon Info: '+await evaluate("JSON.stringify({focus:document.activeElement.outerHTML.slice(0,300),phase:roguelikeUI.phase,drawer:document.getElementById('app').dataset.drawer})"));
+    await evaluate("HexPreparationInfo.hide();roguelikeUI.showConfirm('Kiểm tra focus',()=>{});");
+    await sleep(50);
+    await evaluate("document.getElementById('btnAcceptConfirm').focus()");
+    await command('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+    await command('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+    assert.equal(await evaluate('document.activeElement.id'),'btnCancelConfirm','Confirmation keeps keyboard focus inside');
+    await evaluate("document.getElementById('btnCancelConfirm').click();HexPreparationInfo.hide();");
+    await evaluate(`(() => {const ui=roguelikeUI;ui.startBattle();ui.hexCombat.stop();const unit=[...ui.hexCombat.units.values()].find(unit=>unit.color==='w');ui.hexRenderer.sheetVfx.play('cast_fire_01',unit.id,{duration:2});ui.hexCombat.tickCount+=6;ui.hexRenderer.sheetVfx.update();})()`);
+    await screenshot('overhaul-skill-playback');
+    await evaluate('roguelikeUI.resetRun();roguelikeUI.closeMainMenu();NotificationCenter.dismiss();');
+
+    for (const viewport of [{width:768,height:1024}, { width: 768, height: 432 }, {width:812,height:375}, { width: 844, height: 390 }, {width:390,height:844}]) {
         await command('Emulation.setDeviceMetricsOverride', { ...viewport, deviceScaleFactor: 1, mobile: false });
         await sleep(100);
         const clear = await evaluate(`(() => {
             const ui=roguelikeUI,square=ui.placedPieces[0].sq;
-            HexPreparationInfo.showInfo(ui.game.board[square],square);
+            HexPreparationInfo.showInfo(ui.game.board[square],square); HexPreparationInfo.reveal();
             const panel=HexPreparationInfo.panel.getBoundingClientRect(),recruit=document.querySelector('.right-panel').getBoundingClientRect();
-            return panel.right<=recruit.left;
+            const view=document.querySelector('.board-view');
+            return {contained:panel.left>=0 && panel.right<=innerWidth,
+                scrollHeight:view.scrollHeight,clientHeight:view.clientHeight,panel:panel.toJSON(),recruit:recruit.toJSON()};
         })()`);
-        assert.ok(clear, `Inspector overlaps Recruit at ${viewport.width}×${viewport.height}`);
+        await screenshot(`visual-${viewport.width}`);
+        assert.ok(clear.contained && clear.scrollHeight<=clear.clientHeight+1, JSON.stringify(clear));
+        await evaluate("document.getElementById('app').dataset.drawer='';HexPreparationInfo.hide();");
+        const hud=await evaluate(`(() => {
+            const buttons=[...document.querySelectorAll('.game-header button')].filter(b=>b.getClientRects().length);
+            const contained=buttons.every(b=>{const r=b.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0;});
+            const ui=roguelikeUI;ui.showToast('Thông báo dài '.repeat(50),'info');
+            const toast=document.getElementById('gameToast').getBoundingClientRect(),map=document.querySelector('.board-wrapper').getBoundingClientRect();
+            const safe=toast.left>=0&&toast.right<=innerWidth&&toast.bottom<=map.top&&map.height>60;
+            NotificationCenter.dismiss();return {contained,safe};
+        })()`);
+        assert.ok(hud.contained&&hud.safe,JSON.stringify(hud));
+        const hit=await evaluate(`(() => {
+            const cell=roguelikeUI.getSquareEl(48),rect=cell.getBoundingClientRect();
+            const point=document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2);
+            const battle=document.getElementById('btnStartBattle').getBoundingClientRect();
+            const slot=document.querySelector('#inventorySlots .inv-slot'),source=slot.getBoundingClientRect();
+            const delta=roguelikeUI.getAppRelativeDelta(slot,cell),scale=rect.width/36;
+            return {square:point?.closest('.square')?.dataset.sq,battle: battle.bottom<=innerHeight && battle.top>=0,
+                x:rect.width/36,y:rect.height/42,rect:rect.toJSON(),target:point?.className,
+                animation:Math.abs(delta.dx*scale-(rect.left+rect.width/2-source.left-source.width/2))<.01};
+        })()`);
+        await screenshot(`visual-board-${viewport.width}`);
+        assert.equal(hit.square,'48',JSON.stringify(hit));assert.ok(hit.battle);assert.ok(Math.abs(hit.x-hit.y)<.001);
+        assert.ok(hit.animation,'Bench animation must use the board inverse scale');
+        if(viewport.width===812) {
+            await evaluate("document.querySelector('.recruit-collapse').click();");await sleep(100);
+            const expanded=await evaluate(`(() => {
+                const map=document.querySelector('.board-wrapper').getBoundingClientRect(),button=document.getElementById('btnStartBattle').getBoundingClientRect();
+                return map.height>80&&button.bottom<=innerHeight&&document.querySelector('.board-view').scrollHeight<=document.querySelector('.board-view').clientHeight+1;
+            })()`);
+            assert.ok(expanded,'Expanded iPhone shop leaves a usable map and battle action');
+            await screenshot('iphone-recruit-expanded');
+            await evaluate("document.querySelector('.recruit-collapse').click();");
+        }
+        if(viewport.width===844) {
+            await command('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+            const touch=await evaluate(`(() => {const r=roguelikeUI.getSquareEl(roguelikeUI.placedPieces[0].sq).getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()`);
+            await command('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[touch]});
+            await command('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+            await sleep(150);
+            assert.ok(await evaluate("HexPreparationInfo.panel.classList.contains('visible')"),'Tap must open unit details');
+            await command('Emulation.setTouchEmulationEnabled',{enabled:false});
+        }
     }
+    await command('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    const clarity=[];
+    for(const size of [3,6,12]){
+        const result=await evaluate(`(()=>{
+            roguelikeUI.resetRun();roguelikeUI.closeMainMenu();HexPreparationInfo.hide();
+            document.body.classList.add('hex-combat-active');
+            const c=new HexCombat(new HexBoard(),{random:()=>.8}),r=new HexRenderer(c);window.clarityCombat=c;window.clarityRenderer=r;
+            for(let n=0;n<${size};n++)for(const color of ['w','b']){
+                const square=color==='w'?28+n:n,id=color+n;
+                c.addUnit(square,{id,color,type:color==='w'?'6':'3',pokemonId:color==='w'?'6':'3',element:color==='w'?'fire':'grass',maxHp:5000,attackDamage:20,attackRange:3,role:'mage',isBoss:n===0&&color==='b'});
+                r.createSprite(c.units.get(id));
+            }
+            const start=performance.now();for(let n=0;n<180;n++)c.step();const elapsed=performance.now()-start;
+            for(const u of [...c.units.values()]){
+                const target=[...c.units.values()].find(v=>v.color!==u.color);
+                for(let n=0;n<8;n++){c.dealDamage(u,target,1,'skill',{damageType:'true'});c.healUnit(u,1);c.emit({type:'status',unitId:u.id,status:'burn',duration:3});}
+                u.statuses.burn={expiresAt:c.tickCount+90};u.statuses.poison={expiresAt:c.tickCount+90};u.statuses.hexed={expiresAt:c.tickCount+60};
+                c.emit({type:'skill-cast',unitId:u.id,targetId:target.id,role:'mage',delayTicks:6});
+            }
+            r.updateHP();const max=r.textManager.labels.size;
+            const bounded=max<=24&&[...r.sprites.values()].every(s=>s.element.querySelectorAll('.hex-floating-text').length<=2);
+            const dead=[...c.units.values()][0],deadEl=r.sprites.get(dead.id).element;c.killUnit(dead);c.killUnit(dead);r.createSprite(dead);
+            const noGhost=!r.sprites.has(dead.id)&&deadEl.querySelectorAll('.hex-combat-hp,.hex-combat-mana,.hex-combat-shield,.hex-floating-text').length===0;
+            const owned=[...r.sprites].every(([id,s])=>c.units.has(id)&&s.element.dataset.unitId===id&&s.element.querySelector('.hex-combat-hp'));
+            CombatPresentation.flushLog();return {size:${size},bounded,noGhost,owned,max,elapsed,log:NotificationCenter.entries.length<=200};
+        })()`);
+        assert.ok(result.bounded&&result.noGhost&&result.owned&&result.log,JSON.stringify(result));clarity.push(result);
+        await screenshot('v43-combat-'+size);
+        if(size===12&&process.argv.includes('--screenshots')){
+            const baseline=await evaluate(`(()=>{const r=clarityRenderer,manager=r.textManager;r.textManager=null;
+                for(const row of [...manager.labels.values()])manager.remove(row);
+                for(const s of r.sprites.values())for(let n=0;n<4;n++)for(const [value,kind]of [['10','hex-float-damage'],['+8','hex-float-heal'],['Burn','hex-float-status'],['Critical','hex-float-effective'],['Skill','hex-float-skill-name']])r.spawnFloatingText(s.element,value,kind);
+                const labels=[...document.querySelectorAll('.hex-floating-text')];for(const el of labels)el.style.animation='none';r.textManager=manager;
+                return {units:r.sprites.size,labels:labels.length,reconstruction:true};})()`);
+            await screenshot('v43-before-text-reconstruction');
+            await evaluate("document.querySelectorAll('.hex-floating-text').forEach(el=>el.remove());");
+            fs.writeFileSync(path.join(root,'artifacts','v43-before-text-evidence.json'),JSON.stringify(baseline,null,2));
+        }
+        await sleep(750);
+        assert.equal(await evaluate('clarityRenderer.textManager.labels.size'),0,'Combat text expires while simulation is paused');
+        assert.equal(await evaluate(`(()=>{clarityRenderer.destroy();document.body.classList.remove('hex-combat-active');return document.querySelectorAll('.hex-combat-unit,.hex-floating-text,.hex-sheet-vfx').length;})()`),0,'Battle reset removes every owned visual');
+    }
+    console.log('Combat clarity evidence:',JSON.stringify(clarity));
+    fs.writeFileSync(path.join(root,'artifacts','v43-combat-evidence.json'),JSON.stringify(clarity,null,2));
+    await command('Emulation.setDeviceMetricsOverride',{width:812,height:375,deviceScaleFactor:1,mobile:false});
+    const displayCheck=await evaluate(`(()=>{
+        const saved={...CombatPresentation.settings},journey=localStorage.getItem(SaveSystem.PREFIX+'1');
+        const c=new HexCombat(new HexBoard()),r=new HexRenderer(c);c.addUnit(35,{id:'display',color:'w',type:'6',pokemonId:'6',maxHp:100});r.createSprite(c.units.get('display'));
+        const el=r.sprites.get('display').element;CombatPresentation.settings={mode:'minimal',...CombatPresentation.presets.minimal};CombatPresentation.save();
+        r.spawnFloatingText(el,'10','hex-float-damage');const minimal=r.textManager.labels.size===0;
+        CombatPresentation.settings={mode:'detailed',...CombatPresentation.presets.detailed,bars:false};CombatPresentation.save();
+        const hidden=el.querySelector('.hex-combat-hp').hidden;r.spawnFloatingText(el,'10','hex-float-damage');const detailed=r.textManager.labels.size===1;
+        const independent=journey===localStorage.getItem(SaveSystem.PREFIX+'1');r.destroy();CombatPresentation.settings=saved;CombatPresentation.save();
+        return {minimal,hidden,detailed,independent,clean:CombatPresentation.listeners.size===0};
+    })()`);
+    assert.ok(Object.values(displayCheck).every(Boolean),JSON.stringify(displayCheck));
+    await command('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    await command('Page.navigate',{url:url+'docs/visual/vfx-gallery.html'});
+    for(let n=0;n<50;n++){if(await evaluate('document.querySelectorAll(".card canvas").length===92'))break;await sleep(100);}
+    assert.equal(await evaluate('document.querySelectorAll(".card canvas").length'),92);
+    const galleryLoaded=await evaluate('Promise.all(state.map(s=>s.image.decode())).then(()=>state.every(s=>s.image.naturalWidth>0))');
+    assert.ok(galleryLoaded,'All 92 gallery sheets must load');
+    const galleryPixels=await evaluate(`(() => state.every(s=>{
+        const [w,h]=s.asset.frameSize,canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d');ctx.drawImage(s.image,(s.asset.frameCount-1)*w,0,w,h,0,0,w,h);
+        const data=ctx.getImageData(0,0,w,h).data;
+        if(!s.asset.loop && data.some((value,index)=>index%4===3&&value!==0))return false;
+        for(let x=0;x<w;x++)if(data[x*4+3]||data[((h-1)*w+x)*4+3])return false;
+        for(let y=0;y<h;y++)if(data[y*w*4+3]||data[(y*w+w-1)*4+3])return false;
+        return true;
+    }))()`);
+    assert.ok(galleryPixels,'Exported one-shots finish transparent and have a clear boundary');
+    await screenshot('overhaul-vfx-gallery');
     assert.deepEqual(runtimeErrors, [], 'Browser runtime errors');
-    // Existing optional dev endpoints/overrides and BGM are absent in the
-    // supplied static project; bundled Pokémon definitions still load.
-    const knownMissing = new Set(['/api/list-talismans', '/api/list-pieces', '/api/read-talisman', '/api/read-piece', '/assets/audio/tavern.mp3', '/js/pieces/nidoran_m.js']);
     const missing = [...new Set(missingLocalAssets)];
-    assert.deepEqual(missing.filter(file => !knownMissing.has(file)), [], 'New missing local assets');
-    if (missing.length) console.log('Existing unavailable resources:', missing.join(', '));
-    console.log('Browser checks passed: stage 1/5/10 stats and HUD, inspector layout, selection during movement, live stats, pinned selection, boss phases, pause/resume, restart/load/retry, scaled landscape viewports.');
+    assert.deepEqual(missing, [], 'Missing local runtime assets');
+    console.log('Browser checks passed: stats/combat, buy/sell/recruit/equip, Bench identity, recall/drag/formation, legacy/current saves, HP clipping, settings/confirmation/language, selection, desktop and compact layout, uniform hex scale, resize hit-test and touch details.');
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {

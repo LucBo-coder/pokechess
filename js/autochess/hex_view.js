@@ -42,6 +42,13 @@ const HexView = {
                 cell.dataset.sq = String(sq);
                 cell.dataset.row = String(row);
                 cell.dataset.col = String(col);
+                cell.tabIndex = 0;
+                cell.setAttribute('role', 'button');
+                cell.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault(); cell.click();
+                    }
+                });
 
                 cell.style.left =
                     (col * width + (row % 2) * offsetX) + 'px';
