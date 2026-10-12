@@ -214,7 +214,7 @@ const SaveSystem = {
   BACKUP_KEY:'pokechess_storage_backup_v1',
   storageKeys() {
     return Array.from({length:localStorage.length},(_,i)=>localStorage.key(i)).filter(key=>
-      key && key !== this.BACKUP_KEY && /^(chess_plus_save_slot_|pokechess_mastery_|chessplus_meta_|chess_music_|pokechess_language$|pokechess_reduced_|chess_tutorial_seen$)/.test(key));
+      key && key !== this.BACKUP_KEY && /^(chess_plus_save_slot_|pokechess_mastery_|chessplus_meta_|chess_music_|pokechess_language$|pokechess_reduced_|pokechess_combat_display_|chess_tutorial_seen$)/.test(key));
   },
   backup() {
     const snapshot={version:1,time:Date.now(),values:Object.fromEntries(this.storageKeys().map(key=>[key,localStorage.getItem(key)]))};

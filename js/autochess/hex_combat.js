@@ -267,9 +267,10 @@ class HexCombat extends HexSimulation {
             return false;
         }
 
-        const role = unit.isBoss ? (unit.bossPhase>=2 && unit.bossSkills?.includes('areaBlast')?'mage':'fighter') : unit.combatRole ?? 'fighter';
+        if(window.SpeciesCombat?.castStatus(this,unit,target))return true;
+        const role = unit.isBoss ? (unit.bossPhase>=2 && unit.bossSkills?.includes('areaBlast')?'mage':'fighter') : window.SpeciesCombat?.castRole(unit,unit.combatRole??'fighter') ?? unit.combatRole ?? 'fighter';
 
-        const skill = window.HexSkillInfo?.[role];
+        const skill = window.SpeciesCombat?.skill(unit,role) ?? window.HexSkillInfo?.[role];
         const damageOptions = this.getDamageOptions(unit, 'skill');
         const attackElement = typeof TypeSystem !== 'undefined'
             ? TypeSystem.getHexAttack(unit, target, damageOptions).element
@@ -393,6 +394,7 @@ class HexCombat extends HexSimulation {
         unit.skillCasts =
             (unit.skillCasts ?? 0) + 1;
         if(unit.isBoss)skillName=role==='mage'?'Boss Area Blast':'Boss Strike';
+        else if(skill?.canonicalMove)skillName=skill.canonicalMove.name;
         window.HexTraits?.summon(this,unit);
 
         this.emit({
@@ -402,6 +404,8 @@ class HexCombat extends HexSimulation {
             targetId: target.id,
 
             skillName,
+            moveId:skill?.canonicalMove?.id??null,
+            damageCategory:skill?.damageCategory??null,
             role,
             element: attackElement,
             delayTicks: this.deferDamage ? this.getHitDelay(unit, 'skill') : 0,
@@ -417,6 +421,8 @@ class HexCombat extends HexSimulation {
     // DAMAGE SYSTEM
     // =========================================
     getDamageOptions(unit, source) {
+        const speciesOptions=window.SpeciesCombat?.options(unit,source);
+        if(speciesOptions)return speciesOptions;
         const skill = source === 'skill' ? window.HexSkillInfo?.[unit?.combatRole ?? 'fighter'] : null;
         return { element: skill?.element ?? 'active', damageType: skill?.damageType ?? 'elemental' };
     }
@@ -550,10 +556,12 @@ class HexCombat extends HexSimulation {
         if(window.EquipmentCombat?.has(attacker,'ring_target')&&matchup.multiplier===0&&['attack','skill'].includes(source))matchup.multiplier=1;
         if(window.EquipmentCombat?.has(defender,'safety_goggles')&&options.area)return 0;
 
+        const resolvedAmount=window.SpeciesCombat?.scaleDamage(attacker,defender,amount,source,options)??amount;
+        matchup.category=options.damageCategory;
         let damage = Math.max(
             0,
             Math.round(
-                (Number.isFinite(amount) ? Math.max(0, amount) : 0) *
+                (Number.isFinite(resolvedAmount) ? Math.max(0, resolvedAmount) : 0) *
                 skillMultiplier *
                 suddenMultiplier *
                 matchup.multiplier
@@ -611,6 +619,8 @@ class HexCombat extends HexSimulation {
             absorbed,
             source,
             damageType: options.damageType ?? 'elemental',
+            damageCategory:options.damageCategory??null,
+            moveId:options.moveId??null,
             critical: !!options.critical,
             element: matchup.element,
             effectiveness: matchup.multiplier,
@@ -754,6 +764,7 @@ class HexCombat extends HexSimulation {
         this.winner = winner;
         const survivors=new Set([...this.units.values()].filter(unit=>unit.hp>0).map(unit=>unit.color));
         this.resultVerified = this.initialTeams?.has('w') && this.initialTeams?.has('b') && (
+            (reason==='objective' && window.ExpeditionObjectives?.verify(this,winner)) ||
             (reason==='timeout' && this.tickCount>=this.maxBattleTicks) ||
             (reason==='elimination' && survivors.size<=1 && winner===(survivors.size?[...survivors][0]:'draw'))
         );

@@ -5,11 +5,11 @@ window.UnitHealthBar = {
         return Number.isFinite(current) && Number.isFinite(maximum) && maximum > 0
             ? Math.max(0, Math.min(1, current / maximum)) : 0;
     },
-    create(current, maximum) {
+    create(current, maximum, owner) {
         const track = document.createElement('div'); track.className = 'hex-combat-hp unit-healthbar';
         const fill = document.createElement('div'); fill.className = 'hex-combat-hp-fill';
         fill.style.clipPath = `inset(0 ${(1 - this.ratio(current, maximum)) * 100}% 0 0)`;
-        track.append(fill); track.setAttribute('aria-hidden','true'); return track;
+        track.append(fill); track.setAttribute('aria-hidden','true');window.FactionHealth?.apply(track,owner); return track;
     }
 };
 

@@ -56,10 +56,11 @@ class RoguelikeUI {
   syncHexBattlePause() {
     const combat = this.hexCombat;
     if (!combat || combat.battleEnded || this.phase !== 'battle') return;
-    const blocked = !!document.querySelector(
+    const blocked = document.hidden || !!document.querySelector(
       '.modal-overlay:not(.hidden), .main-menu-overlay:not(.hidden), .tutorial-overlay:not(.hidden)'
     );
     document.body.classList.toggle('hex-combat-paused', blocked);
+    this.hexRenderer?.animations?.pause(blocked);
     if (blocked && combat.running) {
       combat.stop();
       this.hexBattlePaused = true;
@@ -70,6 +71,8 @@ class RoguelikeUI {
   }
 
   observeHexBattleOverlays() {
+    this.hexVisibilityHandler=()=>this.syncHexBattlePause();
+    document.addEventListener('visibilitychange',this.hexVisibilityHandler);
     // Observe direct class changes too (Escape and nested save/menu dialogs).
     this.hexOverlayObserver = new MutationObserver(records => {
       if (records.some(record => record.target.matches?.(
@@ -184,6 +187,13 @@ class RoguelikeUI {
     let bonusHp = (typeof TalismanSystem !== 'undefined' && typeof TalismanSystem.getBonusHp === 'function' ? TalismanSystem.getBonusHp(piece) : 0);
     let bonusSpd = 0;
     const modifierBreakdown = { equipment: { hp: bonusHp, attack: bonusAtk, speed: 0 }, synergy: {}, astral: {} };
+    if (options.expeditionModifiers) {
+      const modifiers = options.expeditionModifiers;
+      bonusHp += modifiers.hp;
+      bonusAtk += modifiers.attack;
+      bonusSpd += modifiers.speed;
+      modifierBreakdown.expedition = { ...modifiers };
+    }
     if (typeof TalismanSystem !== 'undefined') {
       if (typeof TalismanSystem.getBonusSpeed === 'function') {
         bonusSpd += TalismanSystem.getBonusSpeed(piece);

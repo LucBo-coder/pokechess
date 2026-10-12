@@ -34,11 +34,11 @@ window.EquipmentCombat = {
     }}
 };
 const equipmentIncoming=HexEffects.incoming.bind(HexEffects),equipmentAfter=HexEffects.afterDamage.bind(HexEffects),equipmentUpdate=HexEffects.update.bind(HexEffects);
+const equipmentEvasion=HexEffects.evasionChance.bind(HexEffects);
+HexEffects.evasionChance=function(c,d){return equipmentEvasion(c,d)+(d.starfEvasion??0)+((d.statuses.smoke?.expiresAt??0)>c.tickCount ? 0.5 : 0);};
 HexEffects.incoming=function(c,d,damage,source,attacker,matchup){
     if(['attack','skill'].includes(source)){
         if(EquipmentCombat.has(d,'air_balloon')&&!d.airBalloonPopped&&matchup?.element==='ground')return 0;
-        const dodge=Math.min(.75,(d.starfEvasion??0)+((d.statuses.smoke?.expiresAt??0)>c.tickCount ? .5 : 0));
-        if(dodge&&c.random()<dodge){c.emit({type:'status',unitId:d.id,status:'dodge',duration:0});return 0;}
     }return equipmentIncoming(c,d,damage,source,attacker,matchup);
 };
 HexEffects.afterDamage=function(c,a,d,damage,source,matchup,options={}){equipmentAfter(c,a,d,damage,source,matchup,options);EquipmentCombat.hit(c,a,d,damage,source,options);window.AstralRuntime?.afterDamage(c,a,d,damage,source,options);};

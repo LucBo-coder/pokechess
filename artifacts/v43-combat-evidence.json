@@ -4,8 +4,10 @@
     "bounded": true,
     "noGhost": true,
     "owned": true,
+    "factionColors": true,
+    "thresholdColors": true,
     "max": 4,
-    "elapsed": 201.2999999988824,
+    "elapsed": 235.79999999701977,
     "log": true
   },
   {
@@ -13,8 +15,10 @@
     "bounded": true,
     "noGhost": true,
     "owned": true,
+    "factionColors": true,
+    "thresholdColors": true,
     "max": 16,
-    "elapsed": 486.40000000037253,
+    "elapsed": 432.80000000074506,
     "log": true
   },
   {
@@ -22,8 +26,10 @@
     "bounded": true,
     "noGhost": true,
     "owned": true,
+    "factionColors": true,
+    "thresholdColors": true,
     "max": 24,
-    "elapsed": 708.5,
+    "elapsed": 991.4000000022352,
     "log": true
   }
 ]

@@ -1,0 +1,62 @@
+{
+  "navigationCheck": {
+    "noSwitcher": true,
+    "cards": 2,
+    "inventory": "[{\"id\":1,\"type\":\"4\",\"starterSpeciesId\":\"4\",\"talismans\":[],\"maxTalismans\":3,\"element\":\"fire\",\"element2\":null},{\"id\":2,\"type\":\"1\",\"starterSpeciesId\":\"1\",\"talismans\":[],\"maxTalismans\":3,\"element\":\"grass\",\"element2\":\"poison\"},{\"id\":3,\"type\":\"7\",\"starterSpeciesId\":\"7\",\"talismans\":[],\"maxTalismans\":3,\"element\":\"water\",\"element2\":null}]"
+  },
+  "menuPanels": {
+    "front": true,
+    "visible": true,
+    "oneCollection": true
+  },
+  "classicEntry": true,
+  "expeditionCheck": {
+    "mapVisible": true,
+    "reward": true,
+    "hp": 100,
+    "once": true,
+    "isolated": true,
+    "savedStatus": "route",
+    "sourceStats": true,
+    "choiceSaved": true,
+    "model": true,
+    "locked": true,
+    "continued": true
+  },
+  "clarity": [
+    {
+      "size": 3,
+      "bounded": true,
+      "noGhost": true,
+      "owned": true,
+      "factionColors": true,
+      "thresholdColors": true,
+      "max": 4,
+      "elapsed": 235.79999999701977,
+      "log": true
+    },
+    {
+      "size": 6,
+      "bounded": true,
+      "noGhost": true,
+      "owned": true,
+      "factionColors": true,
+      "thresholdColors": true,
+      "max": 16,
+      "elapsed": 432.80000000074506,
+      "log": true
+    },
+    {
+      "size": 12,
+      "bounded": true,
+      "noGhost": true,
+      "owned": true,
+      "factionColors": true,
+      "thresholdColors": true,
+      "max": 24,
+      "elapsed": 991.4000000022352,
+      "log": true
+    }
+  ],
+  "spriteRevision": "0dc105d5b12416932f29b594078282ab4be045f5"
+}

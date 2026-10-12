@@ -508,7 +508,7 @@ Object.assign(RoguelikeUI.prototype, {
         hpNum.className = 'hud-hp-num';
         hpNum.textContent = `${curHp}/${st.maxHp}`;
         hud.appendChild(hpNum);
-        if (window.UnitHealthBar) el.appendChild(UnitHealthBar.create(curHp, st.maxHp));
+        if (window.UnitHealthBar) el.appendChild(UnitHealthBar.create(curHp, st.maxHp,p));
 
         if (typeof TypeSystem !== 'undefined') {
           const hexMode = document.body.classList.contains('hex-mode');

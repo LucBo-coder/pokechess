@@ -108,9 +108,12 @@ HexEffects.outgoing=function(c,a,d,damage,source,matchup){let value=astralOutgoi
     if((a.statuses.swarm?.expiresAt??0)>c.tickCount)value+=HexEffects.flatAtk(2*Math.min(3,a.swarmStacks??0));
     return value;
 };
-HexEffects.incoming=function(c,d,damage,source,attacker,matchup){let value=astralIncoming(c,d,damage,source,attacker,matchup);if(!['attack','skill'].includes(source))return value;
+const astralEvasion=HexEffects.evasionChance.bind(HexEffects);
+HexEffects.evasionChance=function(c,d){
     let chance=0;for(const [id,p]of [['water_notable_2',.1],['flying_notable_2',.15],['flying_keystone',.2],['ghost_keystone',.25],['dark_notable_2',.15]])if(AstralRuntime.has(d,id))chance+=p;
-    if(chance&&c.random()<Math.min(.75,chance)){c.emit({type:'status',unitId:d.id,status:'dodge',duration:0});return 0;}
+    return astralEvasion(c,d)+chance;
+};
+HexEffects.incoming=function(c,d,damage,source,attacker,matchup){let value=astralIncoming(c,d,damage,source,attacker,matchup);if(!['attack','skill'].includes(source))return value;
     if(AstralRuntime.has(d,'dragon_notable_2'))value*=.8;
     if(AstralRuntime.has(d,'ground_notable_2')&&source==='attack')value*=.85;
     if(AstralRuntime.has(d,'ice_keystone'))value*=.7;

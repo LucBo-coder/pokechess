@@ -43,21 +43,24 @@ class HexVfxPlayer {
     }
     event(event) {
         const r=this.renderer,c=r.combat;
+        const visual=window.SkillVisualDefinitions?.resolve(event,r);
         const type=event.element??r.getVfxElement(event.unitId??event.attackerId)??'normal';
         if(event.type==='skill-cast'){
-            const played=this.play(`cast_${type}_01`,event.unitId,{duration:Math.max(.2,(event.delayTicks||6)/c.tickRate)});
-            if(event.role==='tank')this.play('status_shield_01',event.unitId);
+            const played=this.play(visual?.cast??`cast_${type}_01`,event.unitId,{duration:Math.max(.2,(event.delayTicks||6)/c.tickRate)});
+            if(visual?.status)this.play(visual.status,['toxic','string-shot'].includes(window.SpeciesCatalog?.moves[event.moveId]?.slug)?event.targetId:event.unitId);
+            else if(event.role==='tank')this.play('status_shield_01',event.unitId);
             else if(event.role==='mage')this.play(`aoe_${type}_01`,event.targetId);
-            else if(event.role==='marksman')this.play(`proj_${type}_01`,event.targetId,{fromId:event.unitId,duration:Math.max(.2,(event.delayTicks||6)/c.tickRate)});
+            if(visual?.projectile!==null&&(visual?.category==='special'||event.role==='marksman'))this.play(visual?.projectile??`proj_${type}_01`,event.targetId,{fromId:event.unitId,duration:Math.max(.2,(event.delayTicks||6)/c.tickRate)});
             const target=r.sprites.get(event.targetId)?.element;
             if(target){target.classList.add('hex-skill-target');setTimeout(()=>target.classList.remove('hex-skill-target'),250);}
             window.soundManager?.playSfx(window.HexSkillInfo?.[event.role]?.sfxId??'magic');
             return played;
         } else if(event.type==='damage'&&(event.damage>0||event.absorbed>0)){
-            const id=event.critical?'crit_hit_01':({water:'water_splash_01',grass:'grass_vine_01'})[type]??`${type}_impact_01`;
+            const id=event.critical?'crit_hit_01':visual?.impact??({water:'water_splash_01',grass:'grass_vine_01'})[type]??`${type}_impact_01`;
             return this.play(id,event.defenderId)||this.play('hit_light_01',event.defenderId);
         } else if(event.type==='heal')this.play('status_heal_01',event.unitId);
-        else if(event.type==='status')this.play(`status_${event.status}_01`,event.unitId,{duration:1});
+        else if(event.type==='status')this.play(({speciesDefense:'status_defup_01',speciesSlow:'status_stun_01',frozen:'status_freeze_01',paralyzed:'status_paralysis_01'})[event.status]??`status_${event.status}_01`,event.unitId,{duration:1});
+        else if(event.type==='shield')this.play('status_shield_01',event.unitId,{duration:.5});
         else if(event.type==='boss-phase-change')return this.play('boss_phase_01',event.unitId);
         else if(event.type==='spawn'&&r.getUnit(event.unitId)?.isBoss)this.play('boss_aura_01',event.unitId,{duration:1});
         else if(event.type==='death'&&r.getUnit(event.unitId)?.isBoss)this.play('boss_defeat_01',event.unitId);

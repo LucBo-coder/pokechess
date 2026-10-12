@@ -1,0 +1,18 @@
+{
+  "mapVisible": true,
+  "reward": true,
+  "hp": 100,
+  "once": true,
+  "isolated": true,
+  "savedStatus": "route",
+  "sourceStats": true,
+  "choiceSaved": true,
+  "model": true,
+  "locked": true,
+  "continued": true,
+  "telegraphCheck": {
+    "zones": 1,
+    "afterDeath": 0,
+    "afterReset": 0
+  }
+}

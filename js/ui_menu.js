@@ -180,6 +180,7 @@ Object.assign(RoguelikeUI.prototype, {
     const btnMenuContinue = document.getElementById('btnMenuContinue');
     if (btnMenuContinue) {
       btnMenuContinue.addEventListener('click', () => {
+        if(window.GameNavigation){GameNavigation.continue();return;}
         const latestSlot = (typeof SaveSystem !== 'undefined') ? SaveSystem.getLatestSlot() : null;
         if (latestSlot) {
           this.loadGameSlot(latestSlot);
@@ -193,6 +194,7 @@ Object.assign(RoguelikeUI.prototype, {
     const btnMenuNewRun = document.getElementById('btnMenuNewRun');
     if (btnMenuNewRun) {
       btnMenuNewRun.addEventListener('click', () => {
+        if(window.GameNavigation){GameNavigation.play();return;}
         this.resetRun();
         this.closeMainMenu();
       });

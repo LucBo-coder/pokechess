@@ -1,0 +1,182 @@
+[
+  {
+    "size": 3,
+    "act": 0,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 40.333333333333336
+  },
+  {
+    "size": 3,
+    "act": 0,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 50.3
+  },
+  {
+    "size": 3,
+    "act": 1,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 20.233333333333334
+  },
+  {
+    "size": 3,
+    "act": 1,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 20.033333333333335
+  },
+  {
+    "size": 3,
+    "act": 2,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 11.633333333333333
+  },
+  {
+    "size": 3,
+    "act": 2,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 11.3
+  },
+  {
+    "size": 6,
+    "act": 0,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 33.93333333333333
+  },
+  {
+    "size": 6,
+    "act": 0,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 22.766666666666666
+  },
+  {
+    "size": 6,
+    "act": 1,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 20.1
+  },
+  {
+    "size": 6,
+    "act": 1,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 18.6
+  },
+  {
+    "size": 6,
+    "act": 2,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 16.8
+  },
+  {
+    "size": 6,
+    "act": 2,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 13.333333333333334
+  },
+  {
+    "size": 12,
+    "act": 0,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 26.6
+  },
+  {
+    "size": 12,
+    "act": 0,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 33.333333333333336
+  },
+  {
+    "size": 12,
+    "act": 1,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 26.166666666666668
+  },
+  {
+    "size": 12,
+    "act": 1,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 25.5
+  },
+  {
+    "size": 12,
+    "act": 2,
+    "kind": "battle",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 21.333333333333332
+  },
+  {
+    "size": 12,
+    "act": 2,
+    "kind": "boss",
+    "attached": true,
+    "finished": true,
+    "verified": true,
+    "finite": true,
+    "seconds": 17.766666666666666
+  }
+]

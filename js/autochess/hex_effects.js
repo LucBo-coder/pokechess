@@ -29,7 +29,7 @@ window.HexEffects = {
     outgoing(combat, attacker, defender, damage, source, matchup) {
         if (source !== 'attack' && source !== 'skill') return damage;
         if (this.has(attacker, 'hasExpertBelt') && matchup.multiplier > 1) damage *= 1.2;
-        if (this.has(attacker, 'hasChoiceSpecs')) damage *= 1.15;
+        if (this.has(attacker, 'hasChoiceSpecs') && (!attacker.speciesCombat || matchup.category==='special')) damage *= 1.15;
         if (this.has(attacker, 'hasBlackBelt') && attacker.hp <= attacker.maxHp * 0.5) damage *= 1.25;
         if (this.matches(attacker, 'fire') && this.node(attacker, 'fire_keystone') && attacker.hp > attacker.maxHp * 0.5) damage *= 1.5;
         const dark = attacker.effects?.tiers?.dark;
@@ -52,6 +52,7 @@ window.HexEffects = {
         // Type immunity remains absolute, including HP based item bonuses.
         return matchup.multiplier === 0 ? 0 : damage;
     },
+    evasionChance(combat,unit){return this.tier(unit,'flying','teamDodge','selfDodge')+(this.has(unit,'hasBrightPowder') ? 0.18 : 0);},
     incoming(combat, defender, damage, source) {
         if (source !== 'attack' && source !== 'skill') return damage;
         if(defender.statuses.masteryGuard && defender.hp<=defender.maxHp*0.5)damage*=0.85;
@@ -62,8 +63,7 @@ window.HexEffects = {
             return 0;
         }
         const ghostDodge = this.tier(defender, 'ghost', 'teamFirstDodge', 'selfFirstDodge');
-        const flyingDodge = this.tier(defender, 'flying', 'teamDodge', 'selfDodge');
-        const dodgeChance=Math.min(0.75, flyingDodge + (this.has(defender, 'hasBrightPowder') ? 0.18 : 0));
+        const dodgeChance=Math.max(0,Math.min(0.75,this.evasionChance(combat,defender)));
         if ((!defender.ghostDodgeUsed && ghostDodge) || (dodgeChance>0 && combat.random() < dodgeChance)) {
             defender.ghostDodgeUsed = true;
             combat.emit({ type: 'status', unitId: defender.id, status: 'dodge', duration: 0 });
@@ -126,8 +126,9 @@ window.HexEffects = {
     },
     dot(combat, owner, target, id, damage, seconds) {
         if(this.has(target,'hasLumBerry') || (this.matches(target,'fairy')&&this.node(target,'fairy_keystone')))return;
-        target.statuses[id] = { name:id, ownerId:owner.id, owner:{id:owner.id,color:owner.color,element:owner.element,element2:owner.element2,square:owner.square,hp:0,effects:{elements:{...owner.effects?.elements},astral:[...(owner.effects?.astral??[])]}}, damage, expiresAt:combat.tickCount+seconds*combat.tickRate, nextTick:combat.tickCount+combat.tickRate };
-        combat.emit({type:'status',unitId:target.id,status:id,duration:seconds});
+        const previous=target.statuses[id],active=previous&&previous.expiresAt>combat.tickCount;
+        target.statuses[id] = { name:id, ownerId:owner.id, owner:{id:owner.id,color:owner.color,element:owner.element,element2:owner.element2,square:owner.square,hp:0,effects:{elements:{...owner.effects?.elements},astral:[...(owner.effects?.astral??[])]}}, damage, expiresAt:combat.tickCount+seconds*combat.tickRate, nextTick:active?previous.nextTick:combat.tickCount+combat.tickRate };
+        if(!active)combat.emit({type:'status',unitId:target.id,status:id,duration:seconds});
     },
     update(combat, unit) {
         if (combat.tickCount % combat.tickRate === 0 && this.has(unit, 'hasLeftovers'))

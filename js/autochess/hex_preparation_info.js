@@ -256,8 +256,9 @@ window.HexPreparationInfo = {
         const movementSpeed = (ui.hexCombat?.tickRate ?? 30) / (unit?.moveCooldownTicks ?? predicted?.moveCooldownTicks ?? ui.hexCombat?.moveCooldownTicks ?? 15);
         const eliteType = unit?.eliteType ?? predicted?.eliteType;
         const hasBlast = (unit?.bossSkills ?? predicted?.bossSkills ?? []).includes('areaBlast');
-        const skillName = isBoss ? t(unit?.bossPhase >= 2 && hasBlast ? 'skill.boss.blast' : 'skill.boss.strike') : data.skillName;
-        const skillDescription = isBoss ? `${t('skill.boss.description')} ${hasBlast ? t('skill.boss.area') : ''}` : data.skillDescription;
+        const canonicalMove=window.SpeciesCombat?.move(unit??predicted);
+        const skillName = isBoss ? t(unit?.bossPhase >= 2 && hasBlast ? 'skill.boss.blast' : 'skill.boss.strike') : canonicalMove?.name??data.skillName;
+        const skillDescription = isBoss ? `${t('skill.boss.description')} ${hasBlast ? t('skill.boss.area') : ''}` : canonicalMove?SpeciesCombat.description(unit??predicted):data.skillDescription;
         const traitDescription = (unit?.traits ?? predicted?.traits ?? []).map(id => t(`trait.${id}.description`,{defaultValue:window.HexTraits?.CONFIG[id]?.description??id})).join(' ');
         const traits = (unit?.traits ?? predicted?.traits ?? []).map(id => t(`trait.${id}`,{defaultValue:id})).join(', ') || t('pokemon.none');
         const statuses = Object.entries(unit?.statuses ?? {}).map(([id,status]) => `${t(`status.${id}`,{defaultValue:t(`trait.${id}`,{defaultValue:status.name})})} (${I18n.number(Math.max(0, (status.expiresAt - (ui.hexCombat?.tickCount ?? 0)) / 30),{maximumFractionDigits:1})}s)`).join(', ') || t('pokemon.none');
@@ -359,14 +360,14 @@ window.HexPreparationInfo = {
         const metadata = window.HexSkillInfo?.describe(actualRole, unit ?? predicted, ui.hexCombat);
         if (metadata && sections[1]) {
             const extra = document.createElement('div'); extra.className = 'skill-metadata';
-            extra.innerHTML = `<p>⚔ ${e(t('skill.basic'))}: ${e(range)} Hex · ${e(t('pokemon.attack'))} ${e(damage)}</p><p>✦ ${e(t('skill.active'))} · ${e(t(`type.${activeElement}`,{defaultValue:activeElement}))}</p><p>${e(t('pokemon.mana'))}: ${e(metadata.energyCost)} · ${e(t('skill.cooldown'))}: ${e(metadata.cooldown)}s</p><p>${e(t('pokemon.range'))}: ${e(t('skill.unlimited'))} · ${e(t('skill.windup'))}: ${e(I18n.number(metadata.castTime,{maximumFractionDigits:2}))}s</p>`;
+            extra.innerHTML = `<p>⚔ ${e(t('skill.basic'))}: ${e(range)} Hex · ${e(t('pokemon.attack'))} ${e(damage)}</p><p>✦ ${e(t('skill.active'))} · ${e(t(`type.${canonicalMove?.type??activeElement}`,{defaultValue:activeElement}))}</p><p>${e(t('pokemon.mana'))}: ${e(metadata.energyCost)} · ${e(t('skill.cooldown'))}: ${e(metadata.cooldown)}s</p><p>${e(t('pokemon.range'))}: ${e(t('skill.unlimited'))} · ${e(t('skill.windup'))}: ${e(I18n.number(metadata.castTime,{maximumFractionDigits:2}))}s</p>`;
             sections[1].append(extra);
             const status=document.createElement('p');status.className='skill-state';
             const remaining=combatActive?Math.max(0,((unit?.nextSkillTick??0)-(ui.hexCombat?.tickCount??0))/(ui.hexCombat?.tickRate??30)):0;
             status.textContent=t(!combatActive?'skill.preview':remaining>0?'skill.cooling':(unit?.mana??0)>=metadata.energyCost?'skill.ready':'skill.charging')+(remaining>0?' · '+I18n.number(remaining,{maximumFractionDigits:1})+'s':'');
             const icon=document.createElement('img');icon.src='assets/visual/combat/unit-selection-ring.png';icon.alt='';icon.className='skill-icon';extra.prepend(icon);sections[1].append(status);
             const amount=document.createElement('p');
-            amount.textContent=actualRole==='tank' ? `${t('combat.shield')}: ${Math.round(maxHp*.3)}` : `${t('skill.baseDamage')}: ${I18n.number(damage*(metadata.damageMultiplier??1)*(window.HexBalance?.SKILL_DAMAGE_MULTIPLIER??.65),{maximumFractionDigits:1})}`;
+            amount.textContent=canonicalMove?.category==='status'?t('species.statusSkill'):canonicalMove?`${t('skill.baseDamage')}: ${I18n.number(damage*SpeciesCombat.attackRatio(unit??predicted,canonicalMove.category)*(metadata.damageMultiplier??1)*(window.HexBalance?.SKILL_DAMAGE_MULTIPLIER??.65),{maximumFractionDigits:1})}`:actualRole==='tank' ? `${t('combat.shield')}: ${Math.round(maxHp*.3)}` : `${t('skill.baseDamage')}: ${I18n.number(damage*(metadata.damageMultiplier??1)*(window.HexBalance?.SKILL_DAMAGE_MULTIPLIER??.65),{maximumFractionDigits:1})}`;
             sections[1].append(amount);
         }
         const equipment = document.createElement('section'); equipment.dataset.infoSection = 'equipment';
@@ -380,8 +381,9 @@ window.HexPreparationInfo = {
         }
         window.EquipmentSystem?.mount(equipment,ui,item);
         body.append(equipment); this.setTab(this.activeTab);
+        window.SpeciesCombat?.mountInfo(this,ui,piece,unit??predicted);
         const heading = this.panel.querySelector('.hex-inspector-name');
-        if (window.UnitHealthBar && heading) heading.after(UnitHealthBar.create(hp, maxHp));
+        if (window.UnitHealthBar && heading) heading.after(UnitHealthBar.create(hp, maxHp,unit??piece));
 
         this.panel.classList.add('visible');
         window.MasterySystem?.bindInspector(this.panel,ui);

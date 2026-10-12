@@ -10,6 +10,7 @@ class HexRenderer {
         );
 
         this.sprites = new Map();
+        this.animations=window.PokemonAnimations?new PokemonAnimations(this):null;
         this.effectivenessFeedbackTicks = new Map();
         this.selectedUnitId = null;
         this.destroyed = false;
@@ -29,9 +30,10 @@ class HexRenderer {
             this.reducedEffects = !this.reducedEffects;
             localStorage.setItem('pokechess_reduced_fx', this.reducedEffects ? '1' : '0');
             toggle.textContent = t(this.reducedEffects ? 'vfx.low' : 'vfx.full');
+            this.animations?.refresh();
         };
         this.fxToggle = toggle;
-        this.onPresentationChange=()=>{if(this.destroyed)return;this.updateHP();for(const row of this.textManager?.labels.values()??[]){if(row.numeric&&!CombatPresentation.enabled('damage')||row.kind==='hex-float-skill-name'&&!CombatPresentation.enabled('skills')||row.kind==='hex-float-status'&&!CombatPresentation.enabled('status'))this.textManager.remove(row);}if(!CombatPresentation.enabled('effects'))this.sheetVfx?.destroy();};
+        this.onPresentationChange=()=>{if(this.destroyed)return;this.updateHP();this.animations?.refresh();for(const row of this.textManager?.labels.values()??[]){if(row.numeric&&!CombatPresentation.enabled('damage')||row.kind==='hex-float-skill-name'&&!CombatPresentation.enabled('skills')||row.kind==='hex-float-status'&&!CombatPresentation.enabled('status'))this.textManager.remove(row);}if(!CombatPresentation.enabled('effects'))this.sheetVfx?.destroy();};
         window.CombatPresentation?.listeners.add(this.onPresentationChange);
 
         this.originalOnEvent = combat.onEvent;
@@ -59,6 +61,7 @@ class HexRenderer {
             this.updateHP();
             this.updateProjectiles();
             this.sheetVfx?.update();
+            this.animations?.update();
             if (this.selectedUnitId && window.HexPreparationInfo?.panel?.classList.contains('visible')) window.HexPreparationInfo.showCombatUnit(this.selectedUnitId);
             if (this.hoveredUnitId && !this.tooltip.hidden) {
                 this.showTooltip(this.hoveredUnitId, this.tooltipEvent);
@@ -251,6 +254,7 @@ class HexRenderer {
         };
 
         image.alt = this.getPokemonName(unit);
+        window.PokemonSprites?.bind(image,unit,!this.reducedEffects&&window.CombatPresentation?.enabled('effects')!==false&&!document.body.classList.contains('reduced-motion'));
 
         const roleBadge = document.createElement('div');
         roleBadge.className = 'hex-combat-role';
@@ -381,6 +385,7 @@ class HexRenderer {
 
     handleEvent(event) {
         if (this.destroyed || !event) return;
+        this.animations?.event(event);
         window.CombatPresentation?.record(this.combat,event);
         const sheetPlayed = event.type !== 'damage' ? this.sheetVfx?.event(event) : false;
         if (['battle-end','boss-phase-change'].includes(event.type)) window.NotificationCenter?.record(event.type === 'battle-end' ? t(event.winner === 'w' ? 'combat.victory' : event.winner === 'b' ? 'combat.defeat' : 'combat.draw') : t('combat.phase',{phase:event.phase}),event.type === 'battle-end' ? 'combat' : 'boss');
@@ -492,6 +497,7 @@ class HexRenderer {
 
     playAnimation(element, className) {
         if (!element) return;
+        if(this.animations){this.animations.set(element.dataset.unitId,({'hex-moving':'MOVE','hex-attacking':'ATTACK','hex-casting':'CAST','hex-hit':'HIT'})[className]??'STATUS');return;}
 
         element.classList.remove(className);
         void element.offsetWidth;
@@ -700,7 +706,7 @@ class HexRenderer {
             this.getRole(this.getUnit(event.unitId));
 
         const casterUnit=this.getUnit(event.unitId);
-        const skillName = casterUnit?.isBoss ? t(event.skillName==='Boss Area Blast'?'skill.boss.blast':'skill.boss.strike') : t(`skill.${role}.name`,{defaultValue:event.skillName??this.getSkillName(role)});
+        const skillName = casterUnit?.isBoss ? t(event.skillName==='Boss Area Blast'?'skill.boss.blast':'skill.boss.strike') : event.moveId?event.skillName:t(`skill.${role}.name`,{defaultValue:event.skillName??this.getSkillName(role)});
 
         if (caster) {
             this.playAnimation(
@@ -841,6 +847,7 @@ class HexRenderer {
     }
 
     updateHP() {
+        window.FactionHealth?.update(this);
         for (const unit of this.combat.units.values()) {
             const sprite = this.sprites.get(unit.id);
             if (!sprite) continue;
@@ -1099,6 +1106,7 @@ class HexRenderer {
     }
 
     removeSprite(unitId) {
+        this.animations?.remove(unitId);
         this.sheetVfx?.removeUnit(unitId);
         this.textManager?.removeUnit(unitId);
         for(const projectile of this.boardElement?.querySelectorAll('.elemental-projectile')??[])
@@ -1123,6 +1131,7 @@ class HexRenderer {
     }
 
     destroy() {
+        this.animations?.destroy();
         if (this.destroyed) return;
         this.destroyed = true;
         window.CombatPresentation?.listeners.delete(this.onPresentationChange);

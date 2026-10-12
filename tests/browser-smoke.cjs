@@ -73,7 +73,7 @@ async function main() {
     sendCommand = command;
     const screenshot = async name => {
         if (!process.argv.includes('--screenshots')) return;
-        await evaluate(`Promise.all([...document.querySelectorAll('.board img')].map(image => image.decode().catch(() => {})))`);
+        await evaluate(`Promise.race([Promise.all([...document.querySelectorAll('.board img')].map(image => image.decode().catch(() => {}))),new Promise(resolve=>setTimeout(resolve,3000))])`);
         assert.ok(await evaluate(`[...document.querySelectorAll('.board .piece, .board .hex-combat-sprite')].every(image => image.complete && image.naturalWidth > 0)`), 'Missing Pokémon sprite image');
         const result = await command('Page.captureScreenshot', { format: 'png' });
         const folder = path.join(root, 'artifacts');
@@ -105,8 +105,8 @@ async function main() {
         I18n.setLanguage('vi-VN');
         return {initial,vietnamese,english,persistent,restored,htmlLang:document.documentElement.lang};
     })()`);
-    assert.equal(language.initial,'vi-VN');assert.equal(language.vietnamese,'Hành trình mới');
-    assert.equal(language.english,'New Journey');assert.equal(language.persistent,'en-US');
+    assert.equal(language.initial,'vi-VN');assert.equal(language.vietnamese,'Chơi');
+    assert.equal(language.english,'Play');assert.equal(language.persistent,'en-US');
     assert.equal(language.restored,'en-US');assert.equal(language.htmlLang,'vi-VN');
     const masteryUI=await evaluate(`(() => {
         const ui=roguelikeUI;ui.resetRun();ui.closeMainMenu();MasterySystem.ensure(ui);
@@ -640,6 +640,7 @@ async function main() {
                 r.createSprite(c.units.get(id));
             }
             const start=performance.now();for(let n=0;n<180;n++)c.step();const elapsed=performance.now()-start;
+            let thresholdColors=true;const savedHP=[...c.units.values()].map(u=>[u,u.hp]);for(const ratio of [1,.5,.1]){for(const [u]of savedHP)u.hp=u.maxHp*ratio;r.updateHP();thresholdColors&&=[...r.sprites].every(([id,s])=>getComputedStyle(s.hpFill).backgroundColor===(c.units.get(id).color==='w'?'rgb(39, 199, 111)':'rgb(239, 68, 68)'));}for(const [u,hp]of savedHP)u.hp=hp;
             for(const u of [...c.units.values()]){
                 const target=[...c.units.values()].find(v=>v.color!==u.color);
                 for(let n=0;n<8;n++){c.dealDamage(u,target,1,'skill',{damageType:'true'});c.healUnit(u,1);c.emit({type:'status',unitId:u.id,status:'burn',duration:3});}
@@ -647,13 +648,14 @@ async function main() {
                 c.emit({type:'skill-cast',unitId:u.id,targetId:target.id,role:'mage',delayTicks:6});
             }
             r.updateHP();const max=r.textManager.labels.size;
+            const factionColors=[...r.sprites].every(([id,s])=>getComputedStyle(s.hpFill).backgroundColor===(c.units.get(id).color==='w'?'rgb(39, 199, 111)':'rgb(239, 68, 68)'));
             const bounded=max<=24&&[...r.sprites.values()].every(s=>s.element.querySelectorAll('.hex-floating-text').length<=2);
             const dead=[...c.units.values()][0],deadEl=r.sprites.get(dead.id).element;c.killUnit(dead);c.killUnit(dead);r.createSprite(dead);
             const noGhost=!r.sprites.has(dead.id)&&deadEl.querySelectorAll('.hex-combat-hp,.hex-combat-mana,.hex-combat-shield,.hex-floating-text').length===0;
             const owned=[...r.sprites].every(([id,s])=>c.units.has(id)&&s.element.dataset.unitId===id&&s.element.querySelector('.hex-combat-hp'));
-            CombatPresentation.flushLog();return {size:${size},bounded,noGhost,owned,max,elapsed,log:NotificationCenter.entries.length<=200};
+            CombatPresentation.flushLog();return {size:${size},bounded,noGhost,owned,factionColors,thresholdColors,max,elapsed,log:NotificationCenter.entries.length<=200};
         })()`);
-        assert.ok(result.bounded&&result.noGhost&&result.owned&&result.log,JSON.stringify(result));clarity.push(result);
+        assert.ok(result.bounded&&result.noGhost&&result.owned&&result.log&&result.factionColors&&result.thresholdColors,JSON.stringify(result));clarity.push(result);
         await screenshot('v43-combat-'+size);
         if(size===12&&process.argv.includes('--screenshots')){
             const baseline=await evaluate(`(()=>{const r=clarityRenderer,manager=r.textManager;r.textManager=null;
@@ -684,6 +686,43 @@ async function main() {
     })()`);
     assert.ok(Object.values(displayCheck).every(Boolean),JSON.stringify(displayCheck));
     await command('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    const navigationCheck=await evaluate(`(()=>{const ui=roguelikeUI;ui.phase='setup';ui.disposeHexBattle();const inventory=JSON.stringify(ui.inventory);ui.openMainMenu();const noSwitcher=document.getElementById('expedition-panel').hidden;document.getElementById('btnMenuNewRun').click();return {noSwitcher,cards:document.querySelectorAll('#game-mode-cards button').length,inventory};})()`);
+    assert.ok(navigationCheck.noSwitcher&&navigationCheck.cards===2);
+    const menuPanels=await evaluate(`(()=>{document.getElementById('btnMenuSettings').click();const settings=document.getElementById('settingsModal'),front=getComputedStyle(settings).zIndex>getComputedStyle(document.getElementById('mainMenuOverlay')).zIndex;settings.classList.add('hidden');document.getElementById('btnMasteryCollection').click();const collection=document.getElementById('masteryCollectionModal'),visible=!collection.classList.contains('hidden');collection.querySelector('.mastery-close').click();return {front,visible,oneCollection:document.querySelectorAll('#btnMasteryCollection').length===1&&!document.getElementById('btnMenuCollection')};})()`);assert.ok(menuPanels.front&&menuPanels.visible&&menuPanels.oneCollection,JSON.stringify(menuPanels));
+    await screenshot('unified-main-menu');
+    for(const size of [{width:1366,height:768},{width:812,height:375}]){await command('Emulation.setDeviceMetricsOverride',{...size,deviceScaleFactor:1,mobile:false});await sleep(100);assert.ok(await evaluate(`(()=>{const box=document.querySelector('.main-menu-box').getBoundingClientRect();return box.left>=0&&box.right<=innerWidth&&box.top>=0&&box.bottom<=innerHeight;})()`));await screenshot('unified-menu-'+size.width);}
+    await command('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    const classicEntry=await evaluate(`(()=>{const before=JSON.stringify(roguelikeUI.inventory);document.querySelector('[data-mode="classic"]').click();return !roguelikeUI.expeditionRun&&GameNavigation.mode()==='classic'&&document.getElementById('mainMenuOverlay').classList.contains('hidden')&&before===JSON.stringify(roguelikeUI.inventory);})()`);assert.ok(classicEntry);
+    const speciesPreparation=await evaluate(`(()=>{
+        const ui=roguelikeUI,classicKeys=[SaveSystem.PREFIX+'1',SaveSystem.PREFIX+'2',SaveSystem.PREFIX+'3',MasterySystem.STORAGE_KEY,MetaProgression.STORAGE_KEY].filter(Boolean),before=classicKeys.map(k=>localStorage.getItem(k));ui.phase='setup';ui.disposeHexBattle();
+        ui.openMainMenu();document.getElementById('btnMenuNewRun').click();document.querySelector('[data-mode="expedition"]').click();const panel=document.getElementById('expedition-panel');panel.querySelector('select').value='3';panel.querySelector('input[aria-label="Seed"]').value='browser-expedition';[...panel.querySelectorAll('button')].find(b=>b.textContent==='Bắt đầu').click();
+        const mapVisible=document.querySelector('.expedition-open')!==null&&document.getElementById('mainMenuOverlay').classList.contains('hidden');const first=Expedition.available(ui.expeditionRun)[0];ExpeditionSession.select(first.id);
+        const item=ui.inventory[0];HexPreparationInfo.showInventory(item);HexPreparationInfo.setTab('skills');const choices=[...document.querySelectorAll('.species-skill-choices button')];if(!choices.length)throw Error('Missing source-backed skill choices');choices.at(-1).click();const chosen=item.selectedSpeciesMoveId,sourceStats=document.querySelector('.species-stats')?.textContent.includes('Sp.DEF'),choiceSaved=ExpeditionStore.read('3').run.squad.inventory[0].selectedSpeciesMoveId===chosen;
+        window.speciesSmoke={classicKeys,before,mapVisible,itemId:item.id,chosen,sourceStats,choiceSaved};return {sourceStats,choiceSaved,count:choices.length};
+    })()`);
+    assert.ok(speciesPreparation.sourceStats&&speciesPreparation.choiceSaved);
+    await screenshot('v50-species-skills');
+    const expeditionCheck=await evaluate(`(()=>{
+        const ui=roguelikeUI,{classicKeys,before,mapVisible,itemId,chosen,sourceStats,choiceSaved}=window.speciesSmoke,item=ui.inventory.find(p=>p.id===itemId);delete window.speciesSmoke;
+        ui.autoArrangePlayerFormation();ui.startBattle();ui.hexCombat.stop();const combat=ui.hexCombat;const owned=[...combat.units.values()].find(u=>u.sourcePiece?.invId===item.id),model=owned?.speciesCombat?.version===1&&owned.speciesCombat.moveId===chosen;HexPreparationInfo.showCombatUnit(owned.id);HexPreparationInfo.setTab('skills');const locked=[...document.querySelectorAll('.species-skill-choices button')].every(b=>b.disabled);const node=ui.expeditionRun.currentNode,tick=combat.tickCount;ui.openMainMenu();ui.syncHexBattlePause();document.getElementById('btnMenuContinue').click();ui.syncHexBattlePause();combat.stop();const continued=ui.hexCombat===combat&&ui.expeditionRun.currentNode===node&&combat.tickCount===tick&&document.getElementById('mainMenuOverlay').classList.contains('hidden');for(const unit of [...combat.units.values()].filter(u=>u.color==='b'))combat.killUnit(unit);combat.checkBattleEnd();
+        const reward=ui.expeditionRun.status==='reward',hp=ui.expeditionRun.trainerHp;ExpeditionSession.action('gold');const gold=ui.gold;ExpeditionSession.action('gold');const once=ui.gold===gold;
+        const saved=ExpeditionStore.read('3'),isolated=classicKeys.every((k,i)=>localStorage.getItem(k)===before[i]);return {mapVisible,reward,hp,once,isolated,savedStatus:saved.run.status,sourceStats,choiceSaved,model,locked,continued};
+    })()`);
+    assert.ok(expeditionCheck.mapVisible&&expeditionCheck.reward&&expeditionCheck.once&&expeditionCheck.isolated,JSON.stringify(expeditionCheck));
+    assert.equal(expeditionCheck.hp,100);assert.equal(expeditionCheck.savedStatus,'route');
+    assert.ok(expeditionCheck.sourceStats&&expeditionCheck.choiceSaved&&expeditionCheck.model&&expeditionCheck.locked&&expeditionCheck.continued,JSON.stringify(expeditionCheck));
+    const telegraphCheck=await evaluate(`(()=>{const c=new HexCombat(new HexBoard());c.addUnit(35,{id:'hazard-ally',color:'w',type:'1',maxHp:100});c.addUnit(21,{id:'hazard-boss',color:'b',isBoss:true,type:'248',maxHp:100});c.initialTeams=new Set(['w','b']);const r=new HexRenderer(c);for(const u of c.units.values())r.createSprite(u);ExpeditionRegions.attach(c,1);c.tickCount=240;ExpeditionRegions.update(c);const zones=document.querySelectorAll('.expedition-danger-zone').length;c.killUnit(c.units.get('hazard-boss'));const afterDeath=document.querySelectorAll('.expedition-danger-zone').length;r.destroy();return {zones,afterDeath,afterReset:document.querySelectorAll('.expedition-danger-zone').length};})()`);
+    assert.ok(telegraphCheck.zones>0&&telegraphCheck.afterDeath===0&&telegraphCheck.afterReset===0,JSON.stringify(telegraphCheck));
+    await screenshot('v50-expedition-route');
+    for(const viewport of [{width:812,height:375},{width:390,height:844}]){
+        await command('Emulation.setDeviceMetricsOverride',{...viewport,deviceScaleFactor:1,mobile:false});await sleep(120);
+        const bounds=await evaluate(`(()=>{const r=document.querySelector('#expedition-panel').getBoundingClientRect(),c=document.querySelector('.expedition-content');return {bounded:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight,scroll:c.scrollHeight>=c.clientHeight,edges:document.querySelectorAll('.expedition-edges line').length};})()`);
+        assert.ok(bounds.bounded&&bounds.scroll&&bounds.edges>0,JSON.stringify(bounds));await screenshot('v50-expedition-'+viewport.width);
+    }
+    await command('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+    fs.writeFileSync(path.join(root,'artifacts','v50-expedition-evidence.json'),JSON.stringify({...expeditionCheck,telegraphCheck},null,2));
+    fs.writeFileSync(path.join(root,'artifacts','unified-presentation-evidence.json'),JSON.stringify({navigationCheck,menuPanels,classicEntry,expeditionCheck,clarity,spriteRevision:await evaluate('PokemonSpriteManifest.revision')},null,2));
+    const resumeCheck=await evaluate(`(()=>{const node=roguelikeUI.expeditionRun.currentNode,gold=roguelikeUI.gold;let preserved=true;for(let i=0;i<3;i++){GameNavigation.classic();ExpeditionSession.enter('3');preserved&&=roguelikeUI.expeditionRun.currentNode===node&&roguelikeUI.gold===gold;}ExpeditionSession.leave();return preserved;})()`);assert.ok(resumeCheck,'Repeated mode switching must preserve the saved node and economy');
     await command('Page.navigate',{url:url+'docs/visual/vfx-gallery.html'});
     for(let n=0;n<50;n++){if(await evaluate('document.querySelectorAll(".card canvas").length===92'))break;await sleep(100);}
     assert.equal(await evaluate('document.querySelectorAll(".card canvas").length'),92);

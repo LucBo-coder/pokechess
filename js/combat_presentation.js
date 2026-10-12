@@ -25,7 +25,7 @@ window.CombatPresentation = {
     indicators(renderer,unit,sprite){
         for(const el of sprite.element.querySelectorAll('.hex-combat-hp,.hex-combat-mana,.hex-combat-shield'))el.hidden=!this.enabled('bars');
         let row=sprite.element.querySelector('.hex-status-icons');if(!row){row=document.createElement('div');row.className='hex-status-icons';sprite.element.append(row);}
-        const glyphs={burn:'♨',poison:'●',berserker:'⚔',masteryGuard:'◆',masteryFocus:'✦',shield:'◇',frozen:'❄',paralyzed:'ϟ',chilled:'❄',hexed:'↓',smoke:'≋',starf:'★',swarm:'↑'};
+        const glyphs={bossWarning:'!',speciesDefense:'◆',speciesSlow:'↓',burn:'♨',poison:'●',berserker:'⚔',masteryGuard:'◆',masteryFocus:'✦',shield:'◇',frozen:'❄',paralyzed:'ϟ',chilled:'❄',hexed:'↓',smoke:'≋',starf:'★',swarm:'↑'};
         const statuses=Object.entries(unit.statuses??{}).filter(([,s])=>s.expiresAt==null||s.expiresAt>renderer.combat.tickCount);
         if(unit.shield>0)statuses.unshift(['shield',{}]);
         const key=statuses.map(([id,s])=>id+':'+Math.ceil(Math.max(0,(s.expiresAt-renderer.combat.tickCount)/renderer.combat.tickRate))).join('|');
