@@ -321,7 +321,10 @@ async function main() {
     })()`);
     await sleep(120); // Click while the sprite is still in its movement transition.
     const point = await evaluate(`(() => {
-        const rect=document.querySelector('[data-unit-id="${selected.id}"]').getBoundingClientRect();
+        const element=document.querySelector('[data-unit-id="${selected.id}"]');
+        // Freeze only this visual transition so CDP latency cannot stale the hit coordinates.
+        for(const animation of element.getAnimations())animation.pause();
+        const rect=element.getBoundingClientRect();
         return {x:rect.left+rect.width/2,y:rect.top+rect.height/3};
     })()`);
     await command('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', clickCount: 1 });
@@ -329,6 +332,7 @@ async function main() {
     assert.equal(await evaluate('roguelikeUI.hexRenderer.selectedUnitId'), selected.id);
     assert.equal(await evaluate('HexPreparationInfo.selectedUnitId'), selected.id);
     assert.equal(await evaluate('HexPreparationInfo.selectedSquare'), selected.square);
+    await evaluate(`document.querySelector('[data-unit-id="${selected.id}"]').getAnimations().forEach(animation=>animation.play());`);
 
     const live = await evaluate(`(() => {
         const ui=roguelikeUI, unit=ui.hexCombat.units.get('${selected.id}');

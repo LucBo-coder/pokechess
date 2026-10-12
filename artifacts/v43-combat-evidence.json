@@ -5,7 +5,7 @@
     "noGhost": true,
     "owned": true,
     "max": 4,
-    "elapsed": 147.5,
+    "elapsed": 201.2999999988824,
     "log": true
   },
   {
@@ -14,7 +14,7 @@
     "noGhost": true,
     "owned": true,
     "max": 16,
-    "elapsed": 415.80000000074506,
+    "elapsed": 486.40000000037253,
     "log": true
   },
   {
@@ -23,7 +23,7 @@
     "noGhost": true,
     "owned": true,
     "max": 24,
-    "elapsed": 803.5,
+    "elapsed": 708.5,
     "log": true
   }
 ]
