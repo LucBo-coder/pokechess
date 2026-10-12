@@ -1,0 +1,61 @@
+{
+  "archive": "PokeChess-Biomes-Elements-01.zip",
+  "wrapper": "PokeChess-Biomes-Elements-01",
+  "forestSha256": "ab9ef7768e8f5efd7a1a7a84c44c229aaa00711457d06282f99a61479410c0b1",
+  "assets": [
+    {
+      "original": "maps/volcano/backgrounds/volcano-background.png",
+      "destination": "assets/visual/maps/volcano-background.png",
+      "width": 1254,
+      "height": 1254,
+      "colorType": 2,
+      "sha256": "d89c6de668e56ff14c255629a13131e56d059f5f3ac0b318abdacb8602ef575c",
+      "modified": false
+    },
+    {
+      "original": "maps/ice_cavern/backgrounds/ice_cavern-background.png",
+      "destination": "assets/visual/maps/ice_cavern-background.png",
+      "width": 1254,
+      "height": 1254,
+      "colorType": 2,
+      "sha256": "67197d6a08b42394493d3a390e748a0de2ded429c97dd4f8318b438bd8efdc4d",
+      "modified": false
+    },
+    {
+      "original": "maps/swamp/backgrounds/swamp-background.png",
+      "destination": "assets/visual/maps/swamp-background.png",
+      "width": 1254,
+      "height": 1254,
+      "colorType": 2,
+      "sha256": "060f390bf8d32dd4b9a218fc9c2ee87f92cfb6f368880551b6991787ad2b9cbd",
+      "modified": false
+    },
+    {
+      "original": "hex/elements/fire/hex-fire.png",
+      "destination": "assets/visual/hex/hex-fire.png",
+      "width": 1254,
+      "height": 1254,
+      "colorType": 6,
+      "sha256": "cef4b3844d41850c42c9f9f67550038009ab561ac69a3c1b81a447e3439b8a4c",
+      "modified": false
+    },
+    {
+      "original": "hex/elements/ice/hex-ice.png",
+      "destination": "assets/visual/hex/hex-ice.png",
+      "width": 1254,
+      "height": 1254,
+      "colorType": 6,
+      "sha256": "da5d53bfbaf5a80a28596272743ab7f26cd6413d82e5482aa429c7820a773fff",
+      "modified": false
+    },
+    {
+      "original": "hex/elements/poison/hex-poison.png",
+      "destination": "assets/visual/hex/hex-poison.png",
+      "width": 1254,
+      "height": 1254,
+      "colorType": 6,
+      "sha256": "63d02e2ca8d7d86aeb622748db089b3a9de98297859dda65b2dd33eaeb6e6d53",
+      "modified": false
+    }
+  ]
+}

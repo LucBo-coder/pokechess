@@ -1,0 +1,182 @@
+[
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "map": "volcano",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "map": "ice_cavern",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "map": "swamp",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "map": "volcano",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "map": "ice_cavern",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "map": "swamp",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "map": "volcano",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "map": "ice_cavern",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "map": "swamp",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 432
+    },
+    "map": "volcano",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 432
+    },
+    "map": "ice_cavern",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 432
+    },
+    "map": "swamp",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 812,
+      "height": 375
+    },
+    "map": "volcano",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 812,
+      "height": 375
+    },
+    "map": "ice_cavern",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  },
+  {
+    "viewport": {
+      "width": 812,
+      "height": 375
+    },
+    "map": "swamp",
+    "geometry": true,
+    "formation": true,
+    "engine": true,
+    "hit": true,
+    "textures": true
+  }
+]

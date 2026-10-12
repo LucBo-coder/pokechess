@@ -74,6 +74,12 @@ async function main() {
     const screenshot = async name => {
         if (!process.argv.includes('--screenshots')) return;
         await evaluate(`Promise.race([Promise.all([...document.querySelectorAll('.board img')].map(image => image.decode().catch(() => {}))),new Promise(resolve=>setTimeout(resolve,3000))])`);
+        // UI updates may replace image nodes while decode is awaited. Verify the
+        // current nodes and give newly created local sprites time to finish.
+        for(let i=0;i<50;i++){
+            if(await evaluate(`[...document.querySelectorAll('.board .piece, .board .hex-combat-sprite')].every(image => image.complete && image.naturalWidth > 0)`))break;
+            await sleep(100);
+        }
         assert.ok(await evaluate(`[...document.querySelectorAll('.board .piece, .board .hex-combat-sprite')].every(image => image.complete && image.naturalWidth > 0)`), 'Missing Pokémon sprite image');
         const result = await command('Page.captureScreenshot', { format: 'png' });
         const folder = path.join(root, 'artifacts');
@@ -570,6 +576,30 @@ async function main() {
     await evaluate(`(() => {const ui=roguelikeUI;ui.startBattle();ui.hexCombat.stop();const unit=[...ui.hexCombat.units.values()].find(unit=>unit.color==='w');ui.hexRenderer.sheetVfx.play('cast_fire_01',unit.id,{duration:2});ui.hexCombat.tickCount+=6;ui.hexRenderer.sheetVfx.update();})()`);
     await screenshot('overhaul-skill-playback');
     await evaluate('roguelikeUI.resetRun();roguelikeUI.closeMainMenu();NotificationCenter.dismiss();');
+
+    const biomeEvidence=[];
+    for(const viewport of [{width:1920,height:1080},{width:1366,height:768},{width:1280,height:720},{width:768,height:432},{width:812,height:375}]){
+        await command('Emulation.setDeviceMetricsOverride',{...viewport,deviceScaleFactor:1,mobile:false});await sleep(120);
+        await evaluate(`BattlefieldBiomes.selectMap('forest');BattlefieldBiomes.apply('forest')`);await sleep(150);
+        const baseline=await evaluate(`(()=>{window.biomeFormation=JSON.stringify(roguelikeUI.placedPieces);window.biomeEngine=roguelikeUI.hexCombat;return [...document.querySelectorAll('.board .square')].map(c=>{const r=c.getBoundingClientRect();return [r.x,r.y,r.width,r.height];});})()`);
+        await screenshot('biome-forest-'+viewport.width);
+        for(const id of ['volcano','ice_cavern','swamp']){
+            await evaluate(`BattlefieldBiomes.selectMap('${id}');BattlefieldBiomes.load(BattlefieldBiomes.maps['${id}'].background)`);await sleep(80);
+            const check=await evaluate(`(()=>{const cells=[...document.querySelectorAll('.board .square')];return {map:BattlefieldBiomes.current,rects:cells.map(c=>{const r=c.getBoundingClientRect();return [r.x,r.y,r.width,r.height];}),formation:window.biomeFormation===JSON.stringify(roguelikeUI.placedPieces),engine:window.biomeEngine===roguelikeUI.hexCombat,hit:cells.every(c=>{const r=c.getBoundingClientRect(),e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return e?.closest('.square')===c;})};})()`);
+            assert.equal(check.map,id);assert.deepEqual(check.rects,baseline);assert.ok(check.formation&&check.engine&&check.hit,JSON.stringify(check));
+            await evaluate('BattlefieldBiomes.preview(true)');assert.equal(await evaluate('document.querySelectorAll(".hex-element-surface").length'),3);
+            assert.ok(await evaluate(`Promise.all(Object.values(BattlefieldBiomes.elements).map(path=>BattlefieldBiomes.load(path))).then(values=>values.every(Boolean))`));
+            await screenshot('biome-'+id+'-'+viewport.width);await evaluate('BattlefieldBiomes.preview(false)');
+            biomeEvidence.push({viewport,map:id,geometry:true,formation:true,engine:true,hit:true,textures:true});
+        }
+    }
+    const fallbackCheck=await evaluate(`(async()=>{const b=BattlefieldBiomes,path=b.maps.swamp.background,cached=b.cache.get(path);const failed=await b.load('data:image/png;base64,bm90YW5pbWFnZQ==');b.cache.set(path,Promise.resolve(failed));b.requested=null;await b.apply('swamp');const result=!failed&&b.current==='forest'&&document.querySelector('.board-wrapper').dataset.biome==='forest';b.cache.set(path,cached);b.requested=null;return result;})()`);assert.ok(fallbackCheck);
+    await evaluate(`BattlefieldBiomes.selectMap('forest');BattlefieldBiomes.apply('forest')`);
+    await evaluate(`BattlefieldBiomes.preview(true);roguelikeUI.startBattle();roguelikeUI.hexCombat.stop();BattlefieldBiomes.refresh()`);
+    assert.equal(await evaluate('document.querySelectorAll(".hex-element-surface").length'),0);
+    assert.equal(await evaluate('BattlefieldBiomes.selectMap("swamp")'),false);
+    await evaluate('roguelikeUI.resetRun();roguelikeUI.closeMainMenu();');
+    fs.writeFileSync(path.join(root,'artifacts','biomes-evidence.json'),JSON.stringify(biomeEvidence,null,2));
 
     for (const viewport of [{width:768,height:1024}, { width: 768, height: 432 }, {width:812,height:375}, { width: 844, height: 390 }, {width:390,height:844}]) {
         await command('Emulation.setDeviceMetricsOverride', { ...viewport, deviceScaleFactor: 1, mobile: false });

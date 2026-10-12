@@ -1,0 +1,14 @@
+/* Each surface belongs to an existing cell; geometry and hitboxes stay in HexView. */
+body.hex-mode .board-wrapper { image-rendering: pixelated; }
+/* The old Forest floor contains opaque grass flecks. Other biomes use a neutral
+   translucent floor; placement/selection colors remain above this surface. */
+body.hex-mode .board-wrapper[data-biome]:not([data-biome="forest"]) .board .square::before { background:rgba(18,25,35,.22); filter:none; }
+body.hex-mode .board-wrapper[data-biome]:not([data-biome="forest"]) .board .square:is(.selected,.deploy-zone)::before { background:rgba(240,203,78,.45); }
+.biome-controls { display:flex; align-items:center; gap:4px; min-width:0; flex-wrap:wrap; }
+.biome-controls label { display:flex; align-items:center; gap:4px; font-size:11px; }
+.biome-controls select { max-width:120px; min-width:0; height:28px; font:inherit; color:#f4e8c8; background:#17263f; border:2px solid #d6ac50; border-radius:2px; }
+.biome-controls select:disabled { opacity:.65; }
+body.hex-mode .board .hex-element-surface { position:absolute; inset:0; z-index:0; pointer-events:none; clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); background-position:center; background-size:125% auto; background-repeat:no-repeat; image-rendering:pixelated; opacity:.65; }
+body.hex-mode .board .square:has(.hex-element-surface)::after { z-index:1; }
+body.hex-mode .board .square:is(.selected,.deploy-zone,.hex-range-cell,.hex-range-origin,:hover,:focus-visible) .hex-element-surface { opacity:.25; }
+@media(max-height:500px) { .biome-controls label { font-size:10px; } .biome-controls select { height:24px; max-width:94px; } }
